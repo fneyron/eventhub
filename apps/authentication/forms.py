@@ -43,6 +43,7 @@ class CreateAccountForm(FlaskForm):
                              render_kw={"placeholder": _l('Password')},
                              id='pwd_create',
                              validators=[DataRequired()])
+    #terms = BooleanField(_l('Agree terms'), default=True)
 
 
 class ProfileForm(FlaskForm):

@@ -50,6 +50,7 @@ psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGR
 In HTTP settings tab: 
 - Click on enable https 
 - Force Https redirection
+- Set the Container HTTP port to 80
 
 In Deployment tab:
 - Configure the repository (ie: github.com/fneyron/QRly.git) don't forget to remove the https or ssh
