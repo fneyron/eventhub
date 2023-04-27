@@ -13,6 +13,9 @@ from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
+
+    WEBSITE_NAME = "EventHub"
+
     # Set up the App SECRET_KEY
     SECRET_KEY = os.getenv('SECRET_KEY', 'S#perS3crEt_007')
 

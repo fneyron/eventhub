@@ -14,7 +14,7 @@ from . import mail, celery, db
 @celery.task(name='apps.tasks.send_email')
 def send_email(recipients, **kwargs):
     msg = Message()
-    msg.subject = kwargs['subject']
+    msg.subject = Config.WEBSITE_NAME + ' : ' + kwargs['subject']
     msg.sender = Config.MAIL_SENDER
     msg.recipients = recipients
     if 'html' in kwargs:

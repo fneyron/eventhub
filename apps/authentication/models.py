@@ -22,7 +22,7 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True)
+    #username = db.Column(db.String(64), unique=True)
     firstname = db.Column(db.String)
     lastname = db.Column(db.String)
     email = db.Column(db.String, unique=True)
@@ -35,7 +35,7 @@ class Users(db.Model, UserMixin):
     email_confirmed = db.Column(db.Boolean(), default=False)
     email_confirmed_on = db.Column(db.DateTime())
     role = db.Column(db.Enum(UserRole), default=UserRole.EDITOR)
-    is_admin = db.Column(db.Boolean(), default=False)
+    #is_admin = db.Column(db.Boolean(), default=False)
 
     # Status
     @staticmethod

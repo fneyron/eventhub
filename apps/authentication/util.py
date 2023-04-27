@@ -73,7 +73,7 @@ def send_email_change_confirmation(email):
 def send_email_confirmation(email):
     token = generate_confirmation_token(email)
     confirm_url = url_for('authentication_blueprint.confirm_email', token=token, _external=True)
-    subject = _("QRly : Email confirmation")
+    subject = _("Email confirmation")
     recipients = [email]
     text_body = _("To confirm your account, please follow this link : %s") % confirm_url
 

@@ -98,8 +98,8 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash(_('A confirmation link has been sent to your email'), 'success')
         send_email_confirmation(request.form.get('email'))
+        flash(_('A confirmation link has been sent to your email'), 'success')
 
         # Delete user from session
         logout_user()
@@ -183,7 +183,7 @@ def forgot_password():
             form.email.errors.append(_('Unknown Email, please check the email address'))
             return render_template('accounts/forgot-password.html', form=form)
 
-        subject = _("QRly: Password Reset Requested")
+        subject = _("Password Reset Requested")
 
         # Here we use the URLSafeTimedSerializer we created in `util` at the
         # beginning of the chapter
