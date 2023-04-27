@@ -34,7 +34,7 @@ class Users(db.Model, UserMixin):
     update = db.Column(db.DateTime(), onupdate=datetime.utcnow(), default=datetime.utcnow())
     email_confirmed = db.Column(db.Boolean(), default=False)
     email_confirmed_on = db.Column(db.DateTime())
-    role = db.Column(db.Enum(UserRole), default=UserRole.EDITOR)
+    role = db.Column(db.Enum(UserRole), default=UserRole.USER)
     #is_admin = db.Column(db.Boolean(), default=False)
 
     # Status
