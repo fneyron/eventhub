@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import json
 from datetime import datetime
 from enum import Enum
 
@@ -64,7 +65,17 @@ class Users(db.Model, UserMixin):
         self.password = hash_pass(password)
 
     def __repr__(self):
-        return str(self.username)
+        return dict(email=self.email, role=self.role)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'role': self.role.name,
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
     def last_sync(self):
         from apps.home.models import ICal

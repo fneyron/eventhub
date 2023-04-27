@@ -120,7 +120,8 @@
                 url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
             }
         ];
-        mycalendar = renderCalendar('calendar', events);
+        user = {{ current_user.to_json() | safe }};
+        mycalendar = renderCalendar('calendar', events, user);
 
         // Add event listener to attendees select element
         var selectAttendeesInputEl = document.querySelector('#attendees');

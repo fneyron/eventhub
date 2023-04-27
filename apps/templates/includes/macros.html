@@ -44,7 +44,11 @@
                 </div>
                 <div class="mb-4">
                     {{ form.attendee.label }}
+                    {% if current_user.role.name == 'USER' %}
+                    {{ form.attendee(class='form-control', readonly=True) }}
+                    {% else %}
                     {{ form.attendee(class='form-control') }}
+                    {% endif %}
                     <small id="{{ form.attendee.id }}-help" class="form-text text-muted">
                         {{ form.title.description }}
                     </small>

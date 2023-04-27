@@ -1,4 +1,4 @@
-function renderCalendar(id, events) {
+function renderCalendar(id, events, user) {
     var calendarEl = d.getElementById(id);
     if (calendarEl) {
         var addNewEventModalEl = d.getElementById('modal-new-event');
@@ -129,10 +129,10 @@ function renderCalendar(id, events) {
                     editEventDeleteButton.disabled = false;
                 }
 
+
                 // Remove errors
                 $('.form-control.is-invalid').removeClass('is-invalid');
                 $('.invalid-feedback').text('');
-
 
                 // set current id
                 currentId = info.event.id;
