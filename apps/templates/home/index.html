@@ -26,7 +26,7 @@
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
         <a type="button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=[current_user.email, 'test@gmail.com']) }}">Export</a>
+           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=[current_user.email]) }}">Export</a>
 
     </div>
 </div>

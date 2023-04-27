@@ -50,6 +50,15 @@ class Config(object):
     GEOLOCATION_TIMEOUT = 20
     GEOLOCATION_MAX_AGE = 0
 
+    # Scheduler
+    CELERYBEAT_SCHEDULE = {
+        'sync-events': {
+            'task': 'apps.tasks.sync_events',
+            'schedule': timedelta(seconds=10),
+            'args': (),
+        },
+    }
+
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -77,13 +86,7 @@ class DebugConfig(Config):
         'broker_url': 'redis://127.0.0.1:6379',
         'result_backend': 'redis://127.0.0.1:6379',
     }
-    CELERYBEAT_SCHEDULE = {
-        'sync-events': {
-            'task': 'apps.tasks.sync_events',
-            'schedule': timedelta(seconds=10),
-            'args': (),
-        },
-    }
+
 
     # This will create a file in <app> FOLDER
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')

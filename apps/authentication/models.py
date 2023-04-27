@@ -66,6 +66,10 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return str(self.username)
 
+    def last_sync(self):
+        from apps.home.models import ICal
+        return ICal.query.filter()
+
 
 @login_manager.user_loader
 def user_loader(id):

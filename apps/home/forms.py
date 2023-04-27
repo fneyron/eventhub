@@ -28,8 +28,6 @@ class LinkedCalendarForm(FlaskForm):
             if existing_url:
                 raise ValidationError(_l('This URL already exists.'))
 
-class AttendeeForm(FlaskForm):
-    attendee = StringField(_l('Attendee email'), id='eventAttendeeEdit')
 class EventForm(FlaskForm):
     title = StringField(_l('Title'), id='eventTitleEdit', validators=[DataRequired()])
     start_time = DateTimeField(_l('Select Start Date'), id='dateStartEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
@@ -39,4 +37,4 @@ class EventForm(FlaskForm):
     id = HiddenField(id='eventIdEdit')
     location = StringField('Location')
     description = TextAreaField(_l('Description'), id='eventDescriptionEdit')
-    attendee = StringField(_l('Attendee email'), id='eventAttendeeEdit')
+    attendee = StringField(_l('Attendee'), id='eventAttendeeEdit')
