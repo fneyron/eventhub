@@ -64,7 +64,7 @@ def confirm_token(token, expiration=3600):
 def send_email_change_confirmation(email):
     token = generate_confirmation_token(email)
     confirm_url = url_for('authentication_blueprint.confirm_email_change', token=token, _external=True)
-    subject = _("QRly : New Email requested")
+    subject = _("New Email requested")
     recipients = [email]
     text_body = _("To confirm your new email address, please follow this link : %s") % confirm_url
 

@@ -18,11 +18,12 @@ from werkzeug.datastructures import MultiDict
 
 from apps import db, celery
 from apps import login_manager
+from apps.home.util import get_calendar_events
 from apps.authentication.forms import ProfileForm, ChangePasswordForm, ChangeEmailForm
 from apps.authentication.models import Users, UserRole
 from apps.authentication.util import send_email_change_confirmation
 from apps.home import blueprint
-# from apps.decorator import roles_required
+from apps.decorator import roles_required
 from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
 from apps.home.models import Calendar, ICal, Event, Attendee
 from apps.tasks import sync_events
@@ -37,7 +38,7 @@ def index():
 
 
 @blueprint.route('/calendar', methods=['POST', 'GET'])
-# @roles_required(UserRole.ADMIN, UserRole.EDITOR)
+@roles_required(UserRole.ADMIN, UserRole.EDITOR)
 @login_required
 def calendar_list():
     form = CalendarForm(request.form)
@@ -191,7 +192,7 @@ def task_status(task_id):
 
 @blueprint.route('/calendar/<uuid>', methods=['GET'])
 def calendar_display(uuid):
-    calendar = Calendar.query.filter_by(unique_id=uuid).first_or_404()
+    calendar = Calendar.query.filter_by(uuid=uuid).first_or_404()
     if not calendar.active:
         abort(404)
     data = dict(calendar=calendar)
@@ -202,45 +203,10 @@ def calendar_display(uuid):
 def calendar_events_json():
     calendar_id = request.args.get('calendar_id')
     attendees = request.args.getlist('attendees')
-    print(attendees)
     start = request.args.get('start')
     end = request.args.get('end')
-    if calendar_id:
-        events = Event.query.filter(
-            calendar_id == calendar_id,
-            Event.start_time >= start,
-            Event.end_time <= end
-        ).all()
-    if attendees:
-        events = db.session.query(Event).join(Attendee).filter(
-            Attendee.email.in_(attendees),
-            Event.start_time >= start,
-            Event.end_time <= end
-        ).all()
-    grouped_events = {}
-    for event in events:
-        key = (event.start_time, event.end_time, event.all_day)
-        if key not in grouped_events:
-            grouped_events[key] = {
-                'id': event.id,
-                'title': event.new_summary,
-                'start': event.start_time.isoformat(),
-                'end': event.end_time.isoformat(),
-                'description': event.new_description,
-                'attendees': [a.email for a in event.attendees],
-                'color': event.ical.color,
-                'otherColors': [event.ical.color],
-                'allDay': event.all_day,
-                'disabled': event.ical is not None
-            }
-        else:
-            grouped_events[key]['otherColors'].append(event.ical.color)
-            if not grouped_events[key]['title']:
-                grouped_events[key]['title'] = event.new_summary
-            if not grouped_events[key]['description']:
-                grouped_events[key]['description'] = event.new_description
 
-    events = list(grouped_events.values())
+    events = get_calendar_events(calendar_id=calendar_id, attendees=attendees, start=start, end=end)
 
     return jsonify(events)
 
@@ -283,14 +249,14 @@ def event_update(event_id):
 
         db.session.commit()
 
-    return jsonify({'success': not(form.errors), 'errors': form.errors})
+    return jsonify({'success': not (form.errors), 'errors': form.errors})
 
 
 @blueprint.route('/user/<value>/json', methods=['GET'])
 def get_user_json(value):
     users = Users.query.filter(Users.email.like(value + '%')).all()
     attendee = Attendee.query.filter(Attendee.email.like(value + '%')).all()
-    return jsonify(list(set([user.email for user in users + attendee] )))
+    return jsonify(list(set([user.email for user in users + attendee])))
 
 
 # @blueprint.route('/calendar/<calendar_uuid>/events', methods=['GET'])
@@ -337,19 +303,19 @@ def linked_calendar_delete(id):
     return redirect(url_for('home_blueprint.calendar_edit', calendar_id=ical.calendar_id))
 
 
-@blueprint.route('/calendar/<calendar_uuid>/export', methods=['GET'])
-def calendar_export_ics(calendar_uuid):
-    cal = Calendar.query.filter_by(uuid=calendar_uuid).first_or_404()
-
+@blueprint.route('/calendar/export', methods=['GET'])
+def calendar_export_ics():
+    print(request.args.getlist('attendees'))
+    events = get_calendar_events(calendar_id=request.args.get('calendar_id'), attendees=request.args.getlist('attendees'))
     # create the ICal export file
     ical = ICalendar()
     ical.add('prodid', '-//My Calendar//Example//EN')
     ical.add('version', '2.0')
-    for event in cal.get_all_events:
+    for event in events:
         ical_event = ICalEvent()
-        ical_event.add('summary', event['summary'])
-        ical_event.add('dtstart', event['start_time'])
-        ical_event.add('dtend', event['end_time'])
+        ical_event.add('summary', event['title'])
+        ical_event.add('dtstart', datetime.fromisoformat(event['start']))
+        ical_event.add('dtend', datetime.fromisoformat(event['end']))
         ical_event.add('uid',
                        f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex}@{urlparse(request.host_url).hostname}")
         ical_event.add('sequence', 0)

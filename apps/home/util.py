@@ -1,10 +1,9 @@
 import os
-from flask import current_app
 import uuid
 
-import requests
 from flask import current_app
 from werkzeug.utils import secure_filename
+from apps.home.models import Event, Attendee
 
 
 class Upload():
@@ -17,7 +16,6 @@ class Upload():
 
         if not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], self.folder)):
             os.makedirs(os.path.join(current_app.config['UPLOAD_FOLDER'], self.folder))
-
 
         if self.file and self.allowed_file():
             exist = True
@@ -38,49 +36,49 @@ class Upload():
             'ALLOWED_EXTENSIONS']
 
 
+def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
+    events_query = Event.query
 
-def sync_events():
-    # Get all the calendars
-    icals = ICal.query.all()
+    if calendar_id:
+        events_query = events_query.filter(calendar_id == calendar_id)
 
-    # Loop through each calendar
-    for ical in icals:
-        # Check if it's time to sync this calendar
-        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < 300:
-            continue
+    if attendees:
+        events_query = (
+            events_query
+            .join(Attendee)
+            .filter(Attendee.email.in_(attendees))
+        )
 
-        # Download the ICS data
-        response = requests.get(ical.url)
+    if start and end:
+        events_query = (
+            events_query
+            .filter(Event.start_time >= start)
+            .filter(Event.end_time <= end)
+        )
 
-        # Parse the ICS data
-        cal = Calendar.from_ical(response.text)
+    grouped_events = {}
+    for event in events_query.all():
+        key = (event.start_time, event.end_time, event.all_day)
+        if key not in grouped_events:
+            grouped_events[key] = {
+                'id': event.id,
+                'title': event.new_summary,
+                'start': event.start_time.isoformat(),
+                'end': event.end_time.isoformat(),
+                'description': event.new_description,
+                'attendees': [a.email for a in event.attendees],
+                'color': event.ical.color,
+                'otherColors': [event.ical.color],
+                'allDay': event.all_day,
+                'disabled': event.ical is not None
+            }
+        else:
+            grouped_events[key]['otherColors'].append(event.ical.color)
+            if not grouped_events[key]['title']:
+                grouped_events[key]['title'] = event.new_summary
+            if not grouped_events[key]['description']:
+                grouped_events[key]['description'] = event.new_description
 
-        # Loop through each event in the ICS data
-        for event in cal.walk('vevent'):
-            # Check if the event already exists in the database
-            db_event = Event.query.filter_by(uid=event.get('uid')).first()
+    events = list(grouped_events.values())
 
-            if db_event:
-                # If the event already exists, update it
-                db_event.summary = event.get('summary')
-                db_event.description = event.get('description')
-                db_event.start_time = event.get('dtstart').dt
-                db_event.end_time = event.get('dtend').dt
-                db_event.last_modified = event.get('last-modified').dt
-            else:
-                # If the event doesn't exist, create it
-                db_event = Event(uid=event.get('uid'),
-                                  summary=event.get('summary'),
-                                  description=event.get('description'),
-                                  start_time=event.get('dtstart').dt,
-                                  end_time=event.get('dtend').dt,
-                                  calendar_id=ical.calendar_id,
-                                  last_modified=event.get('last-modified').dt)
-                db.session.add(db_event)
-
-        # Update the last_synced field
-        ical.last_synced = datetime.now()
-
-    db.session.commit()
-
-
+    return events

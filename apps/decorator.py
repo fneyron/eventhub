@@ -19,19 +19,19 @@ def email_confirmed(func):
 
     return decorated_function
 
-#
-# def roles_required(*roles):
-#     def wrapper(fn):
-#         @wraps(fn)
-#         def decorated_view(*args, **kwargs):
-#             if not current_user.is_authenticated:
-#                 return redirect(url_for('authentication_blueprint.login', next=request.url))
-#
-#             if current_user.role not in roles:
-#                 return redirect(url_for('authentication_blueprint.route_default'))
-#
-#             return fn(*args, **kwargs)
-#
-#         return decorated_view
-#
-#     return wrapper
+
+def roles_required(*roles):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return redirect(url_for('authentication_blueprint.login', next=request.url))
+
+            if current_user.role not in roles:
+                return redirect(url_for('authentication_blueprint.route_default'))
+
+            return fn(*args, **kwargs)
+
+        return decorated_view
+
+    return wrapper
