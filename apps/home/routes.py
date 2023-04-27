@@ -42,7 +42,7 @@ def index():
 @login_required
 def calendar_list():
     form = CalendarForm(request.form)
-    calendars = Calendar.query.filter_by(user_id=current_user.get_id())
+    calendars = Calendar.query.all()
 
     if form.validate_on_submit():
 
