@@ -11,8 +11,9 @@
     <div class="col-3">
         {% if current_user.role.name == 'ADMIN' or current_user.role.name == 'EDITOR' %}
         <select id="attendees" class="w-100" name="attendees">
+            <option value="all">{{ _('All')}}</option>
             {% for user in attendees %}
-            <option value="{{user }}" {% if user == current_user.email %}selected{% endif %}>{{ user }}</option>
+            <option value="{{user }}">{{ user }}</option>
             {% endfor %}
         </select>
         {% endif %}
@@ -95,23 +96,28 @@
     var mycalendar;
 
      function refetchEventsForAttendee(email) {
-      // Remove the existing event sources
-      mycalendar.getEventSources().forEach(function(source) {
-        source.remove();
-      });
+          // Remove the existing event sources
+          mycalendar.getEventSources().forEach(function(source) {
+            source.remove();
+          });
 
-      // Add a new event source with the new URL
-      mycalendar.addEventSource({
-        url: "{{ url_for('home_blueprint.calendar_events_json') }}?attendees=" + email,
-        method: 'GET'
-      });
+          var url = "{{ url_for('home_blueprint.calendar_events_json') }}";
+          if(email != 'all'){
+            url += '?attendees=' + email;
+          }
+
+          // Add a new event source with the new URL
+          mycalendar.addEventSource({
+            url: url,
+            method: 'GET'
+          });
     }
 
 
     $(document).ready(function() {
         var events = [
             {
-                url: "{{ url_for('home_blueprint.calendar_events_json', attendees=current_user.email) }}",
+                url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'VISITOR' else None)) }}",
             }
         ];
         mycalendar = renderCalendar('calendar', events);
@@ -129,7 +135,15 @@
         // Choices.js
         var selectAttendeesInputEl = d.querySelector('#attendees');
         if (selectAttendeesInputEl) {
-            const choices = new Choices(selectAttendeesInputEl);
+            const choices = new Choices(selectAttendeesInputEl, {
+                placeholder: true,
+                placeholderValue: 'Select an option',
+                searchEnabled: false,
+                shouldSort: false,
+                itemSelectText: '',
+                renderChoiceLimit: -1
+            });
+
         }
 
     });

@@ -201,11 +201,13 @@ def calendar_display(uuid):
 
 @blueprint.route('/calendar/events', methods=['GET'])
 def calendar_events_json():
+    print(request.args.getlist('attendees'))
     calendar_id = request.args.get('calendar_id')
     attendees = request.args.getlist('attendees')
     start = request.args.get('start')
     end = request.args.get('end')
     print(calendar_id, attendees)
+
     events = get_calendar_events(calendar_id=calendar_id, attendees=attendees, start=start, end=end)
     print(events)
     return jsonify(events)
