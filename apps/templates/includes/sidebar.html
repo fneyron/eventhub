@@ -32,6 +32,7 @@
                     </span>
                 </a>
             </li>
+            {% if current_user.role.name != 'USER' %}
             <li class="nav-item {% if 'properties' in segment %}active{% endif %}">
                 <a href="{{ url_for('home_blueprint.calendar_list') }}" class="nav-link">
             <span class="sidebar-icon">
@@ -40,6 +41,7 @@
                     <span class="mt-1 sidebar-text">{{ _('Properties') }}</span>
                 </a>
             </li>
+            {% endif %}
 
 <!--            <li class="nav-item {% if 'notification' in segment %}active{% endif %}">-->
 <!--                <a href="" class="nav-link d-flex align-items-center justify-content-between">-->
