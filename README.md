@@ -1,27 +1,22 @@
 # QRly
 
 ## Appseed
-QRly is using flask appseed templates. More informations and documentation here : 
+Application is using flask appseed templates. More informations and documentation here : 
 https://themesberg.com/docs/flask/volt-dashboard/getting-started/overview/
 
 ## Development
-In development mode some environment variables should be configured:
-```
-FLASK_APP=run.py
-FLASK_ENV=development
-FLASK_PORT=5000
-```
+In development mode copy the ```.env.template```file to .env and edit with the correct value of your password and API key
 
 ## Production - w/ Caprover
 We will have to create 4 applications:
-- qrly main application
-- qrly-worker worker for Redis tasks
-- qrly-redis Redis server to manage redis tasks
-- qrly-pgsql postgresql database for data storage
+- app main application
+- app-worker worker for Redis tasks
+- app-redis Redis server to manage redis tasks
+- app-pgsql postgresql database for data storage
 
 
 
-### Postgresql Application (qrly-pgsql)
+### Postgresql Application (pgsql)
 To add the postgresql server: 
 1. connect to caprover
 2. Click on Apps and One-click apps/database
@@ -38,23 +33,19 @@ Then click on "Deploy"
 
 
 #### Database Connexion
-Find the qrly db id on the caprover server and connect to the database
+Find the db id on the caprover server and connect to the database
 ```
 docker ps
 docker exec -it d49aa1c52d7e /bin/bash
 psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
 ```
-To show the tree
-```
-
-```
 
 
-### Main Application (qrly)
+### Main Application
 
 1. Go to Apps on caprover
 2. Check the "Has persistent data" box
-3. Create a new app with the name "qrly"
+3. Create a new app 
 
 In HTTP settings tab: 
 - Click on enable https 
@@ -70,12 +61,21 @@ In Deployment tab:
 ```
 
 In App Config tab:
-For the qrly main application the following variables need to be set :
+For the qrly main application the following variables need to be set, it's the same parameters present in .env.template file adapted for production :
 ```
+DEBUG=False
 FLASK_APP=run.py
 FLASK_ENV=production
 DATABASE_URL=postgresql://postgres:password@srv-captain--qrly-db:5432/postgres
 REDIS_URL=redis://:password@srv-captain--qrly-redis:6379
+ASSETS_ROOT=/static/assets
+
+MAPBOX_TOKEN = 'XXX'
+MAIL_USERNAME = "contact@dataik.com"
+MAIL_PASSWORD = "XXX"
+SECRET_KEY = "XXX"
+SECURITY_PASSWORD_SALT = "XXX"
+
 ```
 
 
