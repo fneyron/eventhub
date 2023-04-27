@@ -1,0 +1,110 @@
+{% macro render_modal_form(id, title, content, submit) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form action="" method="POST" id="{{ id }}-form">
+                <div class="modal-header">
+                    <h2 class="h6 modal-title">{{ title }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    {{ content }}
+                </div>
+                <div class="modal-footer">
+                    {{ submit }}
+                    <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">
+                        {{_('Close')}}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro event_modal_form(form) %}
+<!-- Edit event modal -->
+<div class="modal fade" id="modal-edit-event" tabindex="-1" role="dialog" aria-labelledby="modal-edit-event"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="editEventForm" class="modal-content" method="POST">
+            <div class="modal-body">
+                {{ form.csrf_token }}
+                {{ form.id}}
+                <div class="mb-4">
+                    {{ form.title.label }}
+                    {{ form.title(class='form-control') }}
+                    <small id="{{ form.title.id }}-help" class="form-text text-muted">
+                        {{ form.title.description }}
+                    </small>
+                    <div id="{{ form.title.id }}-error" class="invalid-feedback d-block">
+                        {{ form.title.errors | first }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    {{ form.attendee.label }}
+                    {{ form.attendee(class='form-control') }}
+                    <small id="{{ form.attendee.id }}-help" class="form-text text-muted">
+                        {{ form.title.description }}
+                    </small>
+                    <div id="{{ form.attendee.id }}-error" class="invalid-feedback d-block">
+                        {{ form.title.errors | first }}
+                    </div>
+                </div>
+                <div class="mb-4">
+                    {{ form.description.label }}
+                    {{ form.description(class='form-control') }}
+                    <small id="{{ form.description.id }}-help" class="form-text text-muted">
+                        {{ form.description.description }}
+                    </small>
+                    <div id="{{ form.description.id }}-error" class="invalid-feedback d-block">
+                        {{ form.description.errors | first }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="mb-4">
+                            {{ form.start_time.label }}
+                            <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="text-gray-400 fa fa-calendar"></i>
+                                            </span>
+                                {{ form.start_time(class='form-control') }}
+                            </div>
+                            <small id="{{ form.start_time.id }}-help" class="form-text text-muted">
+                                {{ form.start_time.description }}
+                            </small>
+                            <div id="{{ form.start_time.id }}-error" class="invalid-feedback d-block">
+                                {{ form.start_time.errors | first }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="mb-4">
+                            {{ form.end_time.label }}
+                            <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="text-gray-400 fa fa-calendar"></i>
+                                            </span>
+                                {{ form.end_time(class='form-control') }}
+                            </div>
+                            <small id="{{ form.end_time.id }}-help" class="form-text text-muted">
+                                {{ form.end_time.description }}
+                            </small>
+                            <div id="{{ form.end_time.id }}-error" class="invalid-feedback d-block">
+                                {{ form.end_time.errors | first }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-gray-800 me-2" id="editEvent">Update event</button>
+                <button type="submit" class="btn btn-danger" id="deleteEvent">Delete event</button>
+                <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}

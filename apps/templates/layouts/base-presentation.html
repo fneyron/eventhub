@@ -1,0 +1,38 @@
+<!--
+=========================================================
+* Volt Pro - Premium Bootstrap 5 Dashboard
+=========================================================
+* Product Element: https://themesberg.com/product/admin-dashboard/volt-premium-bootstrap-5-dashboard
+* Copyright 2021 Themesberg (https://www.themesberg.com)
+* Designed and coded by https://themesberg.com
+=========================================================
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal. Contact us if you want to remove it.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <!-- Primary Meta Tags -->
+    <title>
+        Flask Volt Pro - {% block title %}{% endblock %} | AppSeed
+    </title>
+    {% include 'includes/header.html' %}
+
+</head>
+<body>
+
+{% include 'includes/navigation-presentation.html' %}
+
+{% block content %}{% endblock content %}
+
+{% include 'includes/footer-presentation.html' %}
+
+{% include 'includes/scripts.html' %}
+
+<!-- Specific Element JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Element CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="py-4">
+    <button class="btn btn-gray-800 d-inline-flex align-items-center me-2" data-bs-toggle="modal"
+            data-bs-target="#add-calendar">
+        <i class="fa fa-plus me-2"></i>
+        {{ _('Add Calendar') }}
+
+    </button>
+</div>
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card card-body shadow border-0 table-wrapper table-responsive">
+            <table class="table table-hover align-items-center">
+                <tr class="d-none d-sm-table-row">
+                    <th class="border-bottom">{{ _('Name') }}</th>
+                    <th class="border-bottom">{{ _('Active') }}</th>
+                </tr>
+
+                {% for calendar in data.calendars %}
+
+                <tr>
+                    <td>
+                        <a href="{{ url_for('home_blueprint.calendar_edit', calendar_id=calendar.id) }}"
+                           class="d-flex align-items-center">
+
+                            <div class="d-block">
+                                <span class="fw-bold">{{ calendar.name }}</span>
+                                <div class="small text-gray text-wrap">{{ calendar.description }}</div>
+
+                            </div>
+                        </a>
+                    </td>
+                    <td class="text-end w-auto">
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" {% if calendar.active %}checked{% endif %}
+                                       type="checkbox"
+                                       name="active" calendar_id="{{ calendar.id }}">
+                            </div>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="modal fade" id="add-calendar" tabindex="-1" aria-labelledby="add-calendar"
+                 style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <form method="POST" action="">
+                            <div class="modal-body p-4">
+                                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                <div class="text-center text-md-center mb-4 mt-md-0"><h1 class="mb-0 h4">{{ _('Add
+                                    Calendar')}}</h1></div>
+
+
+                                {{ form.csrf_token }}
+
+                                <div class="mb-4">
+                                    <div class="col-12">
+                                        {{ form.name.label }}
+                                        {{ form.name(class="form-control") }}
+                                        <small id="{{ form.name.id }}-help" class="form-text text-muted">{{
+                                            form.name.description }}</small>
+                                        <div id="{{ form.name.id }}-error" class="invalid-feedback d-block">{{
+                                            form.name.errors | first }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="col-12">
+                                        {{ form.description.label }}
+                                        {{ form.description(class="form-control") }}
+                                        <small id="{{ form.description.id }}-help" class="form-text text-muted">{{
+                                            form.description.description }}</small>
+                                        <div id="{{ form.description.id }}-error" class="invalid-feedback d-block">
+                                            {{
+                                            form.description.errors | first }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-4">
+                                    {{ form.submit(class="btn btn-gray-800") }}
+                                </div>
+                            </div>
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific Element JS goes HERE  -->
+{% block javascripts %}
+<script>
+
+    {% if form.errors %}
+        $(window).on('load', function() {
+            $('#add-calendar').modal('show');
+        });
+    {% endif %}
+
+    $(document).ready(function() {
+        $('.form-check-input').change(function() {
+
+            var calendarID=$(this).attr('calendar_id');
+            var attr=$(this).attr('name');
+            var value=$(this).prop('checked');
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("home_blueprint.calendar_update") }}',
+                data: {
+                    attr: attr,
+                    value: value,
+                    calendar_id: calendarID,
+                },
+                success: function(data) {
+                    //console.log('QR Code geolocation updated.');
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+    });
+
+
+
+
+</script>
+{% endblock javascripts %}

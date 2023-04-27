@@ -1,0 +1,18 @@
+{% if mode == 'display' %}
+<a class="col-12 col-md-4 mb-2" href="{{ element.link }}">
+    <div class="card border-0 shadow mb-2 bg-gray-50">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <i class="{{ element.icon }} fa-lg"></i>
+                <span class="h6 ms-4 m-0">{{ element.name | translate | capitalize }}</span>
+            </div>
+        </div>
+    </div>
+</a>
+
+{% elif mode=='edit' %}
+<div class="mb-4">
+    {{ form.link.label }}
+    {{ form.link(class="form-control") }}
+</div>
+{% endif %}

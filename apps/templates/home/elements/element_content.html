@@ -1,0 +1,53 @@
+{% if mode == 'display' %}
+<a class="col-12 col-md-4 mb-2" data-bs-toggle="modal"
+   data-bs-target="#element-{{ element.id }}">
+    <div class="card border-0 shadow mb-2 bg-gray-50">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <i class="{{ element.icon }} fa-lg"></i>
+                <span class="h6 ms-4 m-0">{{ element.name | translate | capitalize }}</span>
+            </div>
+        </div>
+    </div>
+</a>
+<div class="modal fade" id="element-{{ element.id }}" tabindex="-1"
+     aria-labelledby="element-{{ element.id }}"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2 class="h6 modal-title">{{ element.name | translate | capitalize }}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body m-3">
+                <div class="text-center">
+                    {{ element.content | translate | safe }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a type="button" class="btn btn-link text-gray-600"
+                   data-bs-dismiss="modal">
+                    {{ _('Close')}}
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% elif mode=='edit' %}
+<div class="mb-4">
+    {{ form.content.label }}
+    <div class="input-group">
+        <div class="ck-container" style="width: 100%;">
+            {{ form.content(id='CKEditorField') }}
+        </div>
+    </div>
+</div>
+<script>
+    const editor = createCKEditor('CKEditorField', '{{ url_for("home_blueprint.upload_image", element_id=(data.element.id if data.element else -1)) }}', 'fr');
+</script>
+{% endif %}

@@ -1,0 +1,117 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Sign UP {% endblock %}
+
+<!-- Specific Element CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center form-bg-image">
+
+            <div class="col-12 d-flex align-items-center justify-content-center">
+                <div class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                    <form method="post" action="">
+                        {{ form.hidden_tag() }}
+                        {% include 'includes/bootstrap_flash.html' %}
+
+                        <div class="form-group mb-4">
+                            {{ form.firstname.label }}
+                            <div class="input-group">
+                                        <span class="input-group-text">
+                                        <i class="text-gray-600 fa fa-user"></i>
+                                        </span>
+                                {{ form.firstname(class="form-control") }}
+
+                            </div>
+                            <small id="{{ form.firstname.id }}-help" class="form-text text-muted">
+                                {{ form.firstname.description }}
+                            </small>
+                            <div id="{{ form.firstname.id }}-error" class="invalid-feedback d-block">
+                                {{ form.firstname.errors | first }}
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            {{ form.lastname.label }}
+                            <div class="input-group">
+                                        <span class="input-group-text">
+                                        <i class="text-gray-600 fa fa-user"></i>
+                                        </span>
+                                {{ form.lastname(class="form-control") }}
+
+                            </div>
+                            <small id="{{ form.lastname.id }}-help" class="form-text text-muted">
+                                {{ form.lastname.description }}
+                            </small>
+                            <div id="{{ form.lastname.id }}-error" class="invalid-feedback d-block">
+                                {{ form.lastname.errors | first }}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            {{ form.email.label }}
+                            <div class="input-group">
+                                        <span class="input-group-text">
+                                        <i class="text-gray-600 fa fa-envelope"></i>
+                                        </span>
+                                {{ form.email(class="input form-control", type="email") }}
+
+                            </div>
+                            <small id="{{ form.email.id }}-help" class="form-text text-muted">
+                                {{ form.email.description }}
+                            </small>
+                            <div id="{{ form.email.id }}-error" class="invalid-feedback d-block">
+                                {{ form.email.errors | first }}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="form-group mb-4">
+                                {{ form.password.label }}
+                                <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="text-gray-600 fa fa-lock"></i>
+                                            </span>
+                                    {{ form.password(class="form-control", type="password") }}
+
+                                </div>
+                                <small id="{{ form.password.id }}-help" class="form-text text-muted">
+                                    {{ form.password.description }}
+                                </small>
+                                <div id="{{ form.password.id }}-error" class="invalid-feedback d-block">
+                                    {{ form.password.errors | first }}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-top mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="remember">
+                                    <label class="form-check-label mb-0" for="remember">
+                                        Agree terms
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" name="register" class="btn btn-gray-800">{{ _('Sign up') }}</button>
+                        </div>
+                    </form>
+
+                    <div class="d-flex justify-content-center align-items-center mt-4">
+                            <span
+                                    class="fw-normal">{{ _('Already have an account?') }} <a
+                                    href="{{ url_for('authentication_blueprint.login') }}"
+                                    class="fw-bold">{{ ('Login here') }}</a> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+<!-- Specific Element JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

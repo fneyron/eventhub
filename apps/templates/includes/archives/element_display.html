@@ -1,0 +1,59 @@
+{% if element.type == 'content' %}
+<div class="text-center">
+    {{ element.content | translate | safe }}
+</div>
+{% elif element.type == 'location' %}
+<div class="mb-2">
+    <div id="location-map" style="width: 100%; height: 400px;"></div>
+</div>
+<script>
+mapboxgl.accessToken = '{{ config["MAPBOX_TOKEN"] }}';
+
+var map = new mapboxgl.Map({
+    container: 'location-map',
+    style: 'mapbox://styles/mapbox/light-v10',
+    center: [{{ element.longitude }}, {{ element.latitude }}],
+    zoom: 14
+});
+
+var marker = new mapboxgl.Marker()
+    .setLngLat([{{ element.longitude }}, {{ element.latitude }}])
+    .addTo(map);
+
+// construct the "Get Directions" link using the marker's coordinates
+var getDirectionsLink = 'https://www.google.com/maps/dir/?api=1&destination=' + {{ element.latitude }} + ',' + {{ element.longitude }};
+
+// create a popup for the marker that displays the "Get Directions" link
+var popup = new mapboxgl.Popup().setHTML('<a href="' + getDirectionsLink + '" target="_blank">{{ _('Get Directions')}}</a>');
+
+// add the popup to the marker when it is clicked
+marker.setPopup(popup);
+
+
+$('#element-{{ element.id }}').on('shown.bs.modal', function() {
+    map.resize(); // resize the map when the modal is shown
+});
+</script>
+{% elif element.type == 'wifi' %}
+<div class="mb-4">
+    <label for="ssid">{{ _("SSID")}}</label>
+    <input type="text" class="form-control" id="ssid" value="{{ element.ssid }}" readonly>
+</div>
+<div class="mb-4">
+    <label for="password">{{ _("Password")}}</label>
+    <div class="input-group">
+        <input type="text" class="form-control" id="password" value="{{ element.password }}" readonly>
+        <button class="btn btn-primary" id="copy-password"><i class="fa fa-copy"></i></button>
+    </div>
+</div>
+<script>
+    function copyPassword() {
+        var passwordInput = document.getElementById('password');
+        passwordInput.select();
+        document.execCommand('copy');
+    }
+
+    var copyPasswordButton = document.getElementById('copy-password');
+    copyPasswordButton.addEventListener('click', copyPassword);
+</script>
+{% endif %}

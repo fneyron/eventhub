@@ -1,0 +1,27 @@
+{
+  "name": "assets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack --mode=development",
+    "watch": "webpack --mode=development --watch",
+    "prod": "webpack --mode=production"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.5",
+    "@fullcalendar/icalendar": "^6.1.5",
+    "bootstrap-colorpicker": "^3.4.0",
+    "fullcalendar": "^6.1.5",
+    "ical.js": "^1.5.0",
+    "select2": "^4.1.0-rc.0",
+    "tagify": "^0.1.1"
+  }
+}

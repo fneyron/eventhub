@@ -1,0 +1,40 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Forgot Password {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main>
+    <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center form-bg-image">
+                <div class="col-12 d-flex align-items-center justify-content-center">
+                    <div class="signin-inner my-3 my-lg-0 bg-white shadow border-0 rounded p-4 p-lg-5 w-100 fmxw-500">
+                        {% include 'includes/bootstrap_flash.html' %}
+
+                        <h1 class="h3">{{ _('Confirm your email') }}</h1>
+                        <p>
+                            {{_('Consult you inbox')}} <b>{{ email }}</b>
+                            {{_('to validate your account and start.')}}</p>
+                        <div class="d-grid">
+                            <a name="resend-confirmation"
+                               href="{{ url_for('authentication_blueprint.resend_confirmation') }}"
+                               class="btn btn-gray-800">{{ _('Resend Confirmation Link') }}
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

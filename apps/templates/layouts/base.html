@@ -1,0 +1,81 @@
+<!--
+
+=========================================================
+* Volt Pro - Premium Bootstrap 5 Dashboard
+=========================================================
+
+* Product Element: https://themesberg.com/product/admin-dashboard/volt-premium-bootstrap-5-dashboard
+* Copyright 2021 Themesberg (https://www.themesberg.com)
+* License (https://themesberg.com/licensing)
+
+* Designed and coded by https://themesberg.com
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Please contact us to request a removal.
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- Primary Meta Tags -->
+
+    <title>
+        Flask Volt Pro - {% block title %}{% endblock title %} | AppSeed
+    </title>
+    {% include 'includes/header.html' %}
+    {% include 'includes/scripts.html' %}
+
+</head>
+<body>
+
+<nav class="navbar navbar-dark navbar-theme-primary px-4 col-12 d-lg-none">
+    <a class="navbar-brand me-lg-5" href="/">
+        <img class="navbar-brand-dark" src="{{ config.ASSETS_ROOT }}/img/brand/light.svg" alt="Volt logo"/> <img
+            class="navbar-brand-light" src="{{ config.ASSETS_ROOT }}/img/brand/dark.svg" alt="Volt logo"/>
+    </a>
+    <div class="d-flex align-items-center">
+        <button class="navbar-toggler d-lg-none collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+{% include 'includes/sidebar.html' %}
+
+<main class="content">
+    {% import 'includes/macros.html' as macros with context%}
+
+    {% include 'includes/navigation.html' %}
+
+    {% block content %}{% endblock content %}
+
+    {% include 'includes/footer.html' %}
+
+    {% include 'includes/lang_modal.html' %}
+
+</main>
+
+
+<!-- Specific Element JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}
+<script>
+    $('#calendar-refresh').click(() => {
+      $('#calendar-refresh').addClass('fa-spin');
+      $.get('/task/apps.tasks.sync_events/start')
+        .done((result) => {
+          checkTaskStatus(result.id);
+        })
+        .fail((error) => {
+          $('#calendar-refresh').removeClass('fa-spin');
+          console.log(error);
+        });
+    });
+</script>
+</body>
+</html>

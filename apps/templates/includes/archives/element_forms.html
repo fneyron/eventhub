@@ -1,0 +1,84 @@
+{% if data.element_type == 'content' %}
+<div class="mb-4">
+    {{ form.content.label }}
+    <div class="input-group">
+        <div class="ck-container" style="width: 100%;">
+            {{ form.content(id='CKEditorField') }}
+        </div>
+    </div>
+</div>
+<script>
+    const editor = createCKEditor('CKEditorField', '{{ url_for("home_blueprint.upload_image", element_id=(data.element.id if data.element else -1)) }}', 'fr');
+</script>
+{% elif data.element_type == 'wifi' %}
+<div class="mb-4">
+    {{ form.ssid.label }}
+    {{ form.ssid(class="form-control") }}
+</div>
+<div class="mb-4">
+    {{ form.password.label }}
+    {{ form.password(class="form-control") }}
+</div>
+{% elif data.element_type == 'location' %}
+<div class="mb-4">
+    {{ form.street_address.label }}
+    <div class="input-group">
+        {{ form.street_address(class="form-control", id="address", autocomplete="address-line1") }}
+        {{ form.postal_code(class="form-control", id="postal-code", autocomplete="postal-code") }}
+        {{ form.city(class="form-control", id="city", autocomplete="address-level2") }}
+        {{ form.latitude(id="latitude") }}
+        {{ form.longitude(id="longitude") }}
+    </div>
+
+</div>
+<div class="mb-4">
+    <div id="location-map" style="width: 100%; height: 400px;"></div>
+</div>
+<script>
+    mapboxgl.accessToken = '{{ config["MAPBOX_TOKEN"] }}';
+
+    var map = new mapboxgl.Map({
+      container: 'location-map',
+      style: 'mapbox://styles/mapbox/light-v10',
+      {% if form.latitude.data and form.longitude.data %}
+      center: [{{ form.longitude.data}}, {{ form.latitude.data }}],
+      {% else %}
+      center: [-74.5, 40], // starting position
+      {% endif %}
+
+      zoom: 14 // starting zoom
+    });
+
+    {% if form.latitude.data and form.longitude.data %}
+       var marker = new mapboxgl.Marker()
+        .setLngLat([{{ form.longitude.data }}, {{ form.latitude.data }}])
+        .addTo(map);
+    {% endif %}
+    loadScript('search-js', '{{ config["MAPBOX_TOKEN"] }}', function(autofill) {
+      autofill.addEventListener('retrieve', event => {
+        var coordinates = event.detail.features[0].geometry.coordinates;
+        console.log(event.detail.features[0].geometry.coordinates[0]);
+        $('#latitude').val(event.detail.features[0].geometry.coordinates[1]);
+        $('#longitude').val(event.detail.features[0].geometry.coordinates[0]);
+
+        // update marker location on map
+        if(marker){
+            marker.remove();
+        }
+
+        var marker = new mapboxgl.Marker()
+        .setLngLat(coordinates)
+        .addTo(map);
+
+        // zoom to marker location
+        map.flyTo({
+          center: coordinates,
+          zoom: 14
+        });
+      });
+    });
+
+
+</script>
+{% endif %}
+

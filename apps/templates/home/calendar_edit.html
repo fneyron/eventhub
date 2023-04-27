@@ -1,0 +1,271 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Calendar {% endblock %}
+
+<!-- Specific Element CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+    <div class="dropdown">
+        <!--<button class="btn btn-gray-800 d-inline-flex align-items-center me-2 dropdown-toggle" data-bs-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false"> {{ _('Edit') }}
+            <svg class="icon icon-xs ms-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clip-rule="evenodd"></path>
+            </svg>
+        </button>
+        <div class="dropdown-menu calendar-dropdown dropdown-menu-start mt-2 py-1">
+            <a class="dropdown-item d-flex align-items-center" href="#">
+                <i class="fa fa-link text-gray-500 me-2"></i>
+                {{ _('Linked calendar')}} </a>
+        </div>-->
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
+        <a type="button" class="btn btn-sm btn-outline-gray-600"
+           href="{{ url_for('home_blueprint.calendar_export_ics', calendar_uuid=data.calendar.uuid) }}">Export</a>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-9 col-12">
+        <div class="card border-0 shadow mb-4">
+            <div id="calendar" class="p-4"></div>
+        </div>
+    </div>
+    <div class="col-md-3 col-12">
+        <div class="col">
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                    <form method="POST" action="">
+                        {{ cal_form.csrf_token }}
+                        <div class="mb-4">
+                            <div class="col-12">
+                                {{ cal_form.name.label }}
+                                {{ cal_form.name(class="form-control") }}
+
+                                <small id="{{ cal_form.name.id }}-help" class="form-text text-muted">{{
+                                    cal_form.name.description }}</small>
+                                <div id="{{ cal_form.name.id }}-error" class="invalid-feedback d-block">{{
+                                    cal_form.name.errors | first }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="col-12">
+                                {{ cal_form.description.label }}
+                                {{ cal_form.description(class="form-control") }}
+                                <small id="{{ cal_form.description.id }}-help" class="form-text text-muted">{{
+                                    cal_form.description.description }}</small>
+                                <div id="{{ cal_form.description.id }}-error" class="invalid-feedback d-block">{{
+                                    cal_form.description.errors | first }}
+                                </div>
+                            </div>
+                        </div>
+                        {{ cal_form.submit(class="btn btn-gray-800") }}
+                    </form>
+                </div>
+            </div>
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                    <h2 class="fs-5 fw-bold mb-3">{{ _('Linked Calendar')}}</h2>
+                    {% for ical in data.calendar.ical %}
+                    <div class="row mb-4">
+                        <div class="col-auto">
+                            <i class="fa fa-calendar" style="color: {{ ical.color }};"></i>
+                        </div>
+                        <div class="col">
+                            <a data-bs-toggle="modal" data-bs-target="#add-linked-calendar" data-id="{{ ical.id }}"
+                               class="h6 mb-0">
+                                {{ ical.name }}
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <a class="text-danger"
+                               href="{{ url_for('home_blueprint.linked_calendar_delete', id=ical.id) }}">
+                                <i class="fa fa-xmark"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <button class="btn btn-gray-800 d-inline-flex align-items-center me-2" data-bs-toggle="modal"
+                            data-bs-target="#add-linked-calendar">
+                        {{ _('Add') }}
+
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Linked Cal Add modal -->
+{% set modal_content %}
+{{ linked_cal_form.csrf_token }}
+{{ linked_cal_form.cal_id(id='cal-id', value=data.calendar.id) }}
+{{ linked_cal_form.ical_id(id='ical-id') }}
+<div class="mb-4">
+    <div class="col-12">
+        {{ linked_cal_form.name.label }}
+        {{ linked_cal_form.name(class="form-control") }}
+        <small id="{{ linked_cal_form.name.id }}-help" class="form-text text-muted">{{
+            linked_cal_form.name.description }}</small>
+        <div id="{{ linked_cal_form.name.id }}-error" class="invalid-feedback d-block">{{
+            linked_cal_form.name.errors | first }}
+        </div>
+    </div>
+</div>
+<div class="mb-4">
+    <div class="col-12">
+        {{ linked_cal_form.url.label }}
+        {{ linked_cal_form.url(class="form-control") }}
+        <small id="{{ linked_cal_form.url.id }}-help" class="form-text text-muted">{{
+            linked_cal_form.url.description }}</small>
+        <div id="{{ linked_cal_form.url.id }}-error" class="invalid-feedback d-block">
+            {{
+            linked_cal_form.url.errors | first }}
+        </div>
+
+    </div>
+</div>
+<div class="">
+    <div class="col-12">
+        {{ linked_cal_form.color.label }}
+        {{ linked_cal_form.color(class="form-control") }}
+        <small id="{{ linked_cal_form.color.id }}-help" class="form-text text-muted">{{
+            linked_cal_form.color.description }}</small>
+        <div id="{{ linked_cal_form.color.id }}-error" class="invalid-feedback d-block">{{
+            linked_cal_form.color.errors | first }}
+        </div>
+    </div>
+</div>
+{% endset %}
+{{ macros.render_modal_form('add-linked-calendar', _('Linked Calendar'), modal_content,
+linked_cal_form.submit(class="btn btn-gray-800")) }}
+
+
+<!-- Add event modal -->
+<div class="modal fade" id="modal-new-event" tabindex="-1" role="dialog" aria-labelledby="modal-new-event"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="addNewEventForm" class="modal-content">
+            <div class="modal-body">
+                <div class="mb-4">
+                    <label for="eventTitle">Event title</label>
+                    <input type="text" class="form-control" id="eventTitle" required>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <div class="mb-4">
+                            <label for="dateStart">Select start date</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20"
+                                             xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd"
+                                                                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                                                                      clip-rule="evenodd"></path></svg>
+                                    </span>
+                                <input data-datepicker="" class="form-control" id="dateStart" type="text"
+                                       placeholder="dd/mm/yyyy" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="mb-2">
+                            <label for="dateEnd">Select end date</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20"
+                                             xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd"
+                                                                                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                                                                      clip-rule="evenodd"></path></svg>
+                                    </span>
+                                <input data-datepicker="" class="form-control" id="dateEnd" type="text"
+                                       placeholder="dd/mm/yyyy" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-gray-800" id="addNewEvent">Add new event</button>
+                <button type="button" class="btn btn-gray-300 ms-auto" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ macros.event_modal_form(event_form) }}
+
+{% endblock content %}
+
+<!-- Specific Element JS goes HERE  -->
+{% block javascripts %}
+<script>
+    var mycalendar;
+    $(document).ready(function() {
+        var events = [
+            {
+                url: "{{ url_for('home_blueprint.calendar_events_json', calendar_id=data.calendar.id) }}",
+            }
+        ];
+        mycalendar = renderCalendar('calendar', events);
+    });
+
+    $(function() {
+      // Initialize the color picker
+      $('#{{ linked_cal_form.color.id }}').colorpicker();
+    });
+
+    {% if linked_cal_form.errors %}
+        $(window).on('load', function() {
+            $('#add-linked-calendar').modal('show');
+        });
+    {% endif %}
+    $('#add-linked-calendar').on('show.bs.modal', function (event) {
+        var modal = $(this);
+        var button = $(event.relatedTarget); // Button that triggered the modal
+
+
+        if(button.data()){
+            // When a button is triggered with an id otherwise this is probably because of errors
+            if ('id' in button.data()){
+                const ical_id = button.data('id'); // Extract ical_id from data-* attributes
+                console.log(ical_id);
+                // Get the corresponding linked calendar object using the ical_id
+                const icals = [
+                    {% for ical in data.calendar.ical %}
+                    {{ ical.to_dict() | safe }},
+                    {% endfor %}
+                ]
+                const result = icals.find(item => item.id === ical_id);
+
+                // Set the value of the hidden input field to the selected ical_id
+
+                console.log(result.id);
+
+                // Populate the form fields with the values from the selected linked calendar object
+                modal.find('#name').val(result.name);
+                modal.find('#url').val(result.url);
+                modal.find('#color').val(result.color);
+                document.getElementById('ical-id').value = result.id;
+            }
+            else {
+                modal.find('#ical_id').val('');
+                modal.find('#name').val('');
+                modal.find('#url').val('');
+                modal.find('#color').val('');
+            }
+        }
+    });
+
+
+
+</script>
+{% endblock javascripts %}

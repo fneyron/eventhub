@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Your receipt</title>
+    <meta
+            name="viewport"
+            content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+</head>
+<body style="background-color: #f6f6f6" bgcolor="#f6f6f6">
+<!-- Main body table -->
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: sans-serif">
+    <tr>
+        <td height="10px">&nbsp;</td>
+    </tr>
+    <tr>
+        <td align="center">
+            <!-- Receipt table -->
+            <table border="0" cellpadding="10" cellspacing="0" style="width: 380px; background-color: #fff">
+                <tr>
+                    <td style="width: 100%; text-align: center; font-size: xx-large; padding: 20px 0 0;">
+                        Scan Detected
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center"
+                        style="color: #3d454d;">
+                        <p>Hello <b>{{ pet.owner_firstname }} {{ pet.owner_lastname }}</b>,</p>
+                        <p>A scan was detected for <b>{{ pet.pet_name }}</b>, please find below all
+                            related
+                            informations.</p>
+                    </td>
+                </tr>
+                <!-- Receipt items -->
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td colspan="2"
+                                    style="border-top-width: 1px;border-top-color: #e0e1e2;border-top-style: dashed;line-height: 0px;font-size: 0;border-collapse: collapse;padding: 0;"
+                                    height="1">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" height="5px"></td>
+                            </tr>
+
+                            <tr>
+                                <td>{{_('Date')}}</td>
+                                <td align="right">{{ scan.date | babel(pet.country_code, 'medium') }}</td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+                <!-- Total table -->
+                <tr>
+                    <td>
+                        <table>
+                            <tr>
+                                <td colspan="2" style="
+                                        border-top-width: 1px;
+                                        border-top-color: #e0e1e2;
+                                        border-top-style: dashed;
+                                        line-height: 0px;
+                                        font-size: 0;
+                                        border-collapse: collapse;
+                                        padding: 0;
+                                        "
+                                    height="1">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" height="5px"></td>
+                            </tr>
+                            <tr>
+                                <td width="100%">Total</td>
+                                <td align="right" style="font-weight: bold"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Map -->
+                <tr>
+                    <td style="padding: 0">
+                        <img
+                                alt=""
+                                src="https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/pin-l-restaurant+c4c4c4(,14/320x150@2x?attribution=false&amp;access_token=YOUR_MAPBOX_ACCESS_TOKEN"
+                                width="320px"
+                        />
+                    </td>
+                </tr>
+                <!-- Address -->
+                <tr>
+                    <td align="center">
+<span style="font-weight: bold"></span
+><br/>
+                        <br/>
+
+
+                    </td>
+                </tr>
+                <!-- Transaction table -->
+                <tr>
+                    <td align="center">
+                        <table style="font-size: smaller; color: #85898c; width: 100%">
+                            <tr>
+                                <td
+                                        colspan="2"
+                                        style="
+border-top-width: 1px;
+border-top-color: #e0e1e2;
+border-top-style: dashed;
+line-height: 0px;
+font-size: 0;
+border-collapse: collapse;
+padding: 0;
+"
+                                        height="1"
+                                >
+                                    &nbsp;
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" height="5px"></td>
+                            </tr>
+                            <tr>
+                                <td>Input type</td>
+                                <td align="right"></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td align="right">xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>Time</td>
+                                <td align="right">
+
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Map attribution -->
+
+                <tr>
+                    <td
+                            colspan="2"
+                            style="
+border-top-width: 1px;
+border-top-color: #e0e1e2;
+border-top-style: dashed;
+line-height: 0px;
+font-size: 0;
+border-collapse: collapse;
+padding: 0;
+"
+                            height="1"
+                    >
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size: smaller; color: #85898c">
+                        Map data
+                        <a
+                                style="color: #85898c"
+                                href="https://www.openstreetmap.org/copyright"
+                        >(c) OpenStreetMap</a
+                        >
+                        contributors<br/>
+                        <a
+                                style="color: #85898c"
+                                href="https://www.mapbox.com/about/maps/"
+                        >(c) Mapbox</a
+                        >
+                        <a
+                                style="color: #85898c"
+                                href="https://www.mapbox.com/contribute"
+                        >Improve this map</a
+                        >
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <!-- Workaround for https://github.com/sendgrid/sendgrid-nodejs/issues/1231#issuecomment-771694665 -->
+        <td height="10px"><span style="display: none">ř</span></td>
+    </tr>
+</table>
+</body>
+</html>
