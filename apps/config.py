@@ -54,7 +54,7 @@ class Config(object):
     CELERYBEAT_SCHEDULE = {
         'sync-events': {
             'task': 'apps.tasks.sync_events',
-            'schedule': timedelta(seconds=10),
+            'schedule': timedelta(minutes=5),
             'args': (),
         },
     }
