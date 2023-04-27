@@ -81,6 +81,7 @@ class DebugConfig(Config):
         'sync-events': {
             'task': 'apps.tasks.sync_events',
             'schedule': timedelta(seconds=10),
+            'args': (),
         },
     }
 
