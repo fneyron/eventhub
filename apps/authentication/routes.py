@@ -90,7 +90,7 @@ def register():
             user.role = UserRole.ADMIN
 
         # check if there is event associated to this email
-        event_attendee = EventAttendee.query.filter_by(email=user.email).all()
+        event_attendee = Attendee.query.filter_by(email=user.email).all()
         for attendee in event_attendee:
             attendee.user_id = user.id
 
