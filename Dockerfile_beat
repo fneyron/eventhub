@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # gunicorn
-CMD ["celery", "--app", "celery_worker.celery", "beat", "-s",  "/apps/celerybeat-schedule", "--loglevel", "INFO"]
+CMD ["celery", "--app", "celery_worker.celery", "beat", "--loglevel", "INFO"]
