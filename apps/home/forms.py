@@ -37,4 +37,4 @@ class EventForm(FlaskForm):
     id = HiddenField(id='eventIdEdit')
     location = StringField('Location')
     description = TextAreaField(_l('Description'), id='eventDescriptionEdit')
-    attendee = StringField(_l('Attendee'), id='eventAttendeeEdit')
+    attendee = StringField(_l('Attendee'), id='eventAttendeeEdit', description=_l('Please, add attendee email address of people in charge'))

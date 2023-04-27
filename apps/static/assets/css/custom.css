@@ -90,3 +90,9 @@ ul {
       width: 6rem;
       height: 6rem; } }
 
+.fc-popover .choices-dropdown {
+  display: inline-block !important;
+}
+.choices__list--dropdown {
+  z-index: 9999 !important;
+}

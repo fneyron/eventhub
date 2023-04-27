@@ -5,11 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import os
 
-from celery.schedules import crontab
-from flask_babel import _
 from itsdangerous import URLSafeTimedSerializer
-from datetime import timedelta
-
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 class Config(object):
@@ -49,16 +45,6 @@ class Config(object):
     # GEOLOCATION OPTIONS
     GEOLOCATION_TIMEOUT = 20
     GEOLOCATION_MAX_AGE = 0
-
-    # Scheduler
-    CELERYBEAT_SCHEDULE = {
-        'sync-events': {
-            'task': 'apps.tasks.sync_events',
-            'schedule': timedelta(minutes=5),
-            'args': (),
-        },
-    }
-
 
 class ProductionConfig(Config):
     DEBUG = False

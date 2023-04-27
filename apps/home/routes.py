@@ -205,9 +205,9 @@ def calendar_events_json():
     attendees = request.args.getlist('attendees')
     start = request.args.get('start')
     end = request.args.get('end')
-
+    print(calendar_id, attendees)
     events = get_calendar_events(calendar_id=calendar_id, attendees=attendees, start=start, end=end)
-
+    print(events)
     return jsonify(events)
 
 

@@ -3,10 +3,11 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from flask import Blueprint, session, current_app
-from apps import babel, get_locale
-from functools import lru_cache
 import json
+
+from flask import Blueprint, session, jsonify
+
+from apps import babel, get_locale
 
 
 blueprint = Blueprint(
@@ -15,6 +16,13 @@ blueprint = Blueprint(
     url_prefix=''
 )
 
+@blueprint.context_processor
+def inject_attendees():
+    from apps.authentication.models import Users
+    from apps.home.models import Attendee
+    users = Users.query.all()
+    attendee = Attendee.query.all()
+    return dict(attendees=list(set([user.email for user in users + attendee])))
 
 @blueprint.context_processor
 def utility_processor():
