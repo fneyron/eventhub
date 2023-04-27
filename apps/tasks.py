@@ -71,8 +71,8 @@ def sync_events(calendar_id=None):
                             event.get('dtend').dt,
                             date) else event.get('dtend').dt,
                         Event.ical_id == ical.id,
-                        Event.all_day == 'VALUE' in event.get('dtstart').params and event.get('dtstart').params[
-                            'VALUE'] == 'DATE'
+                        Event.all_day == ('VALUE' in event.get('dtstart').params and event.get('dtstart').params[
+                            'VALUE'] == 'DATE')
                     )
                 )
             ).first()
