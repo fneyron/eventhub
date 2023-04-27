@@ -41,8 +41,8 @@ def sync_events(calendar_id=None):
     # Loop through each calendar
     for ical in icals:
         # Check if it's time to sync this calendar
-        #if ical.last_synced and (datetime.now() - ical.last_synced).seconds < 300:
-        #    continue
+        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < 300:
+            continue
 
         # Download the ICS data
         response = requests.get(ical.url)
@@ -102,7 +102,6 @@ def sync_events(calendar_id=None):
                 db.session.add(db_event)
                 db.session.commit()
             updated_events.add(db_event)
-            print(updated_events)
 
         # Delete all other events
         Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
