@@ -3,20 +3,17 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from datetime import datetime
+import os
 from importlib import import_module
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from celery import Celery
-
-import requests
 from flask import Flask, request, jsonify
 from flask_admin import Admin
 from flask_babel import Babel
 from flask_ckeditor import CKEditor
 from flask_login import LoginManager, current_user
 from flask_mail import Mail
-
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy as _BaseSQLAlchemy
 
