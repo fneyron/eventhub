@@ -54,6 +54,8 @@ def register_extensions(app):
     celery.conf.update(app.config["CELERY_CONFIG"])
 
     # Mail
+    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     mail.init_app(app)
 
     # Admin ext
