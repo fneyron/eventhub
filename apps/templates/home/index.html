@@ -20,7 +20,7 @@
     </div>
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
-        <a type="button" class="btn btn-sm btn-outline-gray-600"
+        <a type="button" id="export-button" class="btn btn-sm btn-outline-gray-600"
            href="{{ url_for('home_blueprint.calendar_export_ics', attendees=[current_user.email]) }}">Export</a>
 
     </div>
@@ -93,60 +93,68 @@
 <!-- Specific Element JS goes HERE  -->
 {% block javascripts %}
 <script>
-    var mycalendar;
+    (function () {
+        let myCalendar;
+        const user = {{ current_user.to_json() | safe }};
 
-     function refetchEventsForAttendee(email) {
-          // Remove the existing event sources
-          mycalendar.getEventSources().forEach(function(source) {
-            source.remove();
-          });
+        function refetchEventsForAttendee(email) {
+            myCalendar.getEventSources().forEach(source => source.remove());
 
-          var url = "{{ url_for('home_blueprint.calendar_events_json') }}";
-          if(email != 'all'){
-            url += '?attendees=' + email;
-          }
-
-          // Add a new event source with the new URL
-          mycalendar.addEventSource({
-            url: url,
-            method: 'GET'
-          });
-    }
-
-
-    $(document).ready(function() {
-        var events = [
-            {
-                url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
+            let url = "{{ url_for('home_blueprint.calendar_events_json') }}";
+            if (email !== 'all') {
+                url += `?attendees=${email}`;
             }
-        ];
-        user = {{ current_user.to_json() | safe }};
-        mycalendar = renderCalendar('calendar', events, user);
 
-        // Add event listener to attendees select element
-        var selectAttendeesInputEl = document.querySelector('#attendees');
-        if (selectAttendeesInputEl) {
-            selectAttendeesInputEl.addEventListener('change', function() {
-                // Define a function to remove the existing events source and add a new one
-                refetchEventsForAttendee(this.value);
+            myCalendar.addEventSource({
+                url,
+                method: 'GET',
             });
         }
 
-
-        // Choices.js
-        var selectAttendeesInputEl = d.querySelector('#attendees');
-        if (selectAttendeesInputEl) {
-            const choices = new Choices(selectAttendeesInputEl, {
+        function initChoices(selectAttendeesInputEl) {
+            new Choices(selectAttendeesInputEl, {
                 placeholder: true,
                 placeholderValue: 'Select an option',
                 searchEnabled: false,
                 shouldSort: false,
                 itemSelectText: '',
-                renderChoiceLimit: -1
+                renderChoiceLimit: -1,
             });
-
         }
 
-    });
+        function initCalendar() {
+            const events = [
+                {
+                    url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
+                },
+            ];
+
+            myCalendar = renderCalendar('calendar', events, user);
+        }
+        function updateExportButtonHref(attendees) {
+            const exportButton = document.querySelector('#export-button');
+            const baseUrl = "{{ url_for('home_blueprint.calendar_export_ics') }}";
+            exportButton.href = `${baseUrl}?attendees=${attendees}`;
+        }
+
+        function initEventListeners(selectAttendeesInputEl) {
+            selectAttendeesInputEl.addEventListener('change', function () {
+                refetchEventsForAttendee(this.value);
+                updateExportButtonHref(this.value);
+            });
+        }
+
+        $(document).ready(function () {
+            const selectAttendeesInputEl = document.querySelector('#attendees');
+
+            if (selectAttendeesInputEl) {
+                initChoices(selectAttendeesInputEl);
+                initEventListeners(selectAttendeesInputEl);
+            }
+
+            initCalendar();
+        });
+    })();
+
 </script>
 {% endblock javascripts %}
