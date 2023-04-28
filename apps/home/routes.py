@@ -219,9 +219,6 @@ def event_update(event_id):
     if not event: return jsonify({'success': False, 'error': 'Event not found'})
     data = MultiDict(request.form)
     form = EventForm(data, obj=event)
-    print(request.form)
-    print(form.data)
-    print(form.validate_on_submit(), form.errors)
 
     if form.validate_on_submit and (
             event.calendar.user == current_user or current_user.role == (UserRole.ADMIN | UserRole.EDITOR)):
