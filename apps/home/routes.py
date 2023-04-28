@@ -221,7 +221,7 @@ def event_update(event_id):
     form = EventForm(data, obj=event)
 
     if form.validate_on_submit and (
-            event.calendar.user == current_user or current_user.role == (UserRole.ADMIN | UserRole.EDITOR)):
+            event.calendar.user == current_user or or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
 
         # We delete existing attendees
         db.session.query(Attendee).filter_by(event_id=event.id).delete()
