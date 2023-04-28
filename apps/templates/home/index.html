@@ -21,10 +21,10 @@
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
         <a type="button" id="export-button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=[current_user.email]) }}">Export</a>
-
+           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=(current_user.role.name == 'ADMIN' or current_user.role.name == 'EDITOR') and None or [current_user.email]) }}">Export</a>
     </div>
 </div>
+
 
 <div class="row">
     <div class="col-12">
@@ -134,7 +134,11 @@
         function updateExportButtonHref(attendees) {
             const exportButton = document.querySelector('#export-button');
             const baseUrl = "{{ url_for('home_blueprint.calendar_export_ics') }}";
-            exportButton.href = `${baseUrl}?attendees=${attendees}`;
+            if(attendees !== 'all'){
+                exportButton.href = `${baseUrl}?attendees=${attendees}`;
+            } else {
+                exportButton.href = `${baseUrl}`;
+            }
         }
 
         function initEventListeners(selectAttendeesInputEl) {
