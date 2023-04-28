@@ -96,3 +96,18 @@ ul {
 .choices__list--dropdown {
   z-index: 9999 !important;
 }
+
+
+@media (max-width: 768px) {
+  #calendar {
+    width: 100%;
+  }
+}
+
+.fc .fc-button .fc-icon {
+  font-size: 14px;
+}
+
+.fc .fc-button .fc-button-text {
+  display: none;
+}

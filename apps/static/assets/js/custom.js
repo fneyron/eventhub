@@ -27,8 +27,18 @@ function renderCalendar(id, events, user) {
         var calendar = new FullCalendar.Calendar(calendarEl, {
             selectable: true,
             initialView: 'dayGridMonth',
-            themeSystem: 'bootstrap5',
+            themeSystem: 'bootstrap',
             editable: true,
+            firstDay: 1,
+            height: 600,
+            windowResize: function (view) {
+              if (window.innerWidth < 768) {
+                calendar.setOption('height', 'auto');
+              } else {
+                // Set your desired calendar height for larger screens
+                calendar.setOption('height', 600);
+              }
+            },
             customButtons: {
               refreshButton: {
                 text: 'Refresh',
@@ -41,25 +51,8 @@ function renderCalendar(id, events, user) {
                 right: 'today prev,next',
                 left: 'title',
             },
-            buttonIcons: {
-              prev: 'arrow-left-square-fill',
-              next: 'chevron-right',
-              prevYear: 'chevrons-left', // double chevron
-              nextYear: 'chevrons-right' // double chevron
-            },
-            bootstrapFontAwesome: {
-              close: 'fa-times',
-              prev: 'fa-chevron-left',
-              next: 'fa-chevron-right',
-              prevYear: 'fa-angle-double-left',
-              nextYear: 'fa-angle-double-right'
-            },
+            bootstrapFontAwesome: { today: 'redo' },
             eventSources:events,
-            buttonText: {
-                prev: 'Previous',
-                next: 'Next',
-                today: 'Today',
-            },
             eventContent: function(arg) {
                 var contentEl = document.createElement('div');
 

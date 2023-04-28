@@ -8,7 +8,7 @@
 {% block content %}
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-    <div class="col-4">
+    <div class="col-md-3 col-7">
         {% if current_user.role.name in ['ADMIN', 'EDITOR'] %}
         <select id="attendees" class="w-100" name="attendees">
             <option value="all">{{ _('All')}}</option>

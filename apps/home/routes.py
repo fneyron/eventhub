@@ -127,7 +127,6 @@ def calendar_update():
 
     if calendar.user == current_user:
         setattr(calendar, attr, value)
-        print(attr, value)
         db.session.commit()
 
     # Return a JSON response indicating success
@@ -201,15 +200,12 @@ def calendar_display(uuid):
 
 @blueprint.route('/calendar/events', methods=['GET'])
 def calendar_events_json():
-    print(request.args.getlist('attendees'))
     calendar_id = request.args.get('calendar_id')
     attendees = request.args.getlist('attendees')
     start = request.args.get('start')
     end = request.args.get('end')
-    print(calendar_id, attendees)
 
     events = get_calendar_events(calendar_id=calendar_id, attendees=attendees, start=start, end=end)
-    print(events)
     return jsonify(events)
 
 
@@ -304,7 +300,6 @@ def linked_calendar_delete(id):
 
 @blueprint.route('/calendar/export', methods=['GET'])
 def calendar_export_ics():
-    print(request.args.getlist('attendees'))
     events = get_calendar_events(calendar_id=request.args.get('calendar_id'), attendees=request.args.getlist('attendees'))
     # create the ICal export file
     ical = ICalendar()
