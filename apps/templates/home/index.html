@@ -8,8 +8,8 @@
 {% block content %}
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
-    <div class="col-3">
-        {% if current_user.role.name == 'ADMIN' or current_user.role.name == 'EDITOR' %}
+    <div class="col-4">
+        {% if current_user.role.name in ['ADMIN', 'EDITOR'] %}
         <select id="attendees" class="w-100" name="attendees">
             <option value="all">{{ _('All')}}</option>
             {% for user in attendees %}
@@ -21,10 +21,9 @@
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
         <a type="button" id="export-button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=(current_user.role.name == 'ADMIN' or current_user.role.name == 'EDITOR') and None or [current_user.email]) }}">Export</a>
+           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=None if current_user.role.name in ['ADMIN', 'EDITOR'] else [current_user.email]) }}">Export</a>
     </div>
 </div>
-
 
 <div class="row">
     <div class="col-12">
