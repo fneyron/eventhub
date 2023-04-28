@@ -214,7 +214,7 @@ table{
 }
 .hero .text h2{
 	color: #000;
-	font-size: 24px;
+	font-size: 20px;
 	margin-bottom: 0;
 	font-weight: 200;
 	line-height: 1.4;
@@ -228,17 +228,17 @@ table{
 	color: #000;
 }
 
-.text-author{
+.text-encart{
 	bordeR: 1px solid rgba(0,0,0,.05);
 	max-width: 50%;
 	margin: 0 auto;
 	padding: 2em;
 }
-.text-author img{
+.text-encart img{
 	border-radius: 50%;
 	padding-bottom: 20px;
 }
-.text-author h3{
+.text-encart h3{
 	margin-bottom: 0;
 }
 ul.social{
@@ -309,67 +309,13 @@ ul.social li{
             </tr><!-- end tr -->
             <tr>
                 <td valign="middle" class="hero bg_white" style="padding: 2em 0 4em 0;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                        <tr>
-                            <td style="padding: 0 2.5em; text-align: center; padding-bottom: 3em;">
-                                <div class="text">
-                                    <h2>{{ data.content }}</h2>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;">
-                                {% for button in data.buttons %}
-                                    <p><a href="{{ button.url }}" class="{{ button.class }}">{{ button.text }}</a></p>
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    </table>
+                    {% block content %}
+                    {% endblock content %}
                 </td>
             </tr><!-- end tr -->
             <!-- 1 Column Text + Button : END -->
         </table>
-        <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-               style="margin: auto;">
-            <tr>
-                <td valign="middle" class="bg_light footer email-section">
-                    <table>
-                        <tr>
-                            <td valign="top" width="50%" style="padding-top: 20px;">
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                    <tr>
-                                        <td style="text-align: left; padding-right: 10px;">
-                                            <h3 class="heading">{{_('About')}}</h3>
-                                            <p>{{ _('EventHub est une plateforme de gestion de calendriers de
-                                                réservation de locations saisonnières. Gérez vos réservations de manière
-                                                efficace et optimisez votre temps.')}}</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td valign="top" width="50%" style="padding-top: 20px;">
-                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                    <tr>
-                                        <td style="text-align: left; padding-left: 15px; padding-right: 5px;">
-                                            <h3 class="heading">{{ _('Contact Info')}}</h3>
-                                            <ul>
-                                                <li><span class="text">contact@dataik.com</span></li>
-                                                <li><span class="text">+33 (0)6 77 93 91 14</span></a></li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr><!-- end: tr -->
-            <!--        <tr>-->
-            <!--          <td class="bg_light" style="text-align: center;">-->
-            <!--          	<p>No longer want to receive these email? You can <a href="#" style="color: rgba(0,0,0,.8);">Unsubscribe here</a></p>-->
-            <!--          </td>-->
-            <!--        </tr>-->
-        </table>
+        {% include 'email/footer.html' %}
 
     </div>
 </center>

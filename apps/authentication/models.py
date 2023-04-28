@@ -42,7 +42,7 @@ class Users(db.Model, UserMixin):
 
     def add_notification(self, content):
         notification = Notification(user_id=self.id, content=content)
-        self.notification.append(notification)
+        db.session.add(notification)
         db.session.commit()
 
     @staticmethod
@@ -70,7 +70,7 @@ class Users(db.Model, UserMixin):
         self.password = hash_pass(password)
 
     def __repr__(self):
-        return dict(email=self.email, role=self.role)
+        return str(self.email)
 
     def to_dict(self):
         return {

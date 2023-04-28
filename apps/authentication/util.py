@@ -73,7 +73,7 @@ def send_email_confirmation(user):
         recipients=[user.email],
         subject=_("Email confirmation"),
         text=_("To confirm your account, please follow this link : %s") % confirm_url,
-        template='email/authentication_email_template.html',
+        template='email/default_email_template.html',
         content='Thank your <b>%s</b> for registering to %s. Please, click the link below to confirm your email address.' %
                 (user.firstname, current_app.config['WEBSITE_NAME']),
         lang_code=user.language,

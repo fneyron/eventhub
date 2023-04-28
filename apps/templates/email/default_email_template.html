@@ -1,0 +1,18 @@
+{% extends "email/base.html" %}
+
+{% block content %}
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="padding: 0 2.5em; text-align: center; padding-bottom: 3em;">
+            <div class="text">
+                <h2>{{ data.content | safe }}</h2>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center;">
+            <p><a href="{{ data.buttons.url }}" class="btn btn-primary"><b>{{ data.buttons.text }}</b></a></p>
+        </td>
+    </tr>
+</table>
+{% endblock content %}

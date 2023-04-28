@@ -49,6 +49,8 @@ class Config(object):
 class ProductionConfig(Config):
     DEBUG = False
 
+    SERVER_NAME = 'eventhub.dataik.com'
+
     # Security
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
@@ -76,7 +78,7 @@ class ProductionConfig(Config):
 class DebugConfig(Config):
     DEBUG = True
 
-
+    SERVER_NAME = 'localhost:%s' % os.getenv('FLASK_PORT', 5000)
 
     CELERY_CONFIG = {
         'broker_url': 'redis://127.0.0.1:6379',

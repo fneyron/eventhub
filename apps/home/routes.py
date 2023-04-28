@@ -4,25 +4,22 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os
-import uuid
-from datetime import datetime
-from urllib.parse import urlparse
 
 import requests
 import shortuuid
-from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash, Response, \
-    make_response, current_app
+from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash, Response, current_app
+from flask import send_from_directory
 from flask_babel import _
-from flask_login import login_required, current_user
-from icalendar import Calendar as ICalendar, Event as ICalEvent
+from flask_login import current_user
+from icalendar import Calendar as ICalendar
 from werkzeug.datastructures import MultiDict
 
 from apps import db, celery
 from apps import login_manager
 from apps.authentication.forms import ProfileForm, ChangePasswordForm, ChangeEmailForm
 from apps.authentication.models import Users, UserRole
-from apps.authentication.util import send_email_confirmation, generate_confirmation_token
-from apps.decorator import roles_required
+from apps.authentication.util import generate_confirmation_token
+from apps.decorator import authenticated, roles_required
 from apps.home import blueprint
 from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
 from apps.home.models import Calendar, ICal, Event, Attendee
@@ -31,16 +28,13 @@ from apps.tasks import sync_events, send_email
 
 
 @blueprint.route('/index', methods=['POST', 'GET'])
-# @roles_required(UserRole.ADMIN, UserRole.EDITOR)
-@login_required
+@authenticated
 def index():
     event_form = EventForm()
     return render_template('home/index.html', segment='index', event_form=event_form)
 
 
 @blueprint.route('/calendar', methods=['POST', 'GET'])
-@roles_required(UserRole.ADMIN, UserRole.EDITOR)
-@login_required
 def calendar_list():
     form = CalendarForm(request.form)
     calendars = Calendar.query.all()
@@ -55,83 +49,27 @@ def calendar_list():
         # Add qrcode and the language
         calendar = Calendar(uuid=calendar_uuid, name=form.name.data, description=form.description.data,
                             user_id=current_user.get_id())
-
         db.session.add(calendar)
-
         db.session.commit()
 
-        return redirect(url_for('home_blueprint.index'))
+        return redirect(url_for('home_blueprint.calendar_list'))
 
     data = dict(calendars=calendars)
 
     return render_template('home/calendar_list.html', segment='index', data=data, form=form)
 
 
-@blueprint.route('/profile', methods=['GET', 'POST'])
-@login_required
-def profile():
-    profile_form = ProfileForm(request.form, obj=current_user)
-    profile_form.email.data = current_user.email
-    pwd_form = ChangePasswordForm(request.form)
-    email_form = ChangeEmailForm(obj=current_user)
-
-    if request.method == 'POST':
-        if 'change-email' in request.form and email_form.validate_on_submit():
-            if current_user.check_password(email_form.password.data):
-                if Users.query.filter_by(email=email_form.email.data).first():
-                    email_form.email.errors.append(_('This email address is already registered.'))
-                else:
-                    token = generate_confirmation_token(email_form.email.data)
-                    confirm_url = url_for('authentication_blueprint.confirm_email', token=token, change=True,
-                                          _external=True)
-
-                    send_email.delay(
-                        recipients=[email_form.email.data],
-                        subject=_("Email change"),
-                        text=_("To confirm your new email address, please follow this link : %s") % confirm_url,
-                        template='email/authentication_email_template.html',
-                        content=_('To confirm your new email address, please click the link below.'),
-                        lang_code=current_user.language,
-                        buttons={'url': confirm_url, 'text': _('Confirm Change')},
-                    )
-                    flash(_('A confirmation link has been sent to your email. Please check you inbox and spam folder'),
-                          'success')
-            else:
-                email_form.password.errors.append(_('Wrong password provided.'))
-        if 'change-password' in request.form and pwd_form.validate_on_submit():
-            if current_user.check_password(pwd_form.old_password.data):
-                current_user.set_password(pwd_form.password.data)
-                flash(_('Password changed'), 'success')
-
-        if 'edit-profile' in request.form and profile_form.validate_on_submit():
-            profile_form.populate_obj(current_user)
-            flash(_('New profile successfully saved'), 'success')
-        db.session.commit()
-
-    return render_template('home/profile.html', segment='profile',
-                           profile_form=profile_form, email_form=email_form, pwd_form=pwd_form)
-
-
-@blueprint.route('/update_profile', methods=['POST'])
-@login_required
-def update_profile():
-    # Get the form data from the AJAX request
-    form = ProfileForm(request.form)
-    current_user.scan_notification_email = form.scan_notification_email.data
-
-    db.session.commit()
-
-    # Return a JSON response indicating success
-    return jsonify({'status': 'success'})
-
-
-@blueprint.route('/image/<filename>', methods=['GET'])
-def image(filename):
-    return send_file(os.path.join('./static/uploads/', filename))
+@blueprint.route('/calendar/<uuid>', methods=['GET'])
+def calendar_display(uuid):
+    calendar = Calendar.query.filter_by(uuid=uuid).first_or_404()
+    if not calendar.active:
+        abort(404)
+    data = dict(calendar=calendar)
+    return render_template('home/calendar_display.html', segment='qrcode', data=data)
 
 
 @blueprint.route('/calendar/update', methods=['POST'])
-@login_required
+@authenticated
 def calendar_update():
     attr = request.form.get('attr')
     value = bool(str(request.form.get('value')).lower() == 'true')
@@ -147,7 +85,7 @@ def calendar_update():
 
 
 @blueprint.route('/calendar/<int:calendar_id>/edit', methods=['GET', 'POST'])
-@login_required
+@authenticated
 def calendar_edit(calendar_id):
     calendar = Calendar.query.filter_by(id=calendar_id).first_or_404()
     data = dict(calendar=calendar)
@@ -188,8 +126,86 @@ def calendar_edit(calendar_id):
                            linked_cal_form=linked_cal_form, event_form=event_form)
 
 
+@blueprint.route('/calendar/<int:calendar_id>/delete', methods=['GET', 'POST'])
+@authenticated
+@roles_required(UserRole.ADMIN, UserRole.EDITOR)
+def calendar_delete(calendar_id):
+    Calendar.query.filter_by(id=calendar_id).delete()
+    db.session.commit()
+
+    return redirect(url_for('home_blueprint.calendar_list'))
+
+
+@blueprint.route('/profile', methods=['GET', 'POST'])
+@authenticated
+def profile():
+    profile_form = ProfileForm(request.form, obj=current_user)
+    profile_form.email.data = current_user.email
+    pwd_form = ChangePasswordForm(request.form)
+    email_form = ChangeEmailForm(obj=current_user)
+
+    if request.method == 'POST':
+        if 'change-email' in request.form and email_form.validate_on_submit():
+            if current_user.check_password(email_form.password.data):
+                if Users.query.filter_by(email=email_form.email.data).first():
+                    email_form.email.errors.append(_('This email address is already registered.'))
+                else:
+                    token = generate_confirmation_token(email_form.email.data)
+                    confirm_url = url_for('authentication_blueprint.confirm_email', token=token, change=True,
+                                          _external=True)
+
+                    send_email.delay(
+                        recipients=[email_form.email.data],
+                        subject=_("Email change"),
+                        text=_("To confirm your new email address, please follow this link : %s") % confirm_url,
+                        template='email/default_email_template.html',
+                        content=_('To confirm your new email address, please click the link below.'),
+                        lang_code=current_user.language,
+                        buttons={'url': confirm_url, 'text': _('Confirm Change')},
+                    )
+                    flash(_('A confirmation link has been sent to your email. Please check you inbox and spam folder'),
+                          'success')
+            else:
+                email_form.password.errors.append(_('Wrong password provided.'))
+        if 'change-password' in request.form and pwd_form.validate_on_submit():
+            if current_user.check_password(pwd_form.old_password.data):
+                current_user.set_password(pwd_form.password.data)
+                flash(_('Password changed'), 'success')
+
+        if 'edit-profile' in request.form and profile_form.validate_on_submit():
+            profile_form.populate_obj(current_user)
+            flash(_('New profile successfully saved'), 'success')
+        db.session.commit()
+
+    return render_template('home/profile.html', segment='profile',
+                           profile_form=profile_form, email_form=email_form, pwd_form=pwd_form)
+
+
+@blueprint.route('/update_profile', methods=['POST'])
+@authenticated
+def update_profile():
+    # Get the form data from the AJAX request
+    form = ProfileForm(request.form)
+    current_user.scan_notification_email = form.scan_notification_email.data
+
+    db.session.commit()
+
+    # Return a JSON response indicating success
+    return jsonify({'status': 'success'})
+
+
+@blueprint.route('/image/<filename>', methods=['GET'])
+def image(filename):
+    return send_file(os.path.join('./static/uploads/', filename))
+
+
+@blueprint.route('/static/img/<path:filename>')
+def serve_static_file(filename):
+    return send_file(os.path.join('.', 'static', 'assets', 'img', filename))
+
+
 @blueprint.route('/task/<task_name>/start', methods=['GET'])
-@login_required
+@authenticated
 def task_start(task_name):
     task = celery.signature(task_name)
     res = task.delay()
@@ -200,15 +216,6 @@ def task_start(task_name):
 def task_status(task_id):
     task = celery.AsyncResult(task_id)
     return jsonify({'id': task.id, 'status': task.state})
-
-
-@blueprint.route('/calendar/<uuid>', methods=['GET'])
-def calendar_display(uuid):
-    calendar = Calendar.query.filter_by(uuid=uuid).first_or_404()
-    if not calendar.active:
-        abort(404)
-    data = dict(calendar=calendar)
-    return render_template('home/calendar_display.html', segment='qrcode', data=data)
 
 
 @blueprint.route('/calendar/events', methods=['GET'])
@@ -268,7 +275,7 @@ def get_user_json(value):
 
 
 @blueprint.route('/linkedcal/<int:id>/delete', methods=['GET'])
-@login_required
+@authenticated
 def linked_calendar_delete(id):
     ical = ICal.query.join(Calendar).filter(
         ICal.id == id,

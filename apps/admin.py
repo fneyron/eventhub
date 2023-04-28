@@ -1,5 +1,4 @@
-from flask_admin import Admin, AdminIndexView
-from flask_admin.form import SecureForm
+from flask_admin import AdminIndexView, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 

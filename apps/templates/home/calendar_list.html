@@ -19,14 +19,15 @@
         <div class="card card-body shadow border-0 table-wrapper table-responsive">
             <table class="table table-hover align-items-center">
                 <tr class="d-none d-sm-table-row">
-                    <th class="border-bottom">{{ _('Name') }}</th>
-                    <th class="border-bottom">{{ _('Active') }}</th>
+                    <th class="border-bottom col">{{ _('Name') }}</th>
+                    <th class="border-bottom col-auto">{{ _('Active') }}</th>
+                    <th class="border-bottom col-auto">{{ _('Delete') }}</th>
                 </tr>
 
                 {% for calendar in data.calendars %}
 
                 <tr>
-                    <td>
+                    <td  class="col-9">
                         <a href="{{ url_for('home_blueprint.calendar_edit', calendar_id=calendar.id) }}"
                            class="d-flex align-items-center">
 
@@ -37,18 +38,30 @@
                             </div>
                         </a>
                     </td>
-                    <td class="text-end w-auto">
-
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" {% if calendar.active %}checked{% endif %}
-                                       type="checkbox"
-                                       name="active" calendar_id="{{ calendar.id }}">
-                            </div>
+                    <td class="col-auto">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" {% if calendar.active %}checked{% endif %}
+                                   type="checkbox"
+                                   name="active" calendar_id="{{ calendar.id }}">
+                        </div>
+                    </td>
+                    <td class="col-auto text-danger">
+                        <a class="d-inline-flex align-items-center me-2" data-bs-toggle="modal"
+                                data-bs-target="#delete-calendar">
+                            <i class="fa fa-trash"></i>
+                        </a>
                     </td>
 
                 </tr>
+                <!-- Delete Calendar Modal -->
+                {% set modal_content %}
+                {{ _('Are you sure you want to delete {name} ?').format(name=calendar.name) }}
+                {% endset %}
+                {{ macros.render_modal_confirm('delete-calendar', _('Delete Calendar'), modal_content,
+                 _('Confirm'), url_for('home_blueprint.calendar_delete', calendar_id=calendar.id)) }}
                 {% endfor %}
             </table>
+
             <div class="modal fade" id="add-calendar" tabindex="-1" aria-labelledby="add-calendar"
                  style="display: none;" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -87,7 +100,7 @@
                                     </div>
                                 </div>
                                 <div class="py-4">
-                                    {{ form.submit(class="btn btn-gray-800") }}
+                                    {{ form.submit(class="btn btn-primary") }}
                                 </div>
                             </div>
 
@@ -136,6 +149,9 @@
         });
 
     });
+
+
+
 
 
 

@@ -18,19 +18,12 @@ def send_email(recipients, **kwargs):
     msg.subject = Config.WEBSITE_NAME + ' : ' + kwargs['subject']
     msg.sender = Config.MAIL_SENDER
     msg.recipients = recipients
-    data = {
-        'content': kwargs['content'],
-        'buttons': kwargs.get('buttons', []),
-    }
-
     with force_locale(kwargs['lang_code']):
-        msg.html = render_template(kwargs['template'], data=data)
-
-    print(msg.html)
+        msg.html = render_template(kwargs['template'], data=kwargs)
 
     if 'text' in kwargs:
         msg.body = kwargs['text']
-
+    print(msg.html)
     mail.send(msg)
 
 
@@ -40,8 +33,6 @@ def sync_events(calendar_id=None):
         icals = ICal.query.all()
     else:
         icals = ICal.query.filter_by(calendar_id=calendar_id)
-
-
 
     # Loop through each calendar
     for ical in icals:

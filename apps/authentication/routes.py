@@ -63,7 +63,7 @@ def login():
             login_user(user, remember=login_form.remember_me.data)
             user.last_login = datetime.utcnow()
             db.session.commit()
-            return redirect(url_for('authentication_blueprint.route_default'))
+            return redirect(request.args.get('next') or url_for('authentication_blueprint.route_default'))
 
         # Something (user or pass) is not ok
         login_form.email.errors.append(_('Wrong email or password'))
@@ -78,7 +78,7 @@ def register():
         email = form.email.data
 
         # Check email exists
-        user = Users.query.filter_by(email=email).first()
+        user = Users.query.filter_by(email=email, email_confirmed=True).first()
         if user:
             form.email.errors.append(_('Email already registered'))
             return render_template('accounts/register.html',
@@ -170,7 +170,7 @@ def forgot_password():
         send_email.delay(
             recipients=[user.email],
             subject=_("Password Reset Requested"),
-            template='email/authentication_email_template.html',
+            template='email/default_email_template.html',
             text=_(
                 "A password reset request has been received. In order to reset your password, please follow this link : %s" % recover_url),
             content='A password reset request has been received. In order to reset your password, please follow this link',

@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from flask import url_for
 from flask_babel import _
-from flask import url_for, render_template
 from flask_login import current_user
-
+from babel.dates import format_datetime
 from apps import db
 
 
@@ -47,23 +47,34 @@ class Event(db.Model):
         user = Users.query.filter_by(email=email).first()
 
         # Check if an invitation was already sent for this email
-        send_invitation = not(Attendee.query.filter_by(email=email, user_id=None).first())
-        print(send_invitation)
+        send_invitation = not (Attendee.query.filter_by(email=email, user_id=None).first())
+
         attendee = Attendee(email=email, event_id=self.id)
         db.session.add(attendee)
         db.session.commit()
+
         if not user:
             # Send invitation if no previous invitation was sent for this email
             if send_invitation:
-                print('email')
-                recipients = [email]
-                text = _("You've been invited to an event by %s %s. Please sign up to view the details: %s" % (
-                    current_user.firstname, current_user.lastname,
-                    url_for('authentication_blueprint.register', _external=True)))
-                subject = _("You've been invited to an event")
-                data = dict(title=subject, firstname=current_user.firstname, lastname=current_user.lastname)
-                html = render_template('email/email-event-register.html', data=data)
-                send_email.delay(recipients, subject=subject, text=text, html=html)
+                lang_code = current_user.language
+                send_email.delay(
+                    recipients=[email],
+                    lang_code=lang_code,
+                    subject=_("You've been invited to an event"),
+                    text=_("You've been invited to an event by %s %s. Please sign up to view the details: %s" % (
+                        current_user.firstname, current_user.lastname,
+                        url_for('home_blueprint.index', _external=True))),
+                    template='email/event_email_template.html',
+                    content=_(
+                        'You are receiving this email because %s, invited you to the following event.') %
+                            (current_user.firstname),
+                    event={
+                        'title': self.new_summary,
+                        'start': format_datetime(self.start_time, format='medium', locale=lang_code),
+                        'end': format_datetime(self.end_time, format='medium', locale=lang_code),
+                    },
+                    buttons={'url': url_for('home_blueprint.index', _external=True), 'text': _('View Event')},
+                )
         else:
             self.associate_attendee_with_user(user)
 

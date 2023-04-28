@@ -17,7 +17,7 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy as _BaseSQLAlchemy
 
-from apps.admin import MyModelView as ModelView, UserAdminView
+
 
 app = Flask(__name__)
 db = SQLAlchemy()
@@ -71,8 +71,11 @@ def register_extensions(app):
 
 
 def configure_admin(admin, db):
+    from apps.admin import MyModelView, UserAdminView
     from apps.authentication.models import Users
     from apps.home.models import Calendar, ICal, Event, Attendee
+    from flask_admin.contrib.sqla import ModelView
+
     admin.add_view(UserAdminView(Users, db.session))
     admin.add_view(ModelView(Calendar, db.session))
     admin.add_view(ModelView(ICal, db.session))

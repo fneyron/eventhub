@@ -1,0 +1,24 @@
+{% extends "email/base.html" %}
+
+{% block content %}
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="padding: 0 2.5em; text-align: center; padding-bottom: 3em;">
+            <div class="text">
+                <h2>{{ data.content | safe }}</h2>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align: center;">
+            <div class="text-author">
+                <img src="{{ url_for('static', filename='img/calendar.png', _external=True) }}" alt=""
+                     style="width: 100px; max-width: 600px; height: auto; margin: auto; display: block;">
+                <h3 class="name">{{ data.event.title }}</h3>
+                <span>{{ _('From')}}&nbsp;{{ data.event.start }}<br>{{ _('To')}}&nbsp;{{ data.event.end }}</span>
+                <p><a href="{{ data.buttons.url }}" class="btn btn-primary"><b>{{ data.buttons.text }}</b></a></p>
+            </div>
+        </td>
+    </tr>
+</table>
+{% endblock content %}

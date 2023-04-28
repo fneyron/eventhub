@@ -91,7 +91,8 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
 def create_ics(events):
     # create the ICal export file
     ical = ICalendar()
-    ical.add('prodid', '-//My Calendar//Example//EN')
+    ical.add('prodid', 'X-RICAL-TZSOURCE=TZINFO:-//EventHub//Hosting Calendar//EN')
+    ical.add('CALSCALE', 'GREGORIAN')
     ical.add('version', '2.0')
     for event in events:
         ical_event = ICalEvent()
@@ -100,14 +101,13 @@ def create_ics(events):
         ical_event.add('dtend', datetime.fromisoformat(event['end']))
         ical_event.add('uid',
                        f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex}@{urlparse(request.host_url).hostname}")
-        ical_event.add('sequence', 0)
         ical_event.add('description', event.get('description', ''))
-        ical_event.add('location', event.get('location', ''))
+        #ical_event.add('location', event.get('location', ''))
         ical.add_component(ical_event)
 
     ical = ical.to_ical()
     response = make_response(ical)
-    response.headers['Content-Disposition'] = 'attachment; filename=export.ics'
-    response.headers['Content-Type'] = 'text/calendar'
+    response.headers['Content-Disposition'] = 'inline; filename="calendar.ics"'
+    response.headers['Content-Type'] = 'text/calendar;charset=utf-8'
 
     return response
