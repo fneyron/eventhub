@@ -9,8 +9,8 @@ class UserAdminView(ModelView):
     column_exclude_list = ('password', )
     form_excluded_columns = ('password',)
 
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.role.name in ['ADMIN']
+    # def is_accessible(self):
+    #     return current_user.is_authenticated and current_user.role.name in ['ADMIN']
 
 
 class MyAdminIndexView(AdminIndexView):

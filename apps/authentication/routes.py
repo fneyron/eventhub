@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import datetime
 
-from flask import render_template, redirect, request, url_for, flash, session
+from flask import render_template, redirect, request, url_for, flash, current_app
 from flask_babel import _
 from flask_login import (
     current_user,
@@ -13,17 +13,16 @@ from flask_login import (
     login_required,
     logout_user
 )
-from sqlalchemy import or_
 
 import apps
 from apps import db, login_manager
 from apps.authentication import blueprint
 from apps.authentication.forms import LoginForm, CreateAccountForm, ResetPasswordForm, RecoverPasswordForm
 from apps.authentication.models import Users, UserRole
-from apps.authentication.util import send_email_confirmation
 from apps.authentication.util import verify_pass, confirm_token, generate_confirmation_token, hash_pass
 from apps.home.models import Attendee
 from apps.tasks import send_email
+from apps.authentication.util import send_email_confirmation
 
 
 @blueprint.route('/')
@@ -33,7 +32,7 @@ def route_default():
         if not current_user.email_confirmed: return redirect(url_for("authentication_blueprint.unconfirmed"))
 
         # User
-        #if current_user.role == UserRole.USER:
+        # if current_user.role == UserRole.USER:
         #    return redirect(url_for('home_blueprint.profile'))
         return redirect(url_for('home_blueprint.index'))
 
@@ -62,6 +61,8 @@ def login():
         # Check the password
         if user and verify_pass(password, user.password):
             login_user(user, remember=login_form.remember_me.data)
+            user.last_login = datetime.utcnow()
+            db.session.commit()
             return redirect(url_for('authentication_blueprint.route_default'))
 
         # Something (user or pass) is not ok
@@ -74,7 +75,7 @@ def login():
 def register():
     form = CreateAccountForm(request.form)
     if request.method == 'POST' and form.validate_on_submit():
-        email = request.form['email']
+        email = form.email.data
 
         # Check email exists
         user = Users.query.filter_by(email=email).first()
@@ -84,7 +85,7 @@ def register():
                                    form=form)
 
         # else we can create the user
-        user = Users(**request.form)
+        user = Users(**form.data)
         # set as admin if it's the first user
         if user.is_first_user():
             user.role = UserRole.ADMIN
@@ -98,16 +99,14 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        send_email_confirmation(request.form.get('email'))
-        flash(_('A confirmation link has been sent to your email'), 'success')
+        send_email_confirmation(user)
 
         # Delete user from session
         logout_user()
 
         return redirect(url_for('authentication_blueprint.route_default'))
 
-    else:
-        return render_template('accounts/register.html', form=form)
+    return render_template('accounts/register.html', form=form)
 
 
 @blueprint.route('/reset/<token>', methods=["GET", "POST"])
@@ -123,7 +122,7 @@ def reset_with_token(token):
         user = Users.query.filter_by(email=email).first_or_404()
         user.password = hash_pass(form.password.data)
         db.session.commit()
-
+        flash(_('Password successfully updated'), 'success')
         return redirect(url_for('authentication_blueprint.login'))
 
     return render_template('accounts/reset-password.html', form=form, token=token)
@@ -132,28 +131,8 @@ def reset_with_token(token):
 @blueprint.route('/resend-confirmation')
 @login_required
 def resend_confirmation():
-    send_email_confirmation(current_user.email)
-    flash(_('A confirmation link has been sent. Please check you inbox and spam folder'), 'success')
+    send_email_confirmation(current_user)
     return redirect(url_for('authentication_blueprint.unconfirmed'))
-
-
-@blueprint.route('/change-email/<token>/confirm')
-@login_required
-def confirm_email_change(token):
-    try:
-        email = confirm_token(token)
-    except Exception as e:
-        return render_template('main/page-404.html'), 404
-
-    user = Users.query.filter_by(email=current_user.email).first_or_404()
-    user.email = email
-
-    if not user.email_confirmed:
-        user.email_confirmed = True
-        user.email_confirmed_on = datetime.datetime.now()
-    db.session.commit()
-
-    return redirect(url_for("authentication_blueprint.route_default"))
 
 
 @blueprint.route('/email/<token>/confirm')
@@ -162,8 +141,7 @@ def confirm_email(token):
         email = confirm_token(token)
     except Exception as e:
         return render_template('main/page-404.html'), 404
-
-    user = Users.query.filter_by(email=email).first_or_404()
+    user = Users.query.filter_by(email=current_user.email if request.args.get('change') else email).first_or_404()
     user.email = email
 
     if not user.email_confirmed:
@@ -183,25 +161,23 @@ def forgot_password():
             form.email.errors.append(_('Unknown Email, please check the email address'))
             return render_template('accounts/forgot-password.html', form=form)
 
-        subject = _("Password Reset Requested")
-
-        # Here we use the URLSafeTimedSerializer we created in `util` at the
-        # beginning of the chapter
         token = generate_confirmation_token(form.email.data)
-
         recover_url = url_for(
             'authentication_blueprint.reset_with_token',
             token=token,
             _external=True)
 
-        recipients = [user.email]
-        # msg.body = render_template(
-        #    'base/recover-email.html',
-        #    recover_url=recover_url)
-        text_body = _(
-            "A password reset request has been received. In order to reset your password, please follow this link : %s") % recover_url
-
-        send_email.delay(recipients, subject=subject, text=text_body)
+        send_email.delay(
+            recipients=[user.email],
+            subject=_("Password Reset Requested"),
+            template='email/authentication_email_template.html',
+            text=_(
+                "A password reset request has been received. In order to reset your password, please follow this link : %s" % recover_url),
+            content='A password reset request has been received. In order to reset your password, please follow this link',
+            lang_code=user.language,
+            buttons={'url': recover_url, 'text': _('Reset Password')},
+        )
+        flash(_('A link to reset your password has been sent. Please check you inbox and spam folder'), 'success')
         return redirect(url_for('authentication_blueprint.login'))
 
     return render_template('accounts/forgot-password.html', form=form)

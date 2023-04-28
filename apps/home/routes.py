@@ -10,7 +10,8 @@ from urllib.parse import urlparse
 
 import requests
 import shortuuid
-from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash, Response, make_response
+from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash, Response, \
+    make_response, current_app
 from flask_babel import _
 from flask_login import login_required, current_user
 from icalendar import Calendar as ICalendar, Event as ICalEvent
@@ -18,15 +19,15 @@ from werkzeug.datastructures import MultiDict
 
 from apps import db, celery
 from apps import login_manager
-from apps.home.util import get_calendar_events
 from apps.authentication.forms import ProfileForm, ChangePasswordForm, ChangeEmailForm
 from apps.authentication.models import Users, UserRole
-from apps.authentication.util import send_email_change_confirmation
-from apps.home import blueprint
+from apps.authentication.util import send_email_confirmation, generate_confirmation_token
 from apps.decorator import roles_required
+from apps.home import blueprint
 from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
 from apps.home.models import Calendar, ICal, Event, Attendee
-from apps.tasks import sync_events
+from apps.home.util import get_calendar_events
+from apps.tasks import sync_events, send_email
 
 
 @blueprint.route('/index', methods=['POST', 'GET'])
@@ -80,9 +81,19 @@ def profile():
                 if Users.query.filter_by(email=email_form.email.data).first():
                     email_form.email.errors.append(_('This email address is already registered.'))
                 else:
-                    # Send confirmation email
-                    send_email_change_confirmation(email_form.email.data)
-                    flash(_('A confirmation link has been sent to %s') % email_form.email.data, 'success')
+                    token = generate_confirmation_token(email_form.email.data)
+                    confirm_url = url_for('authentication_blueprint.confirm_email', token=token, change=True, _external=True)
+
+                    send_email.delay(
+                        recipients=[email_form.email.data],
+                        subject=_("Email change"),
+                        text=_("To confirm your new email address, please follow this link : %s") % confirm_url,
+                        template='email/authentication_email_template.html',
+                        content=_('To confirm your new email address, please click the link below.'),
+                        lang_code=current_user.language,
+                        buttons={'url': confirm_url, 'text': _('Confirm Change')},
+                    )
+                    flash(_('A confirmation link has been sent to your email. Please check you inbox and spam folder'), 'success')
             else:
                 email_form.password.errors.append(_('Wrong password provided.'))
         if 'change-password' in request.form and pwd_form.validate_on_submit():

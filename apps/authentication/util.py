@@ -3,18 +3,21 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import os
 import hashlib
-from flask_babel import _, lazy_gettext
+import os
+
+from flask import url_for, current_app, flash
+from flask_babel import _
 from itsdangerous import URLSafeTimedSerializer
+
 from apps.config import Config
 from apps.tasks import send_email
-from flask import render_template, redirect, request, url_for
-import binascii
 
+import binascii
 
 secret_key = Config.SECRET_KEY
 secret_pwd = Config.SECURITY_PASSWORD_SALT
+
 
 def hash_pass(password):
     """Hash a password for storing."""
@@ -61,20 +64,19 @@ def confirm_token(token, expiration=3600):
         return False
     return email
 
-def send_email_change_confirmation(email):
-    token = generate_confirmation_token(email)
-    confirm_url = url_for('authentication_blueprint.confirm_email_change', token=token, _external=True)
-    subject = _("New Email requested")
-    recipients = [email]
-    text_body = _("To confirm your new email address, please follow this link : %s") % confirm_url
 
-    send_email.delay(recipients, subject=subject, text=text_body)
-
-def send_email_confirmation(email):
-    token = generate_confirmation_token(email)
+def send_email_confirmation(user):
+    token = generate_confirmation_token(user.email)
     confirm_url = url_for('authentication_blueprint.confirm_email', token=token, _external=True)
-    subject = _("Email confirmation")
-    recipients = [email]
-    text_body = _("To confirm your account, please follow this link : %s") % confirm_url
 
-    send_email.delay(recipients, subject=subject, text=text_body)
+    send_email.delay(
+        recipients=[user.email],
+        subject=_("Email confirmation"),
+        text=_("To confirm your account, please follow this link : %s") % confirm_url,
+        template='email/authentication_email_template.html',
+        content='Thank your <b>%s</b> for registering to %s. Please, click the link below to confirm your email address.' %
+                (user.firstname, current_app.config['WEBSITE_NAME']),
+        lang_code=user.language,
+        buttons={'url': confirm_url, 'text': _('Confirm Email')},
+    )
+    flash(_('A confirmation link has been sent. Please check you inbox and spam folder'), 'success')

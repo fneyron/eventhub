@@ -1,6 +1,7 @@
 from datetime import datetime, date, time
 
 import requests
+from flask import render_template
 from flask_babel import force_locale
 from flask_mail import Message
 from icalendar import Calendar as ICalendar
@@ -17,12 +18,16 @@ def send_email(recipients, **kwargs):
     msg.subject = Config.WEBSITE_NAME + ' : ' + kwargs['subject']
     msg.sender = Config.MAIL_SENDER
     msg.recipients = recipients
-    if 'html' in kwargs:
-        if 'lang_code' in kwargs:
-            with force_locale(kwargs['lang_code']):
-                msg.html = kwargs['html']
-        else:
-            msg.html = kwargs['html']
+    data = {
+        'content': kwargs['content'],
+        'buttons': kwargs.get('buttons', []),
+    }
+
+    with force_locale(kwargs['lang_code']):
+        msg.html = render_template(kwargs['template'], data=data)
+
+    print(msg.html)
+
     if 'text' in kwargs:
         msg.body = kwargs['text']
 

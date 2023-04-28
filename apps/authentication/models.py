@@ -19,30 +19,35 @@ class UserRole(Enum):
     EDITOR = _('Editor')
     USER = _('User')
 
+
 class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
-    #username = db.Column(db.String(64), unique=True)
     firstname = db.Column(db.String)
     lastname = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     password = db.Column(db.LargeBinary)
-    calendars = db.relationship('Calendar', backref='user', lazy=True)
-    events = db.relationship('Event', backref='creator', lazy=True)
     language = db.Column(db.String(2), nullable=False)
     creation = db.Column(db.DateTime(), default=datetime.utcnow())
     update = db.Column(db.DateTime(), onupdate=datetime.utcnow(), default=datetime.utcnow())
+    last_login = db.Column(db.DateTime, default=datetime.utcnow)
     email_confirmed = db.Column(db.Boolean(), default=False)
     email_confirmed_on = db.Column(db.DateTime())
     role = db.Column(db.Enum(UserRole), default=UserRole.USER)
-    #is_admin = db.Column(db.Boolean(), default=False)
 
-    # Status
+    calendars = db.relationship('Calendar', backref='user', lazy=True)
+    events = db.relationship('Event', backref='creator', lazy=True)
+    events = db.relationship('Notification', backref='user', lazy=True)
+
+    def add_notification(self, content):
+        notification = Notification(user_id=self.id, content=content)
+        self.notification.append(notification)
+        db.session.commit()
+
     @staticmethod
     def is_first_user():
         return Users.query.count() == 0
-
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -81,6 +86,16 @@ class Users(db.Model, UserMixin):
         from apps.home.models import ICal
         return ICal.query.filter()
 
+
+class Notification(db.Model):
+    __tablename__ = 'Notification'
+
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+
+
+# Charge l'utilisateur
 
 @login_manager.user_loader
 def user_loader(id):
