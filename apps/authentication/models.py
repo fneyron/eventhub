@@ -31,7 +31,7 @@ class Users(db.Model, UserMixin):
     language = db.Column(db.String(2), nullable=False)
     creation = db.Column(db.DateTime(), default=datetime.utcnow())
     update = db.Column(db.DateTime(), onupdate=datetime.utcnow(), default=datetime.utcnow())
-    last_login = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime, default=datetime.utcnow())
     email_confirmed = db.Column(db.Boolean(), default=False)
     email_confirmed_on = db.Column(db.DateTime())
     role = db.Column(db.Enum(UserRole), default=UserRole.USER)

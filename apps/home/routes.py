@@ -26,7 +26,7 @@ from apps.decorator import roles_required
 from apps.home import blueprint
 from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
 from apps.home.models import Calendar, ICal, Event, Attendee
-from apps.home.util import get_calendar_events
+from apps.home.util import get_calendar_events, create_ics
 from apps.tasks import sync_events, send_email
 
 
@@ -82,7 +82,8 @@ def profile():
                     email_form.email.errors.append(_('This email address is already registered.'))
                 else:
                     token = generate_confirmation_token(email_form.email.data)
-                    confirm_url = url_for('authentication_blueprint.confirm_email', token=token, change=True, _external=True)
+                    confirm_url = url_for('authentication_blueprint.confirm_email', token=token, change=True,
+                                          _external=True)
 
                     send_email.delay(
                         recipients=[email_form.email.data],
@@ -93,7 +94,8 @@ def profile():
                         lang_code=current_user.language,
                         buttons={'url': confirm_url, 'text': _('Confirm Change')},
                     )
-                    flash(_('A confirmation link has been sent to your email. Please check you inbox and spam folder'), 'success')
+                    flash(_('A confirmation link has been sent to your email. Please check you inbox and spam folder'),
+                          'success')
             else:
                 email_form.password.errors.append(_('Wrong password provided.'))
         if 'change-password' in request.form and pwd_form.validate_on_submit():
@@ -265,38 +267,6 @@ def get_user_json(value):
     return jsonify(list(set([user.email for user in users + attendee])))
 
 
-# @blueprint.route('/calendar/<calendar_uuid>/events', methods=['GET'])
-# def calendar_events_get(calendar_uuid):
-#     calendar = Calendar.query.filter_by(uuid=calendar_uuid).first_or_404()
-#     ical_events = []
-#     for ical in calendar.ical:
-#         if ical.url is not None:
-#             response = requests.get(ical.url)
-#             cal = ICalendar.from_ical(response.text)
-#             for component in cal.walk():
-#                 if component.name == "VEVENT":
-#                     event = {
-#                         'title': component.get('summary'),
-#                         'start': component.get('dtstart').dt.isoformat(),
-#                         'end': component.get('dtend').dt.isoformat(),
-#                         'description': component.get('description'),
-#                         'color': ical.color,
-#                     }
-#                     ical_events.append(event)
-#
-#     custom_events = []
-#     for event in calendar.events:
-#         custom_events.append({
-#             'title': event.summary,
-#             'start': event.start_time.isoformat(),
-#             'end': event.end_time.isoformat(),
-#             'description': event.description,
-#         })
-#
-#     all_events = ical_events + custom_events
-#     return jsonify(all_events)
-
-
 @blueprint.route('/linkedcal/<int:id>/delete', methods=['GET'])
 @login_required
 def linked_calendar_delete(id):
@@ -311,28 +281,10 @@ def linked_calendar_delete(id):
 
 @blueprint.route('/calendar/export', methods=['GET'])
 def calendar_export_ics():
-    events = get_calendar_events(calendar_id=request.args.get('calendar_id'), attendees=request.args.getlist('attendees'))
-    # create the ICal export file
-    ical = ICalendar()
-    ical.add('prodid', '-//My Calendar//Example//EN')
-    ical.add('version', '2.0')
-    for event in events:
-        ical_event = ICalEvent()
-        ical_event.add('summary', event['title'])
-        ical_event.add('dtstart', datetime.fromisoformat(event['start']))
-        ical_event.add('dtend', datetime.fromisoformat(event['end']))
-        ical_event.add('uid',
-                       f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex}@{urlparse(request.host_url).hostname}")
-        ical_event.add('sequence', 0)
-        ical_event.add('description', event.get('description', ''))
-        ical_event.add('location', event.get('location', ''))
-        ical.add_component(ical_event)
+    events = get_calendar_events(calendar_id=request.args.get('calendar_id'),
+                                 attendees=request.args.getlist('attendees'))
 
-    ical = ical.to_ical()
-    response = make_response(ical)
-    response.headers['Content-Disposition'] = 'attachment; filename=export.ics'
-    response.headers['Content-Type'] = 'text/calendar'
-    return response
+    return create_ics(events)
 
 
 @blueprint.route('/icalendar', methods=['GET'])
@@ -341,132 +293,6 @@ def icalendar_get_url():
     response = requests.get(url)
 
     return Response(response.text, content_type='text/calendar')
-
-
-#
-# @blueprint.route('/qrcode/<int:qrcode_id>/delete', methods=['GET'])
-# @login_required
-# def qrcode_delete(qrcode_id):
-#     qrcode = QRCode.query.filter_by(id=qrcode_id, user_id=current_user.get_id()).first_or_404()
-#     db.session.delete(qrcode)
-#     db.session.commit()
-#     if os.path.isfile(os.path.join(current_app.config['UPLOAD_FOLDER'], qrcode.picture)):
-#         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], qrcode.picture))
-#     return redirect(url_for('home_blueprint.index'))
-#
-#
-# @blueprint.route('/qrcode/<int:qrcode_id>/add_language', methods=['POST'])
-# @login_required
-# def add_language(qrcode_id):
-#     qrcode = QRCode.query.filter_by(id=qrcode_id).first_or_404()
-#     if request.form.get('referer') and request.form.get('lang'):
-#         lang = Language(lang_code=request.form.get('lang'), qrcode_id=qrcode_id, default=False)
-#         qrcode.languages.append(lang)
-#         db.session.add(lang)
-#         db.session.commit()
-#
-#     return redirect(request.form.get('referer'))
-#
-#
-# @blueprint.route('/qrcode/<int:qrcode_id>/element/<int:element_id>/move', methods=['GET'])
-# def element_move(qrcode_id, element_id):
-#     element = Element.query.filter_by(id=element_id).first_or_404()
-#     # Check if we edit order
-#     if request.args.get('direction'):
-#         direction = request.args.get('direction')
-#         if direction == "up":
-#             new_pos = element.order - 1
-#         elif direction == "down":
-#             new_pos = element.order + 1
-#         el = Element.query.filter_by(order=new_pos).first()
-#         if el:
-#             el.order = element.order
-#             element.order = new_pos
-#             db.session.commit()
-#     return redirect(url_for('home_blueprint.qrcode_edit', qrcode_id=qrcode_id))
-#
-#
-
-# @blueprint.route('/qrcode/<int:qrcode_id>/add_element', methods=['GET', 'POST'])
-# @login_required
-# def element_add(qrcode_id):
-#     qrcode = QRCode.query.filter_by(id=qrcode_id).first_or_404()
-#
-#     element_type = request.args.get('element_type')
-#     if element_type not in current_app.config['ELEMENTS'].keys():
-#         abort(404)
-#
-#     form_class, element_class = get_form_and_element_classes(element_type)
-#     form = form_class(obj=request.form)
-#
-#     if form.validate_on_submit():
-#
-#         element_data = form.data.copy()
-#         del element_data['csrf_token']
-#         del element_data['submit']
-#         element_data['qrcode_id'] = qrcode.id
-#         element_data['order'] = Element.get_latest_order_for_qrcode(qrcode.id) + 1
-#         element = element_class(**element_data)
-#         db.session.add(element)
-#         db.session.commit()
-#         return redirect(url_for('home_blueprint.element_edit', qrcode_id=qrcode.id, element_id=element.id,
-#                                 element_type=element_type))
-#
-#     data = dict(qrcode=qrcode, element_type=element_type)
-#     return render_template('home/element_edit.html', segment='elements', data=data, form=form)
-#
-#
-# @blueprint.route('/qrcode/<int:qrcode_id>/element/<int:element_id>/edit', methods=['GET', 'POST'])
-# @login_required
-# def element_edit(qrcode_id, element_id):
-#     qrcode = QRCode.query.filter_by(id=qrcode_id).first_or_404()
-#
-#     element_type = request.args.get('element_type')
-#     if element_type not in current_app.config['ELEMENTS'].keys():
-#         abort(404)
-#     form_class, element_class = get_form_and_element_classes(element_type)
-#
-#     element = element_class.query.filter_by(id=element_id, qrcode_id=qrcode.id).first_or_404()
-#     form = form_class(obj=element)
-#
-#     if form.validate_on_submit():
-#         element_data = form.data.copy()
-#         del element_data['csrf_token']
-#         del element_data['submit']
-#         element_data['qrcode_id'] = qrcode.id
-#
-#         form.populate_obj(element)
-#         db.session.commit()
-#
-#     data = dict(qrcode=qrcode, element=element, element_type=element_type)
-#     return render_template('home/element_edit.html', segment='elements', data=data, form=form)
-#
-#
-# def get_form_and_element_classes(element_type):
-#     """Return the form and element classes for a given element type."""
-#     from apps.home.forms import ContentForm, WifiForm, LinkForm
-#     from apps.home.models import ContentElement, WIFIElement, LinkElement
-#
-#     if element_type == 'content':
-#         return ContentForm, ContentElement
-#     if element_type == 'link':
-#         return LinkForm, LinkElement
-#     # elif element_type == 'location':
-#     #     return LocationForm, LocationElement
-#     elif element_type == 'wifi':
-#         return WifiForm, WIFIElement
-#     else:
-#         raise ValueError(f"Unsupported element type: {element_type}")
-#         abort(404)
-#
-#
-# @blueprint.route('/element/<int:element_id>/delete', methods=['GET', 'POST'])
-# @login_required
-# def element_delete(element_id):
-#     element = Element.query.filter_by(id=element_id).first_or_404()
-#     db.session.delete(element)
-#     db.session.commit()
-#     return redirect(url_for('home_blueprint.qrcode_edit', qrcode_id=element.qrcode_id))
 
 
 @login_manager.unauthorized_handler

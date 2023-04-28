@@ -3,7 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import datetime
+from datetime import datetime
 
 from flask import render_template, redirect, request, url_for, flash, current_app
 from flask_babel import _
@@ -146,7 +146,7 @@ def confirm_email(token):
 
     if not user.email_confirmed:
         user.email_confirmed = True
-        user.email_confirmed_on = datetime.datetime.now()
+        user.email_confirmed_on = datetime.now()
     db.session.commit()
 
     return redirect(url_for("authentication_blueprint.route_default"))
