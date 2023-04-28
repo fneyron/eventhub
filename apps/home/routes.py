@@ -213,7 +213,7 @@ def calendar_events_json():
     return jsonify(events)
 
 
-@blueprint.route('/event/<event_id>/update', methods=['POST', 'GET'])
+@blueprint.route('/event/<event_id>/update', methods=['POST'])
 def event_update(event_id):
     event = Event.query.get(event_id)
     if not event: return jsonify({'success': False, 'error': 'Event not found'})
