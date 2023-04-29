@@ -51,6 +51,9 @@ function renderCalendar(id, events, user) {
                 right: 'today prev,next',
                 left: 'title',
             },
+            buttonText: {
+              today: ''
+            },
             bootstrapFontAwesome: { today: 'redo' },
             eventSources:events,
             eventContent: function(arg) {

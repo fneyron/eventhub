@@ -97,7 +97,7 @@ ul {
   z-index: 9999 !important;
 }
 
-
+/* FULL CALENDAR UPDATE */
 @media (max-width: 768px) {
   #calendar {
     width: 100%;
@@ -110,4 +110,17 @@ ul {
 
 .fc .fc-button .fc-button-text {
   display: none;
+}
+
+/* Calendar header title size */
+.fc .fc-toolbar-title {
+  font-size: 1.2rem; /* Change the value to your desired font size */
+}
+
+.fc-today-button::before {
+  font-family: 'Font Awesome 6 Free'; /* Or 'Font Awesome 6 Free', depending on the version you are using */
+  content: "\f133"; /* Unicode value for the desired FontAwesome icon (e.g., \f073 for the 'calendar' icon) */
+  font-weight: 900; /* Adjust the font weight based on the FontAwesome version you are using (900 for the solid style) */
+  font-size: 16px; /* Adjust the font size as needed */
+  vertical-align: middle;
 }

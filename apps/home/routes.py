@@ -290,7 +290,6 @@ def linked_calendar_delete(id):
 def calendar_export_ics():
     events = get_calendar_events(calendar_id=request.args.get('calendar_id'),
                                  attendees=request.args.getlist('attendees'))
-
     return create_ics(events)
 
 
