@@ -9,7 +9,7 @@ from apps.home.models import ICal
 class CalendarForm(FlaskForm):
     name = StringField(_l('Name'), validators=[DataRequired(), Length(max=100)])
     description = TextAreaField(_l('Description'), validators=[Length(max=500)])
-    street = StringField(_l('Street'),
+    address = StringField(_l('Street'),
                          validators=[DataRequired()])
     zip = StringField(_l('ZIP Code'),
                       validators=[DataRequired()])
