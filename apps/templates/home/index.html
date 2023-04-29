@@ -21,10 +21,10 @@
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600" data-bs-toggle="modal"
                 data-bs-target="#share-calendar">
-            Share
+            {{ _('Ical') }}
         </button>
         <a type="button" id="export-button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=None if current_user.role.name in ['ADMIN', 'EDITOR'] else [current_user.email]) }}">Export</a>
+           href="{{ url_for('home_blueprint.calendar_export_ics', attendees=None if current_user.role.name in ['ADMIN', 'EDITOR'] else [current_user.email]) }}">{{ _('Download') }}</a>
     </div>
 </div>
 {% set modal_content %}
