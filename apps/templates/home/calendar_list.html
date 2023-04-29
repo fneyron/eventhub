@@ -27,7 +27,7 @@
                 {% for calendar in data.calendars %}
 
                 <tr>
-                    <td  class="col-9">
+                    <td class="col-9">
                         <a href="{{ url_for('home_blueprint.calendar_edit', calendar_id=calendar.id) }}"
                            class="d-flex align-items-center">
 
@@ -47,7 +47,7 @@
                     </td>
                     <td class="col-auto text-danger">
                         <a class="d-inline-flex align-items-center me-2" data-bs-toggle="modal"
-                                data-bs-target="#delete-calendar">
+                           data-bs-target="#delete-calendar">
                             <i class="fa fa-trash"></i>
                         </a>
                     </td>
@@ -58,57 +58,110 @@
                 {{ _('Are you sure you want to delete {name} ?').format(name=calendar.name) }}
                 {% endset %}
                 {{ macros.render_modal_confirm('delete-calendar', _('Delete Calendar'), modal_content,
-                 _('Confirm'), url_for('home_blueprint.calendar_delete', calendar_id=calendar.id)) }}
+                _('Confirm'), url_for('home_blueprint.calendar_delete', calendar_id=calendar.id)) }}
                 {% endfor %}
             </table>
 
-            <div class="modal fade" id="add-calendar" tabindex="-1" aria-labelledby="add-calendar"
-                 style="display: none;" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <form method="POST" action="">
-                            <div class="modal-body p-4">
-                                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                <div class="text-center text-md-center mb-4 mt-md-0"><h1 class="mb-0 h4">{{ _('Add
-                                    Calendar')}}</h1></div>
 
+            {% set modal_content %}
+            {{ form.csrf_token }}
 
-                                {{ form.csrf_token }}
-
-                                <div class="mb-4">
-                                    <div class="col-12">
-                                        {{ form.name.label }}
-                                        {{ form.name(class="form-control") }}
-                                        <small id="{{ form.name.id }}-help" class="form-text text-muted">{{
-                                            form.name.description }}</small>
-                                        <div id="{{ form.name.id }}-error" class="invalid-feedback d-block">{{
-                                            form.name.errors | first }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-4">
-                                    <div class="col-12">
-                                        {{ form.description.label }}
-                                        {{ form.description(class="form-control") }}
-                                        <small id="{{ form.description.id }}-help" class="form-text text-muted">{{
-                                            form.description.description }}</small>
-                                        <div id="{{ form.description.id }}-error" class="invalid-feedback d-block">
-                                            {{
-                                            form.description.errors | first }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="py-4">
-                                    {{ form.submit(class="btn btn-primary") }}
-                                </div>
-                            </div>
-
-
-                        </form>
+            <div class="mb-4">
+                <div class="col-12">
+                    {{ form.name.label }}
+                    {{ form.name(class="form-control") }}
+                    <small id="{{ form.name.id }}-help" class="form-text text-muted">{{
+                        form.name.description }}</small>
+                    <div id="{{ form.name.id }}-error" class="invalid-feedback d-block">{{
+                        form.name.errors | first }}
                     </div>
                 </div>
             </div>
+            <div class="mb-4">
+                <div class="col-12">
+                    {{ form.description.label }}
+                    {{ form.description(class="form-control") }}
+                    <small id="{{ form.description.id }}-help" class="form-text text-muted">{{
+                        form.description.description }}</small>
+                    <div id="{{ form.description.id }}-error" class="invalid-feedback d-block">
+                        {{
+                        form.description.errors | first }}
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                {{ form.street.label }}
+                <div class="input-group">
+                    {% if form.street.errors %}
+                    {{ input(class="form-control is-invalid", autocomplete="address-line1") }}
+                    {% else %}
+                    {{ form.street(class="form-control", autocomplete="address-line1") }}
+                    {% endif %}
+                </div>
+                <small id="{{ form.street.id }}-help" class="form-text text-muted">{{ form.street.description
+                    }}</small>
+                <div id="{{ form.street.id }}-error" class="invalid-feedback">{{ form.street.errors | first
+                    }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-sm-6">
+                    <div class="mb-4">
+                        {{ form.zip.label }}
+                        <div class="input-group">
+                            {% if form.zip.errors %}
+                            {{ input(class="form-control is-invalid", autocomplete="postal-code") }}
+                            {% else %}
+                            {{ form.zip(class="form-control", autocomplete="postal-code") }}
+                            {% endif %}
+                        </div>
+                        <small id="{{ form.zip.id }}-help" class="form-text text-muted">{{ form.zip.description
+                            }}</small>
+                        <div id="{{ form.zip.id }}-error" class="invalid-feedback">{{ form.zip.errors | first
+                            }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-sm-6">
+                    <div class="mb-4">
+                        {{ form.city.label }}
+                        <div class="input-group">
+                            {% if form.city.errors %}
+                            {{ input(class="form-control is-invalid", autocomplete="address-level2") }}
+                            {% else %}
+                            {{ form.city(class="form-control", autocomplete="address-level2") }}
+                            {% endif %}
+                            {{ form.country_code(style="display:none;", autocomplete="country") }}
+                        </div>
+                        <small id="{{ form.city.id }}-help" class="form-text text-muted">{{ form.city.description
+                            }}</small>
+                        <div id="{{ form.city.id }}-error" class="invalid-feedback">{{ form.city.errors | first
+                            }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                {{ form.country.label }}
+                <div class="input-group">
+                    {% if form.country.errors %}
+                    {{ input(class="form-control is-invalid") }}
+                    {% else %}
+                    {{ form.country(class="form-control") }}
+                    {% endif %}
+                    {{ form.country_code(style="display:none;", autocomplete="country") }}
+
+                </div>
+                <small id="{{ form.country.id }}-help" class="form-text text-muted">{{ form.country.description
+                    }}</small>
+                <div id="{{ form.country.id }}-error" class="invalid-feedback">{{ form.country.errors | first
+                    }}
+                </div>
+            </div>
+            <div id="map" style="height: 200px; display:none;" class="mb-3"></div>
+            {% endset %}
+            {{ macros.render_modal_form('add-calendar', _('Add Calendar'), modal_content,
+            form.submit(class="btn btn-primary")) }}
         </div>
     </div>
 </div>
@@ -117,7 +170,7 @@
 <!-- Specific Element JS goes HERE  -->
 {% block javascripts %}
 <script>
-
+    /* If there is errors in the add calendar form then we show the modal */
     {% if form.errors %}
         $(window).on('load', function() {
             $('#add-calendar').modal('show');
@@ -147,14 +200,24 @@
                 }
             });
         });
+        country_input('country');
+        const script = document.getElementById('search-js');
+        script.onload = function() {
+            autofill = mapboxsearch.autofill({
+                accessToken: token
+            });
+            autofill.addEventListener('retrieve', (event) => {
+                console.log(event.detail.features[0]);
+                $('#map').show();
+                loadMap('map', event.detail.features[0].geometry.coordinates[0],
+                    event.detail.features[0].geometry.coordinates[1], 0, 12)
+                const featureCollection = event.detail;
+                cc = featureCollection.features[0].properties.country_code;
+                $("#profile_country").countrySelect("selectCountry", cc);
+            });
+        };
 
     });
-
-
-
-
-
-
 
 </script>
 {% endblock javascripts %}

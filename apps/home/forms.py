@@ -8,8 +8,17 @@ from apps.home.models import ICal
 
 class CalendarForm(FlaskForm):
     name = StringField(_l('Name'), validators=[DataRequired(), Length(max=100)])
-    description = StringField(_l('Description'), validators=[Length(max=500)])
-
+    description = TextAreaField(_l('Description'), validators=[Length(max=500)])
+    street = StringField(_l('Street'),
+                         validators=[DataRequired()])
+    zip = StringField(_l('ZIP Code'),
+                      validators=[DataRequired()])
+    city = StringField(_l('City'),
+                       validators=[DataRequired()])
+    country = StringField(_l('Country'),
+                          validators=[DataRequired()])
+    country_code = StringField(_l('Country Code'),
+                               validators=[DataRequired()])
     submit = SubmitField(_l('Save'), name='cal-form')
 
 
@@ -28,6 +37,7 @@ class LinkedCalendarForm(FlaskForm):
             if existing_url:
                 raise ValidationError(_l('This URL already exists.'))
 
+
 class EventForm(FlaskForm):
     title = StringField(_l('Title'), id='eventTitleEdit', validators=[DataRequired()])
     start_time = DateTimeField(_l('Select Start Date'), id='dateStartEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
@@ -37,4 +47,5 @@ class EventForm(FlaskForm):
     id = HiddenField(id='eventIdEdit')
     location = StringField('Location')
     description = TextAreaField(_l('Description'), id='eventDescriptionEdit')
-    attendee = StringField(_l('Attendee'), id='eventAttendeeEdit', description=_l('Please, add attendee email address of people in charge'))
+    attendee = StringField(_l('Attendee'), id='eventAttendeeEdit',
+                           description=_l('Please, add attendee email address of people in charge'))

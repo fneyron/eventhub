@@ -304,3 +304,50 @@ function checkTaskStatus(taskId) {
 }
 
 
+function country_input(field_id){
+     $("#"+ field_id).countrySelect({
+        defaultCountry: "fr",
+        preferredCountries: ['fr', 'gb', 'us'],
+        responsiveDropdown: true,
+    });
+}
+
+var token = '{{ config.MAPBOX_TOKEN }}';
+function loadMap(id, lng, lat, acc, zoom) {
+    mapboxgl.accessToken = token;
+    const metersToPixelsAtMaxZoom = (acc, lat) => acc / 0.075 / Math.cos(lat * Math.PI / 180)
+    var map = new mapboxgl.Map({
+        container: id,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [lng, lat],
+        zoom: zoom,
+    });
+    map.on('load', () => {
+        // Create a new marker.
+        const marker = new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .addTo(map);
+        var options = {
+          steps: 100,
+          units: 'kilometers'
+        };
+        if (acc != 0){
+            var circle = turf.circle(turf.point([lng, lat]), acc/1000, options);
+            // Create a circle for accuracy
+             map.addLayer({
+                "id": "circle-fill",
+                "type": "fill",
+                "source": {
+                    "type": "geojson",
+                    "data": circle
+                },
+                "paint": {
+                    "fill-color": "#1da1f2",
+                    "fill-opacity": 0.2
+                }
+            });
+            map.fitBounds(turf.bbox(circle), {padding: 20});
+        }
+    });
+    return mapboxgl;
+}
