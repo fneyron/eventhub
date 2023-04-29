@@ -1,3 +1,25 @@
+{% macro render_modal_info(id, title, content) %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="h6 modal-title">{{ title }}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                {{ content }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link text-gray-600 ms-auto" data-bs-dismiss="modal">
+                    {{_('Close')}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
 {% macro render_modal_confirm(id, title, content, submit, url) %}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}"
      style="display: none;" aria-hidden="true">

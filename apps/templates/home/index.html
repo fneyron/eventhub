@@ -19,11 +19,27 @@
         {% endif %}
     </div>
     <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-outline-gray-600">Share</button>
+        <button type="button" class="btn btn-sm btn-outline-gray-600" data-bs-toggle="modal"
+                data-bs-target="#share-calendar">
+            Share
+        </button>
         <a type="button" id="export-button" class="btn btn-sm btn-outline-gray-600"
            href="{{ url_for('home_blueprint.calendar_export_ics', attendees=None if current_user.role.name in ['ADMIN', 'EDITOR'] else [current_user.email]) }}">Export</a>
     </div>
 </div>
+{% set modal_content %}
+<div class="row">
+    <p>{{ _('Copy the ical address to your favorite calendar tool to keep all your calendar at the same place.')}}</p>
+    <div class="d-flex mb-3 justify-content-center input-group">
+        <input type="text" class="form-control" readonly
+               value="{{ url_for('home_blueprint.calendar_export_ics', attendees=None if current_user.role.name in ['ADMIN', 'EDITOR'] else [current_user.email], _external=True) }}">
+        <button type="button" onclick="copy_to_clipboard()"
+                class="btn btn-block btn-secondary">{{_('Copy')}}
+        </button>
+    </div>
+</div>
+{% endset %}
+{{ macros.render_modal_info('share-calendar', _('Share Calendar'), modal_content) }}
 
 <div class="row">
     <div class="col-12">
@@ -158,6 +174,10 @@
             initCalendar();
         });
     })();
+
+
+
+
 
 </script>
 {% endblock javascripts %}

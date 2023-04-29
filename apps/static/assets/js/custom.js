@@ -308,7 +308,7 @@ function country_input(field_id){
      $("#"+ field_id).countrySelect({
         defaultCountry: "fr",
         preferredCountries: ['fr', 'gb', 'us'],
-        responsiveDropdown: true,
+        responsiveDropdown: false,
     });
 }
 
@@ -350,4 +350,12 @@ function loadMap(id, lng, lat, acc, zoom) {
         }
     });
     return mapboxgl;
+}
+
+
+function copy_to_clipboard() {
+    const inputElement = document.querySelector('.form-control');
+    inputElement.select();
+    inputElement.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand('copy');
 }

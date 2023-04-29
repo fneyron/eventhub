@@ -124,3 +124,14 @@ ul {
   font-size: 16px; /* Adjust the font size as needed */
   vertical-align: middle;
 }
+
+/* Specific for Phone Number */
+.iti, .country-select {
+    display: block !important;
+
+}
+.iti *, .country-select * {
+    font-size: 0.875rem !important;
+}
+
+.country-select {width: 100%;}
