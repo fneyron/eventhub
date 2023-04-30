@@ -111,6 +111,18 @@
     (function () {
         let myCalendar;
         const user = {{ current_user.to_json() | safe }};
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('event_id');
+
+        function initCalendar() {
+            const events = [
+                {
+                    url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
+                },
+            ];
+
+            myCalendar = renderCalendar('calendar', events, user);
+        }
 
         function refetchEventsForAttendee(email) {
             myCalendar.getEventSources().forEach(source => source.remove());
@@ -137,15 +149,6 @@
             });
         }
 
-        function initCalendar() {
-            const events = [
-                {
-                    url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
-                },
-            ];
-
-            myCalendar = renderCalendar('calendar', events, user);
-        }
         function updateExportButtonHref(attendees) {
             const exportButton = document.querySelector('#export-button');
             const baseUrl = "{{ url_for('home_blueprint.calendar_export_ics') }}";
