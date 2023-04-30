@@ -57,8 +57,9 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
     if start and end:
         events_query = (
             events_query
-            .filter(Event.start_time >= start)
-            .filter(Event.end_time <= end)
+            .filter(((Event.start_time >= start) & (Event.start_time <= end)) |
+                    ((Event.end_time >= start) & (Event.end_time <= end)) |
+                    ((Event.start_time <= start) & (Event.end_time >= end)))
         )
 
     grouped_events = {}
@@ -88,6 +89,7 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
 
     return events
 
+
 def create_ics(events):
     # create the ICal export file
     ical = ICalendar()
@@ -102,7 +104,7 @@ def create_ics(events):
         ical_event.add('uid',
                        f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex}@{urlparse(request.host_url).hostname}")
         ical_event.add('description', event.get('description', ''))
-        #ical_event.add('location', event.get('location', ''))
+        # ical_event.add('location', event.get('location', ''))
         ical.add_component(ical_event)
 
     ical = ical.to_ical()
