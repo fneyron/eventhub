@@ -12,8 +12,10 @@ function renderCalendar(id, events, user) {
     const editEventModalEl = d.getElementById('modal-edit-event');
     const editEventModal = new bootstrap.Modal(editEventModalEl);
     const editEventTitleInput = d.getElementById('eventTitleEdit');
+    const editEventOrigTitleTooltip = d.getElementById('eventTitleEdit-tooltip');
     const editEventIdInput = d.getElementById('eventIdEdit');
     const editEventDescriptionInput = d.getElementById('eventDescriptionEdit');
+    const editEventOrigDescriptionTooltip = d.getElementById('eventDescriptionEdit-tooltip');
     const editEventAttendeeInput = d.getElementById('eventAttendeeEdit');
     //const choices = new Choices(editEventAttendeeInput);
     tagify = new Tagify(editEventAttendeeInput, {whitelist:[]});
@@ -98,7 +100,7 @@ function renderCalendar(id, events, user) {
         eventMouseLeave: function(info) {
           tooltip.dispose();
         },*/
-        dateClick: (d) => {
+        /*dateClick: (d) => {
             addNewEventModal.show();
             newEventTitleInput.value = '';
             newEventStartDatepicker.setDate(d.date);
@@ -107,7 +109,7 @@ function renderCalendar(id, events, user) {
             addNewEventModalEl.addEventListener('shown.bs.modal', function () {
                 newEventTitleInput.focus();
             });
-        },
+        },*/
         eventClick: (info) => {
             // Check if event source is not editable
             if (info.event.extendedProps.disabled) {
@@ -135,16 +137,22 @@ function renderCalendar(id, events, user) {
             // set current id
             currentId = info.event.id;
             editEventIdInput.value = info.event.id;
+            editEventOrigTitleTooltip.setAttribute('data-bs-content', info.event.extendedProps.orig_title);
             editEventTitleInput.value = info.event.title;
             editEventDescriptionInput.value = info.event.extendedProps.description;
-            /*choices.clearStore();
-            if (info.event.extendedProps.attendees.length){
-                choices.setValue(info.event.extendedProps.attendees);
-            }*/
+            editEventOrigDescriptionTooltip.setAttribute('data-bs-content', info.event.extendedProps.orig_description);
+
+            // add event listeners to title and description tooltips
+            /*editEventOrigTitleTooltip.addEventListener('click', function() {
+              editEventTitleInput.value = info.event.extendedProps.orig_title;
+            });
+
+            editEventOrigDescriptionTooltip.addEventListener('click', function() {
+              editEventDescriptionInput.value = info.event.extendedProps.orig_description;
+            });*/
 
             const initialValue = info.event.extendedProps.attendees;
             tagify.loadOriginalValues(initialValue);
-
             // listen to any keystrokes which modify tagify's input
             tagify.on('input', onInput)
 
@@ -160,7 +168,6 @@ function renderCalendar(id, events, user) {
                   tagify.whitelist = newWhitelist // update whitelist Array in-place
                 })
             }
-
 
             editEventStartDatepicker.setDate(info.event.start);
             editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
@@ -305,15 +312,32 @@ function checkTaskStatus(taskId) {
 }
 
 
-function country_input(field_id){
-     $("#"+ field_id).countrySelect({
+function initializeCountrySelect(field_id){
+    const countrySelect = $("#" + field_id).countrySelect({
         defaultCountry: "fr",
         preferredCountries: ['fr', 'gb', 'us'],
         responsiveDropdown: false,
     });
+    return countrySelect;
 }
 
-var token = '{{ config.MAPBOX_TOKEN }}';
+function initializeAutofill(token, field_id) {
+  const script = document.getElementById('search-js');
+  script.onload = function() {
+    autofill = mapboxsearch.autofill({
+      accessToken: token,
+    });
+    autofill.addEventListener('retrieve', (event) => {
+      const featureCollection = event.detail;
+      const cc = featureCollection.features[0].properties.country_code;
+      const countrySelect = $("#" + field_id).countrySelect();
+      countrySelect.countrySelect("selectCountry", cc);
+      $("#" + field_id + "_code").val(cc);
+      const inputEl = event.target;
+    });
+  };
+}
+
 function loadMap(id, lng, lat, acc, zoom) {
     mapboxgl.accessToken = token;
     const metersToPixelsAtMaxZoom = (acc, lat) => acc / 0.075 / Math.cos(lat * Math.PI / 180)

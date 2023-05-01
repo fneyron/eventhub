@@ -96,12 +96,18 @@ d.addEventListener("DOMContentLoaded", function (event) {
 
 
     // Datepicker
-    var datepickers = [].slice.call(d.querySelectorAll('[data-datepicker]'))
-    var datepickersList = datepickers.map(function (el) {
-        return new Datepicker(el, {
-            buttonClass: 'btn'
-        });
-    })
+//    var datepickers = [].slice.call(d.querySelectorAll('[data-datepicker]'))
+//    var datepickersList = datepickers.map(function (el) {
+//        return new Datepicker(el, {
+//            buttonClass: 'btn'
+//        });
+//    })
+//    var datepickers = [].slice.call(d.querySelectorAll('[data-datepicker]'))
+//    var datepickersList = datepickers.map(function (el) {
+//        return new tempusDominus.TempusDominus(el, {
+//            //buttonClass: 'btn'
+//        });
+//    })
 
     // DataTables
     var dataTableEl = d.getElementById('datatable');

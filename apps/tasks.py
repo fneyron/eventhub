@@ -37,7 +37,7 @@ def sync_events(calendar_id=None):
     # Loop through each calendar
     for ical in icals:
         # Check if it's time to sync this calendar
-        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < Config.EVENT_SYNC_FREQUENCY:
+        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < 60:
             continue
 
         # Download the ICS data
@@ -60,10 +60,10 @@ def sync_events(calendar_id=None):
                     ),
                     and_(
                         Event.orig_summary == event.get('summary'),
-                        Event.start_time == datetime.combine(event.get('dtstart').dt, time.min) if isinstance(
+                        Event.start_date == datetime.combine(event.get('dtstart').dt, time.min) if isinstance(
                             event.get('dtstart').dt,
                             date) else event.get('dtstart').dt,
-                        Event.end_time == datetime.combine(event.get('dtend').dt, time.min) if isinstance(
+                        Event.end_date == datetime.combine(event.get('dtend').dt, time.min) if isinstance(
                             event.get('dtend').dt,
                             date) else event.get('dtend').dt,
                         Event.ical_id == ical.id,
@@ -74,11 +74,12 @@ def sync_events(calendar_id=None):
             ).first()
 
             if db_event:
+
                 # If the event already exists, update the date start end and full day.
                 db_event.orig_summary = event.get('summary')
                 db_event.orig_description = event.get('description')
-                db_event.start_time = event.get('dtstart').dt
-                db_event.end_time = event.get('dtend').dt
+                db_event.start_date = event.get('dtstart').dt
+                db_event.end_date = event.get('dtend').dt
                 if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
                     db_event.all_day = True
                 db.session.commit()
@@ -89,8 +90,8 @@ def sync_events(calendar_id=None):
                                  orig_description=event.get('description'),
                                  new_summary=event.get('summary'),
                                  new_description=event.get('description'),
-                                 start_time=event.get('dtstart').dt,
-                                 end_time=event.get('dtend').dt,
+                                 start_date=event.get('dtstart').dt,
+                                 end_date=event.get('dtend').dt,
                                  calendar_id=ical.calendar_id,
                                  ical_id=ical.id)
                 if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':

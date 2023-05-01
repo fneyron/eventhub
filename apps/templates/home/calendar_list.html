@@ -88,18 +88,45 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-4">
-                {{ form.address.label }}
-                <div class="input-group">
-                    {% if form.address.errors %}
-                    {{ input(class="form-control is-invalid", autocomplete="address-line1") }}
-                    {% else %}
-                    {{ form.address(class="form-control", autocomplete="address-line1") }}
-                    {% endif %}
+            <div class="row">
+                <div class="col-6">
+                    <div class="mb-4">
+                        {{ form.checkin_time.label }}
+
+                        {{ form.checkin_time(class="form-control") }}
+                        <small id="{{ form.checkin_time.id }}-help" class="form-text text-muted">{{
+                            form.checkin_time.description }}</small>
+                        <div id="{{ form.checkin_time.id }}-error" class="invalid-feedback d-block">
+                            {{
+                            form.checkin_time.errors | first }}
+                        </div>
+                    </div>
                 </div>
-                <small id="{{ form.address.id }}-help" class="form-text text-muted">{{ form.address.description
+                <div class="col-6">
+                    <div class="mb-4">
+                        {{ form.checkout_time.label }}
+
+                        {{ form.checkout_time(class="form-control") }}
+                        <small id="{{ form.checkout_time.id }}-help" class="form-text text-muted">{{
+                            form.checkout_time.description }}</small>
+                        <div id="{{ form.checkout_time.id }}-error" class="invalid-feedback d-block">
+                            {{
+                            form.checkout_time.errors | first }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                {{ form.street.label }}
+                {% if form.street.errors %}
+                {{ form.street(class="form-control is-invalid", autocomplete="address-line1") }}
+                {% else %}
+                {{ form.street(class="form-control", autocomplete="address-line1") }}
+                {% endif %}
+
+                <small id="{{ form.street.id }}-help" class="form-text text-muted">{{ form.street.description
                     }}</small>
-                <div id="{{ form.address.id }}-error" class="invalid-feedback">{{ form.address.errors | first
+                <div id="{{ form.street.id }}-error" class="invalid-feedback">{{ form.street.errors | first
                     }}
                 </div>
             </div>
@@ -124,14 +151,13 @@
                 <div class="col-lg-8 col-sm-6">
                     <div class="mb-4">
                         {{ form.city.label }}
-                        <div class="input-group">
-                            {% if form.city.errors %}
-                            {{ input(class="form-control is-invalid", autocomplete="address-level2") }}
-                            {% else %}
-                            {{ form.city(class="form-control", autocomplete="address-level2") }}
-                            {% endif %}
-                            {{ form.country_code(style="display:none;", autocomplete="country") }}
-                        </div>
+
+                        {% if form.city.errors %}
+                        {{ input(class="form-control is-invalid", autocomplete="address-level2") }}
+                        {% else %}
+                        {{ form.city(class="form-control", autocomplete="address-level2") }}
+                        {% endif %}
+
                         <small id="{{ form.city.id }}-help" class="form-text text-muted">{{ form.city.description
                             }}</small>
                         <div id="{{ form.city.id }}-error" class="invalid-feedback">{{ form.city.errors | first
@@ -148,7 +174,7 @@
                     {% else %}
                     {{ form.country(class="form-control") }}
                     {% endif %}
-                    {{ form.country_code(style="display:none;", autocomplete="country") }}
+                    {{ form.country_code(type="hidden", autocomplete="country") }}
 
                 </div>
                 <small id="{{ form.country.id }}-help" class="form-text text-muted">{{ form.country.description
@@ -163,6 +189,7 @@
         </div>
     </div>
 </div>
+
 {% endblock content %}
 
 <!-- Specific Element JS goes HERE  -->
@@ -175,7 +202,11 @@
         });
     {% endif %}
 
+    const token = '{{ config.MAPBOX_TOKEN }}';
+    const country = initializeCountrySelect('country');
+    initializeAutofill(token, 'country');
     $(document).ready(function() {
+
         $('.form-check-input').change(function() {
 
             var calendarID=$(this).attr('calendar_id');
@@ -198,16 +229,17 @@
                 }
             });
         });
-        country_input('country');
-        var token = '{{ config.MAPBOX_TOKEN }}';
-        const script = document.getElementById('search-js');
-        script.onload = function() {
-            autofill = mapboxsearch.autofill({
-                accessToken: token
-            });
-        };
+
 
     });
+
+
+
+
+
+
+
+
 
 </script>
 {% endblock javascripts %}

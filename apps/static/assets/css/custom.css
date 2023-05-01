@@ -135,3 +135,7 @@ ul {
 }
 
 .country-select {width: 100%;}
+
+div[class$="--MapboxSearch"] > div[class$="--Results"] {
+  z-index: 2000 !important;
+}
