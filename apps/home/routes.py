@@ -43,8 +43,8 @@ def calendar_list():
 
     form = CalendarForm(request.form)
     form.street.data = request.form.get('street address-search')
-    print(request.form)
-    print(form.data, form.validate_on_submit())
+    #print(request.form)
+    #print(form.data, form.validate_on_submit())
     if form.validate_on_submit():
 
         calendar_uuid = shortuuid.uuid()
@@ -96,7 +96,10 @@ def calendar_edit(calendar_id):
 
     # forms
     linked_cal_form = LinkedCalendarForm(request.form, obj=calendar.ical)
+
     cal_form = CalendarForm(request.form, obj=calendar)
+    cal_form.street.data = request.form.get('street address-search')
+
     event_form = EventForm()
 
     if request.method == 'POST':
@@ -124,6 +127,7 @@ def calendar_edit(calendar_id):
 
         if 'cal-form' in request.form and cal_form.validate_on_submit():
             cal_form.populate_obj(calendar)
+
             db.session.commit()
             return redirect(url_for('home_blueprint.calendar_edit', calendar_id=calendar.id))
 
