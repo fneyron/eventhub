@@ -1,6 +1,6 @@
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, HiddenField, DateTimeField, TextAreaField, FieldList, FormField
+from wtforms import StringField, SubmitField, HiddenField, DateTimeField, TimeField, TextAreaField, FieldList, FormField
 from wtforms.validators import DataRequired, Length, URL, ValidationError, Email
 
 from apps.home.models import ICal
@@ -9,7 +9,9 @@ from apps.home.models import ICal
 class CalendarForm(FlaskForm):
     name = StringField(_l('Name'), validators=[DataRequired(), Length(max=100)])
     description = TextAreaField(_l('Description'), validators=[Length(max=500)])
-    address = StringField(_l('Street'),
+    checkin_time = TimeField(_l('Check-in'), format='%H:%M', validators=[DataRequired()])
+    checkout_time = TimeField(_l('Check-out'), format='%H:%M', validators=[DataRequired()])
+    street = StringField(_l('Street'),
                          validators=[DataRequired()])
     zip = StringField(_l('ZIP Code'),
                       validators=[DataRequired()])
@@ -40,9 +42,9 @@ class LinkedCalendarForm(FlaskForm):
 
 class EventForm(FlaskForm):
     title = StringField(_l('Title'), id='eventTitleEdit', validators=[DataRequired()])
-    start_time = DateTimeField(_l('Select Start Date'), id='dateStartEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
+    start_date = DateTimeField(_l('Select Start Date'), id='dateStartEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
                                format='%Y-%m-%d %H:%M', validators=[DataRequired()])
-    end_time = DateTimeField(_l('Select End Date'), id='dateEndEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
+    end_date = DateTimeField(_l('Select End Date'), id='dateEndEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
                              format='%Y-%m-%d %H:%M', validators=[DataRequired()])
     id = HiddenField(id='eventIdEdit')
     location = StringField('Location')

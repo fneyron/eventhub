@@ -38,7 +38,7 @@ class Users(db.Model, UserMixin):
     email_confirmed_on = db.Column(db.DateTime())
     role = db.Column(db.Enum(UserRole), default=UserRole.USER)
 
-    calendars = db.relationship('Calendar', backref='user', lazy=True)
+    calendars = db.relationship('Calendar', backref='creator', lazy=True)
     events = db.relationship('Event', backref='creator', lazy=True)
     notifications = db.relationship('Notification', backref='user', lazy=True)
 

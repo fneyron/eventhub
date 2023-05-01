@@ -72,7 +72,7 @@ def register_extensions(app):
 
 def configure_admin(admin, db):
     from apps.admin import MyModelView, UserAdminView
-    from apps.authentication.models import Users
+    from apps.authentication.models import Users, NotificationSettings, Notification
     from apps.home.models import Calendar, ICal, Event, Attendee
     from flask_admin.contrib.sqla import ModelView
 
@@ -81,6 +81,8 @@ def configure_admin(admin, db):
     admin.add_view(ModelView(ICal, db.session))
     admin.add_view(ModelView(Event, db.session))
     admin.add_view(ModelView(Attendee, db.session))
+    admin.add_view(ModelView(NotificationSettings, db.session))
+    admin.add_view(ModelView(Notification, db.session))
 
 
 def register_blueprints(app):

@@ -30,6 +30,7 @@ class Attendee(db.Model):
         calendar_name = event.calendar.name
         return f"<b>{current_user.firstname} {current_user.lastname}</b> invited you to the following event '{calendar_name} : {event_title}'"
 
+
 class Event(db.Model):
     __tablename__ = 'Event'
 
@@ -39,8 +40,8 @@ class Event(db.Model):
     orig_description = db.Column(db.String)
     new_summary = db.Column(db.String)
     new_description = db.Column(db.String)
-    start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime)
+    start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
     last_modified = db.Column(db.DateTime, onupdate=datetime.utcnow, default=datetime.utcnow)
     all_day = db.Column(db.Boolean(), default=False)
     calendar_id = db.Column(db.Integer, db.ForeignKey('Calendar.id'))
@@ -85,11 +86,14 @@ class Event(db.Model):
             event={
                 'calendar': self.calendar.name,
                 'title': self.new_summary,
-                'start': format_datetime(self.start_time, format='d MMM YYYY' if self.all_day else 'medium', locale=lang_code),
-                'end': format_datetime(self.end_time, format='d MMM YYYY' if self.all_day else 'medium', locale=lang_code),
+                'start': format_datetime(self.start_date, format='d MMM YYYY' if self.all_day else 'medium',
+                                         locale=lang_code),
+                'end': format_datetime(self.end_date, format='d MMM YYYY' if self.all_day else 'medium',
+                                       locale=lang_code),
             },
             buttons={'url': url_for('home_blueprint.index', _external=True), 'text': _('View Event')},
         )
+
     def associate_attendee_with_user(self, user):
         attendees = Attendee.query.filter_by(email=user.email).all()
         for attendee in attendees:
@@ -98,12 +102,21 @@ class Event(db.Model):
         db.session.commit()
 
 
+calendar_users = db.Table('calendar_users',
+                          db.Column('user_id', db.Integer, db.ForeignKey('Users.id'), primary_key=True),
+                          db.Column('calendar_id', db.Integer, db.ForeignKey('Calendar.id'), primary_key=True)
+                          )
+
+
 class Calendar(db.Model):
     __tablename__ = 'Calendar'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     description = db.Column(db.String)
+    # Checkin & Checkout in property timezone
+    checkin_time = db.Column(db.Time)
+    checkout_time = db.Column(db.Time)
     latitude = db.Column(db.Float())
     longitude = db.Column(db.Float())
     street = db.Column(db.String)
@@ -115,8 +128,10 @@ class Calendar(db.Model):
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
     active = db.Column(db.Boolean(), default=True)
     ical = db.relationship('ICal', backref='calendar', lazy=True, cascade='all,delete')
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
     events = db.relationship('Event', backref='calendar', lazy=True, cascade='all,delete')
+
+    users = db.relationship('Users', secondary=calendar_users, backref='calendar')
 
 
 class ICal(db.Model):

@@ -78,7 +78,9 @@
                 {{ form.csrf_token }}
                 {{ form.id}}
                 <div class="mb-4">
-                    {{ form.title.label }}
+                    {{ form.title.label }} <a data-bs-toggle="popover" data-bs-title="{{ _('Original Title')}}" data-bs-placement="top"
+                                              id="{{ form.title.id }}-tooltip"><i
+                        class="fa fa-info-circle ml-1"></i></a>
                     {{ form.title(class='form-control') }}
                     <small id="{{ form.title.id }}-help" class="form-text text-muted">
                         {{ form.title.description }}
@@ -102,7 +104,8 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    {{ form.description.label }}
+                    {{ form.description.label }} <a data-bs-toggle="popover" data-bs-placement="top" data-bs-title="{{ _('Original Description')}}" id="{{ form.description.id }}-tooltip"><i
+                        class="fa fa-info-circle ml-1"></i></a>
                     {{ form.description(class='form-control') }}
                     <small id="{{ form.description.id }}-help" class="form-text text-muted">
                         {{ form.description.description }}
@@ -114,39 +117,38 @@
                 <div class="row">
                     <div class="col-12 col-lg-6">
                         <div class="mb-4">
-                            {{ form.start_time.label }}
                             <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="text-gray-400 fa fa-calendar"></i>
                                             </span>
-                                {{ form.start_time(class='form-control') }}
+                                {{ form.start_date(class='form-control') }}
                             </div>
-                            <small id="{{ form.start_time.id }}-help" class="form-text text-muted">
-                                {{ form.start_time.description }}
+                            <small id="{{ form.start_date.id }}-help" class="form-text text-muted">
+                                {{ form.start_date.description }}
                             </small>
-                            <div id="{{ form.start_time.id }}-error" class="invalid-feedback d-block">
-                                {{ form.start_time.errors | first }}
+                            <div id="{{ form.start_date.id }}-error" class="invalid-feedback d-block">
+                                {{ form.start_date.errors | first }}
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-6">
                         <div class="mb-4">
-                            {{ form.end_time.label }}
                             <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="text-gray-400 fa fa-calendar"></i>
                                             </span>
-                                {{ form.end_time(class='form-control') }}
+                                {{ form.end_date(class='form-control') }}
                             </div>
-                            <small id="{{ form.end_time.id }}-help" class="form-text text-muted">
-                                {{ form.end_time.description }}
+                            <small id="{{ form.end_date.id }}-help" class="form-text text-muted">
+                                {{ form.end_date.description }}
                             </small>
-                            <div id="{{ form.end_time.id }}-error" class="invalid-feedback d-block">
-                                {{ form.end_time.errors | first }}
+                            <div id="{{ form.end_date.id }}-error" class="invalid-feedback d-block">
+                                {{ form.end_date.errors | first }}
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-gray-800 me-2" id="editEvent">Update event</button>

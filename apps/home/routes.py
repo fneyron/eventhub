@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """
 Copyright (c) 2019 - present AppSeed.us
 """
@@ -39,19 +38,21 @@ def index():
 
 @blueprint.route('/calendar', methods=['POST', 'GET'])
 def calendar_list():
-    form = CalendarForm(request.form)
+
     calendars = Calendar.query.all()
 
+    form = CalendarForm(request.form)
+    form.street.data = request.form.get('street address-search')
+    print(request.form)
+    print(form.data, form.validate_on_submit())
     if form.validate_on_submit():
 
-        # Manage QRcode uuid
         calendar_uuid = shortuuid.uuid()
         while Calendar.query.filter_by(uuid=calendar_uuid).count():
             calendar_uuid = shortuuid.uuid()
 
-        # Add qrcode and the language
-        calendar = Calendar(uuid=calendar_uuid, name=form.name.data, description=form.description.data,
-                            user_id=current_user.get_id())
+        calendar = Calendar(creator_id=current_user.id)
+        form.populate_obj(calendar)
         db.session.add(calendar)
         db.session.commit()
 
@@ -124,6 +125,7 @@ def calendar_edit(calendar_id):
         if 'cal-form' in request.form and cal_form.validate_on_submit():
             cal_form.populate_obj(calendar)
             db.session.commit()
+            return redirect(url_for('home_blueprint.calendar_edit', calendar_id=calendar.id))
 
     return render_template('home/calendar_edit.html', segment='elements', data=data, cal_form=cal_form,
                            linked_cal_form=linked_cal_form, event_form=event_form)
@@ -246,8 +248,8 @@ def event_update(event_id):
         # We delete existing attendees
         db.session.query(Attendee).filter_by(event_id=event.id).delete()
         if not event.ical_id:
-            event.start_time = form.start_time.data
-            event.end_time = form.end_time.data
+            event.start_date = form.start_date.data
+            event.end_date = form.end_date.data
         event.new_summary = form.title.data
         event.new_description = form.description.data
 
