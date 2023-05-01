@@ -42,14 +42,16 @@ class Config(object):
     MAIL_USE_SSL = True
 
 
-    # GEOLOCATION OPTIONS
-    GEOLOCATION_TIMEOUT = 20
-    GEOLOCATION_MAX_AGE = 0
+    # Scheduler
+    # Event sync frequency
+    EVENT_SYNC_FREQUENCY = 300
 
 class ProductionConfig(Config):
     DEBUG = False
 
     SERVER_NAME = 'eventhub.dataik.com'
+
+    PREFERRED_URL_SCHEME = 'https'
 
     # Security
     SESSION_COOKIE_HTTPONLY = True
