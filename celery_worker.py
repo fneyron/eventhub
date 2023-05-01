@@ -15,5 +15,5 @@ app.app_context().push()
 def setup_periodic_tasks(sender, **kwargs):
 
     # Sync events from icalendar every 30 seconds
-    sender.add_periodic_task(30.0, tasks.sync_events.s())
+    sender.add_periodic_task(app_config.EVENT_SYNC_FREQUENCY, tasks.sync_events.s())
 

@@ -15,10 +15,10 @@ from flask_login import (
 )
 
 import apps
-from apps import db, login_manager
+from apps import db, login_manager, app
 from apps.authentication import blueprint
 from apps.authentication.forms import LoginForm, CreateAccountForm, ResetPasswordForm, RecoverPasswordForm
-from apps.authentication.models import Users, UserRole
+from apps.authentication.models import Users, UserRole, NotificationSettings, Notification
 from apps.authentication.util import verify_pass, confirm_token, generate_confirmation_token, hash_pass
 from apps.home.models import Attendee
 from apps.tasks import send_email
@@ -86,6 +86,7 @@ def register():
 
         # else we can create the user
         user = Users(**form.data)
+        user.notification_settings = NotificationSettings()
         # set as admin if it's the first user
         if user.is_first_user():
             user.role = UserRole.ADMIN
@@ -196,16 +197,17 @@ def unauthorized_handler():
     return render_template('home/page-403.html'), 403
 
 
-@blueprint.errorhandler(403)
+@app.errorhandler(403)
 def access_forbidden(error):
     return render_template('home/page-403.html'), 403
 
 
-@blueprint.errorhandler(404)
+@app.errorhandler(404)
 def not_found_error(error):
+    print('404')
     return render_template('home/page-404.html'), 404
 
 
-@blueprint.errorhandler(500)
+@app.errorhandler(500)
 def internal_error(error):
     return render_template('home/page-500.html'), 500

@@ -8,7 +8,7 @@ from icalendar import Calendar as ICalendar
 from sqlalchemy import or_, and_, not_
 
 from apps.config import Config
-from apps.home.models import Event, ICal
+from apps.home.models import Event, ICal, Calendar
 from . import mail, celery, db
 
 
@@ -37,7 +37,7 @@ def sync_events(calendar_id=None):
     # Loop through each calendar
     for ical in icals:
         # Check if it's time to sync this calendar
-        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < 300:
+        if ical.last_synced and (datetime.now() - ical.last_synced).seconds < Config.EVENT_SYNC_FREQUENCY:
             continue
 
         # Download the ICS data

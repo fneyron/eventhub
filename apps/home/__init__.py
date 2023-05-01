@@ -5,16 +5,17 @@ Copyright (c) 2019 - present AppSeed.us
 
 import json
 
-from flask import Blueprint, session, jsonify
+from babel.dates import format_datetime
+from flask import Blueprint, session
 
 from apps import babel, get_locale
-
 
 blueprint = Blueprint(
     'home_blueprint',
     __name__,
     url_prefix=''
 )
+
 
 @blueprint.context_processor
 def inject_attendees():
@@ -24,12 +25,15 @@ def inject_attendees():
     attendee = Attendee.query.all()
     return dict(attendees=list(set([user.email for user in users + attendee])))
 
+
 @blueprint.context_processor
 def utility_processor():
     def active_language():
         lang_code = session['language'] or get_locale()
         return dict(code=lang_code, name=babel.default_locale.parse(lang_code).get_display_name())
+
     return dict(active_language=active_language)
+
 
 @blueprint.app_template_filter('translate')
 def translate(value, lang_code=None):
@@ -53,3 +57,8 @@ def translate(value, lang_code=None):
 @blueprint.app_template_filter('json_loads')
 def json_loads_filter(value):
     return json.loads(value)
+
+
+@blueprint.app_template_filter('format_datetime')
+def format_datetime_filter(value, format='medium', locale='en'):
+    return format_datetime(value, format=format, locale=locale)
