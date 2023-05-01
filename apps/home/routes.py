@@ -101,7 +101,8 @@ def calendar_edit(calendar_id):
     cal_form.street.data = request.form.get('street address-search')
 
     event_form = EventForm()
-
+    print(request.form)
+    print(cal_form.data, cal_form.validate_on_submit())
     if request.method == 'POST':
         if 'linked-cal-form' in request.form and linked_cal_form.validate_on_submit():
             is_valid = True
@@ -247,7 +248,7 @@ def event_update(event_id):
     form = EventForm(data, obj=event)
 
     if form.validate_on_submit and (
-            event.calendar.user == current_user or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
+            event.calendar.creator_id == current_user.get_id() or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
 
         # We delete existing attendees
         db.session.query(Attendee).filter_by(event_id=event.id).delete()

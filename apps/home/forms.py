@@ -11,7 +11,7 @@ class CalendarForm(FlaskForm):
     description = TextAreaField(_l('Description'), validators=[Length(max=500)])
     checkin_time = TimeField(_l('Check-in'), format='%H:%M', validators=[DataRequired()])
     checkout_time = TimeField(_l('Check-out'), format='%H:%M', validators=[DataRequired()])
-    street = StringField(_l('Street'),
+    street = StringField(_l('Street'), name="street",
                          validators=[DataRequired()])
     zip = StringField(_l('ZIP Code'),
                       validators=[DataRequired()])
