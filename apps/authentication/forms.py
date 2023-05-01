@@ -59,11 +59,20 @@ class ProfileForm(FlaskForm):
                         id='email_profile',
                         validators=[DataRequired(), Email()])
 
-    scan_notification_email = BooleanField(
+    event_notification_email = BooleanField(
         _l('Event Email'),
         description=_l('I want to receive an email when I\'m added to an event.'),
         default=False
     )
+
+    reminder_notification_email = BooleanField(
+        _l('Event Reminder'),
+        description=_l('I want to receive a reminder by email one day before an event.'),
+        default=False
+    )
+
+
+
 
 
 
