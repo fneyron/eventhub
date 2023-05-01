@@ -128,7 +128,7 @@ class Calendar(db.Model):
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
     active = db.Column(db.Boolean(), default=True)
     ical = db.relationship('ICal', backref='calendar', lazy=True, cascade='all,delete')
-    creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
     events = db.relationship('Event', backref='calendar', lazy=True, cascade='all,delete')
 
     users = db.relationship('Users', secondary=calendar_users, backref='calendar')
