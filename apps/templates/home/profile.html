@@ -90,12 +90,23 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex align-items-center justify-content-between px-0 border-bottom mb-2">
                             <div>
-                                <h3 class="h6 mb-1">{{ profile_form.scan_notification_email.label }}</h3>
-                                <p class="small pe-4">{{ profile_form.scan_notification_email.description }}</p>
+                                <h3 class="h6 mb-1">{{ profile_form.event_notification_email.label }}</h3>
+                                <p class="small pe-4">{{ profile_form.event_notification_email.description }}</p>
                             </div>
                             <div>
                                 <div class="form-check form-switch">
-                                    {{ profile_form.scan_notification_email(class='form-check-input')}}
+                                    {{ profile_form.event_notification_email(class='form-check-input')}}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center justify-content-between px-0 mb-2">
+                            <div>
+                                <h3 class="h6 mb-1">{{ profile_form.reminder_notification_email.label }}</h3>
+                                <p class="small pe-4">{{ profile_form.reminder_notification_email.description }}</p>
+                            </div>
+                            <div>
+                                <div class="form-check form-switch">
+                                    {{ profile_form.reminder_notification_email(class='form-check-input')}}
                                 </div>
                             </div>
                         </li>
@@ -243,25 +254,23 @@
     {% endif %}
 
     $(document).ready(function() {
-         $('.form-check-input').change(function() {
-        // Get the form data and serialize it
-        var form_data = $('#profile-alerts').serialize();
+         $('#profile-alerts').on('change', '.form-check-input', function() {
+            // Get the form data and serialize it
+            var form_data = $('#profile-alerts').serialize();
 
-        // Send an AJAX request to the server to update the form
-        $.ajax({
-            type: 'POST',
-            url: '{{ url_for("home_blueprint.update_profile")}}',
-            data: form_data,
-            success: function(response) {
-                // Handle the response from the server
-                console.log(response);
-            },
-            error: function(response) {
-                // Handle errors
-                console.log(response);
-            }
+            // Send an AJAX request to the server to update the form
+            $.post('{{ url_for("home_blueprint.update_profile")}}', form_data)
+                .done(function(response) {
+                    if (response.success) {
+                        console.log('Update successful');
+                    } else {
+                        console.log('Update failed');
+                    }
+                })
+                .fail(function(response) {
+                    console.log(response);
+                });
         });
-    });
     });
 
 </script>
