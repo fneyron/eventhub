@@ -5,10 +5,12 @@ Copyright (c) 2019 - present AppSeed.us
 
 import json
 from datetime import datetime
+from datetime import timedelta
 from enum import Enum
 
 from flask_babel import _
 from flask_login import UserMixin
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from apps import db, login_manager
 from apps.authentication.util import hash_pass, verify_pass
@@ -28,7 +30,7 @@ class Users(db.Model, UserMixin):
     lastname = db.Column(db.String)
     email = db.Column(db.String, unique=True)
     password = db.Column(db.LargeBinary)
-    language = db.Column(db.String(2), nullable=False)
+    language = db.Column(db.String(2), nullable=False, default='fr')
     creation = db.Column(db.DateTime(), default=datetime.utcnow())
     update = db.Column(db.DateTime(), onupdate=datetime.utcnow(), default=datetime.utcnow())
     last_login = db.Column(db.DateTime, default=datetime.utcnow())
@@ -38,7 +40,10 @@ class Users(db.Model, UserMixin):
 
     calendars = db.relationship('Calendar', backref='user', lazy=True)
     events = db.relationship('Event', backref='creator', lazy=True)
-    events = db.relationship('Notification', backref='user', lazy=True)
+    notifications = db.relationship('Notification', backref='user', lazy=True)
+
+    notification_settings_id = db.Column(db.Integer, db.ForeignKey('NotificationSettings.id'))
+    notification_settings = db.relationship('NotificationSettings', backref='user', uselist=False)
 
     def add_notification(self, content):
         notification = Notification(user_id=self.id, content=content)
@@ -86,6 +91,21 @@ class Users(db.Model, UserMixin):
         from apps.home.models import ICal
         return ICal.query.filter()
 
+class NotificationSettings(db.Model):
+    __tablename__ = 'NotificationSettings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_notification_email = db.Column(db.Boolean(), default=False)
+    reminder_notification_email = db.Column(db.Boolean(), default=False)
+    reminder_time_minutes = db.Column(db.Integer, default=1440)  # Default to 1 day (1440 minutes)
+
+    @hybrid_property
+    def reminder_time(self):
+        return timedelta(minutes=self.reminder_time_minutes)
+
+    @reminder_time.setter
+    def reminder_time(self, value):
+        self.reminder_time_minutes = value.total_seconds() // 60
 
 class Notification(db.Model):
     __tablename__ = 'Notification'
