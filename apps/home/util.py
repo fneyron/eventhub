@@ -99,8 +99,16 @@ def create_ics(events):
     for event in events:
         ical_event = ICalEvent()
         ical_event.add('summary', event['title'])
-        ical_event.add('dtstart', datetime.fromisoformat(event['start']))
-        ical_event.add('dtend', datetime.fromisoformat(event['end']))
+        start = event['start']
+        end = event['end']
+        if event['allDay']:
+            # event is a full day event
+            ical_event.add('dtstart;value=date', datetime.fromisoformat(start).date())
+            ical_event.add('dtend;value=date', datetime.fromisoformat(end).date())
+        else:
+            # event is not a full day event
+            ical_event.add('dtstart', datetime.fromisoformat(start))
+            ical_event.add('dtend', datetime.fromisoformat(end))
         ical_event.add('uid',
                        f"{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex}@{urlparse(request.host_url).hostname}")
         ical_event.add('description', event.get('description', ''))
