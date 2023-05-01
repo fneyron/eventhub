@@ -30,8 +30,11 @@ from apps.tasks import sync_events, send_email
 @blueprint.route('/index', methods=['POST', 'GET'])
 @authenticated
 def index():
+    event = request.args.get('event_id')
+
+
     event_form = EventForm()
-    return render_template('home/index.html', segment='index', event_form=event_form)
+    return render_template('home/index.html', segment='index', event_form=event_form, event=event)
 
 
 @blueprint.route('/calendar', methods=['POST', 'GET'])
@@ -186,7 +189,8 @@ def profile():
 def update_profile():
     # Get the form data from the AJAX request
     form = ProfileForm(request.form)
-    current_user.scan_notification_email = form.scan_notification_email.data
+    current_user.notification_settings.event_notification_email = form.event_notification_email.data
+    current_user.notification_settings.reminder_notification_email = form.reminder_notification_email.data
 
     db.session.commit()
 
@@ -300,22 +304,3 @@ def icalendar_get_url():
 
     return Response(response.text, content_type='text/calendar')
 
-
-@login_manager.unauthorized_handler
-def unauthorized_handler():
-    return render_template('home/page-403.html'), 403
-
-
-@blueprint.errorhandler(403)
-def access_forbidden(error):
-    return render_template('home/page-403.html'), 403
-
-
-@blueprint.errorhandler(404)
-def not_found_error(error):
-    return render_template('home/page-404.html'), 404
-
-
-@blueprint.errorhandler(500)
-def internal_error(error):
-    return render_template('home/page-500.html'), 500
