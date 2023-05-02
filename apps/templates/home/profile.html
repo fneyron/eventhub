@@ -95,7 +95,8 @@
                             </div>
                             <div>
                                 <div class="form-check form-switch">
-                                    {{ profile_form.event_notification_email(class='form-check-input')}}
+                                    {{ profile_form.event_notification_email(class='form-check-input',
+                                    checked=current_user.notification_settings.event_notification_email)}}
                                 </div>
                             </div>
                         </li>
@@ -106,7 +107,8 @@
                             </div>
                             <div>
                                 <div class="form-check form-switch">
-                                    {{ profile_form.reminder_notification_email(class='form-check-input')}}
+                                    {{ profile_form.reminder_notification_email(class='form-check-input',
+                                    checked=current_user.notification_settings.reminder_notification_email)}}
                                 </div>
                             </div>
                         </li>
@@ -272,6 +274,8 @@
                 });
         });
     });
+
+
 
 </script>
 

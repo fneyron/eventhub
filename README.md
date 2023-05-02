@@ -87,7 +87,7 @@ Delete alembic folder :
 >>> import sqlite3
 >>> conn = sqlite3.connect('apps/db.sqlite3')
 >>> cursor = conn.cursor()
->>> cursor.execute('DROP TABLE alembic_version;')
+>>> cursor.execute('TRUNCATE TABLE alembic_version;')
 <sqlite3.Cursor object at 0x10052fec0>
 >>> conn.close()
 ```
