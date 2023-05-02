@@ -98,7 +98,7 @@ def calendar_edit(calendar_id):
     linked_cal_form = LinkedCalendarForm(request.form, obj=calendar.ical)
 
     cal_form = CalendarForm(request.form, obj=calendar)
-    cal_form.street.data = request.form.get('street address-search')
+    cal_form.street.data = request.form.get('street address-search') if request.form.get('street address-search') else cal_form.street.data
 
     event_form = EventForm()
     print(request.form)

@@ -1,3 +1,4 @@
+let calendar;
 function renderCalendar(id, events, user) {
     const calendarEl = d.getElementById(id);
     if (!calendarEl) {
@@ -28,7 +29,7 @@ function renderCalendar(id, events, user) {
     // current id selection
     let currentId = null;
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
+    calendar = new FullCalendar.Calendar(calendarEl, {
         selectable: true,
         initialView: 'dayGridMonth',
         themeSystem: 'bootstrap',
@@ -288,8 +289,8 @@ function checkTaskStatus(taskId) {
         // task has completed successfully
         // stop the spinner and do something else
         $('#calendar-refresh').removeClass('fa-spin');
-        if (mycalendar){
-            mycalendar.refetchEvents();
+        if (calendar){
+            calendar.refetchEvents();
         }
       } else if (result.status === "FAILURE") {
         // task has failed

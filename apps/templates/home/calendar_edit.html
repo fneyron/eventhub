@@ -333,14 +333,13 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
 <!-- Specific Element JS goes HERE  -->
 {% block javascripts %}
 <script>
-    var mycalendar;
     $(document).ready(function() {
         var events = [
             {
                 url: "{{ url_for('home_blueprint.calendar_events_json', calendar_id=data.calendar.id) }}",
             }
         ];
-        mycalendar = renderCalendar('calendar', events);
+        calendar = renderCalendar('calendar', events);
     });
 
     const token = '{{ config.MAPBOX_TOKEN }}';

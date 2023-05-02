@@ -1086,6 +1086,7 @@ d.addEventListener("DOMContentLoaded", function (event) {
                 sidebar.classList.add('contracted');
                 localStorage.setItem('sidebar', 'contracted');
             }
+            $(window).trigger("resize");
         });
 
         sidebar.addEventListener('mouseenter', function () {
@@ -1095,6 +1096,7 @@ d.addEventListener("DOMContentLoaded", function (event) {
                 } else {
                     sidebar.classList.add('contracted');
                 }
+
             }
         });
 

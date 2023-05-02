@@ -109,7 +109,6 @@
 {% block javascripts %}
 <script>
     (function () {
-        let myCalendar;
         const user = {{ current_user.to_json() | safe }};
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('event_id');
@@ -121,18 +120,18 @@
                 },
             ];
 
-            myCalendar = renderCalendar('calendar', events, user);
+            renderCalendar('calendar', events, user);
         }
 
         function refetchEventsForAttendee(email) {
-            myCalendar.getEventSources().forEach(source => source.remove());
+            calendar.getEventSources().forEach(source => source.remove());
 
             let url = "{{ url_for('home_blueprint.calendar_events_json') }}";
             if (email !== 'all') {
                 url += `?attendees=${email}`;
             }
 
-            myCalendar.addEventSource({
+            calendar.addEventSource({
                 url,
                 method: 'GET',
             });
