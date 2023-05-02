@@ -33,7 +33,7 @@ function renderCalendar(id, events, user) {
         selectable: true,
         initialView: 'dayGridMonth',
         themeSystem: 'bootstrap',
-        editable: true,
+        editable: false,
         firstDay: 1,
         height: 700,
         windowResize: function (view) {
@@ -44,15 +44,6 @@ function renderCalendar(id, events, user) {
             calendar.setOption('height', 700);
           }
         },
-
-        customButtons: {
-          refreshButton: {
-            text: 'Refresh',
-            click: function() {
-              calendar.refetchEvents();
-            }
-          }
-        },
         headerToolbar: {
             right: 'today prev,next',
             left: 'title',
@@ -60,47 +51,16 @@ function renderCalendar(id, events, user) {
         buttonText: {
           today: ''
         },
-        bootstrapFontAwesome: { today: 'redo' },
         eventSources:events,
-//        eventContent: function(arg) {
-//            var contentEl = document.createElement('div');
-//
-//            title = '&nbsp;' + arg.event.title;
-//            if (!arg.event.extendedProps.attendees.length){
-//                title = '&nbsp;<i class="fa fa-warning"></i>' + title;
-//            }
-//            contentEl.innerHTML = title;
-//
-//            var colors = arg.event.extendedProps.otherColors || [];
-//
-//            if (colors.length) {
-//                var gradient = `repeating-linear-gradient(-45deg, ${arg.event.backgroundColor}`;
-//                var stepSize = 10;
-//                for (var i = 0; i < colors.length; i++) {
-//                    gradient += `, ${arg.event.backgroundColor} ${stepSize}px, ${colors[i]} ${stepSize}px, ${colors[i]} ${stepSize * 2}px`;
-//                    stepSize *= 2;
-//                }
-//                contentEl.style.backgroundImage = gradient + ')';
-//            } else {
-//                contentEl.style.backgroundColor = arg.event.backgroundColor;
-//            }
-//
-//            //contentEl.style.border = `2px solid ${arg.event.borderColor}`;
-//
-//            return { domNodes: [contentEl] };
-//        },
-        // other calendar options
-        /*eventMouseEnter: function(info) {
-          var tooltip = new Tooltip(info.el, {
-            title: info.event.title + ': ' + info.event.extendedProps.description,
-            placement: 'top',
-            trigger: 'hover',
-            container: 'body'
-          });
+        eventContent: function(arg) {
+            var contentEl = document.createElement('div');
+            title = '&nbsp;' + arg.event.title;
+            if (!arg.event.extendedProps.attendees.length){
+                title = '&nbsp;<i class="fa fa-warning"></i>' + title;
+            }
+            contentEl.innerHTML = title;
+            return { domNodes: [contentEl] };
         },
-        eventMouseLeave: function(info) {
-          tooltip.dispose();
-        },*/
         /*dateClick: (d) => {
             addNewEventModal.show();
             newEventTitleInput.value = '';
