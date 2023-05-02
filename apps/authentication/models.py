@@ -4,12 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import json
+import uuid
 from datetime import datetime
 from datetime import timedelta
 from enum import Enum
 
 from flask_babel import _
 from flask_login import UserMixin
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from apps import db, login_manager
@@ -26,6 +28,8 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'Users'
 
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String, default=str(uuid.uuid4()), unique=True)
+
     firstname = db.Column(db.String)
     lastname = db.Column(db.String)
     email = db.Column(db.String, unique=True)

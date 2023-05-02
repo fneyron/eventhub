@@ -30,27 +30,20 @@ from apps.tasks import sync_events, send_email
 @authenticated
 def index():
     event = request.args.get('event_id')
-
-
+    users = Users.query.all()
     event_form = EventForm()
-    return render_template('home/index.html', segment='index', event_form=event_form, event=event)
+    return render_template('home/index.html', segment='index', event_form=event_form, event=event, users=users)
 
 
 @blueprint.route('/property', methods=['POST', 'GET'])
 def property_list():
-
     properties = Property.query.all()
 
     form = PropertyForm(request.form)
     form.street.data = request.form.get('street address-search')
-    #print(request.form)
-    #print(form.data, form.validate_on_submit())
+    # print(request.form)
+    # print(form.data, form.validate_on_submit())
     if form.validate_on_submit():
-
-        property_uuid = shortuuid.uuid()
-        while Property.query.filter_by(uuid=property_uuid).count():
-            property_uuid = shortuuid.uuid()
-
         property = Property(creator_id=current_user.id)
         form.populate_obj(property)
         db.session.add(property)
@@ -99,7 +92,8 @@ def property_edit(property_id):
     linked_cal_form = LinkedCalendarForm(request.form, obj=property.ical)
 
     property_form = PropertyForm(request.form, obj=property)
-    property_form.street.data = request.form.get('street address-search') if request.form.get('street address-search') else property_form.street.data
+    property_form.street.data = request.form.get('street address-search') if request.form.get(
+        'street address-search') else property_form.street.data
 
     event_form = EventForm()
     print(request.form)
@@ -236,6 +230,10 @@ def events_json():
     start = request.args.get('start')
     end = request.args.get('end')
 
+    # Not authorized access
+    if not attendees == [current_user.email] and not (current_user.role.name in ['ADMIN', 'EDITOR']):
+        return jsonify([])
+
     events = get_events(property_id=property_id, attendees=attendees, start=start, end=end)
     return jsonify(events)
 
@@ -248,7 +246,8 @@ def event_update(event_id):
     form = EventForm(data, obj=event)
 
     if form.validate_on_submit and (
-            event.property.creator_id == current_user.get_id() or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
+            event.property.creator_id == current_user.get_id() or current_user.role in (
+            UserRole.ADMIN, UserRole.EDITOR)):
 
         # We delete existing attendees
         db.session.query(Attendee).filter_by(event_id=event.id).delete()
@@ -299,8 +298,19 @@ def linked_calendar_delete(id):
 
 @blueprint.route('/calendar/export', methods=['GET'])
 def calendar_export_ics():
-    events = get_events(property_id=request.args.get('property_id'),
-                                 attendees=request.args.getlist('attendees'))
+    attendees = []
+    for uuid in request.args.getlist('attendees'):
+        attendees.append(Users.query.filter_by(uuid=uuid).first().email)
+
+    property = request.args.get('property')
+    if property:
+        property = Property.query.filter_by(uuid=request.args.get('property')).first().id
+
+    if not property and not attendees:
+        abort(404)
+
+    events = get_events(property_id=property,
+                        attendees=attendees)
     return create_ics(events)
 
 
@@ -310,4 +320,3 @@ def icalendar_get_url():
     response = requests.get(url)
 
     return Response(response.text, content_type='text/calendar')
-

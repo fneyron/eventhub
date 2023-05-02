@@ -345,3 +345,15 @@ function copy_to_clipboard() {
     inputElement.setSelectionRange(0, 99999); // For mobile devices
     document.execCommand('copy');
 }
+
+// Index.html choices for users
+function initChoices(el) {
+    new Choices(el, {
+        placeholder: true,
+        placeholderValue: 'Select an option',
+        searchEnabled: false,
+        shouldSort: false,
+        itemSelectText: '',
+        renderChoiceLimit: -1,
+    });
+}

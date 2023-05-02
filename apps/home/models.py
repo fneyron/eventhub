@@ -1,11 +1,12 @@
+import uuid
 from datetime import datetime
+from hashlib import sha256
 
 from babel.dates import format_datetime
 from flask import url_for
 from flask_babel import _
 from flask_login import current_user
 from sqlalchemy import event
-from sqlalchemy.orm import Session
 
 from apps import db
 
@@ -17,6 +18,7 @@ class Attendee(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('Event.id'), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+
 
     def __init__(self, email, event, user_id=None):
         self.email = email
@@ -65,8 +67,10 @@ class Event(db.Model):
             if user.notification_settings.event_notification_email:
                 self.send_invitation_email(email)
 
-        notification = Notification(content=attendee.notification_message, user=current_user)
-        db.session.add(notification)
+        # No notification if we are inviting ourself
+        if current_user.email != email:
+            notification = Notification(content=attendee.notification_message, user=current_user)
+            db.session.add(notification)
         db.session.commit()
 
     def send_invitation_email(self, email):
@@ -124,7 +128,7 @@ class Property(db.Model):
     city = db.Column(db.String)
     zip = db.Column(db.String)
     country = db.Column(db.String)
-    uuid = db.Column(db.String)
+    uuid = db.Column(db.String, default=str(uuid.uuid4()), unique=True)
     creation = db.Column(db.DateTime, default=datetime.utcnow())
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
     active = db.Column(db.Boolean(), default=True)

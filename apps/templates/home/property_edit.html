@@ -28,7 +28,7 @@
                 data-bs-target="#share-calendar">{{ _('Ical') }}
         </button>
         <a type="button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', property_id=data.property.id) }}">{{ _('Download')
+           href="{{ url_for('home_blueprint.calendar_export_ics', property=data.property.uuid) }}">{{ _('Download')
             }}</a>
 
     </div>
@@ -38,7 +38,7 @@
     <p>{{ _('Copy the ical address to your favorite calendar tool to keep all your calendar at the same place.')}}</p>
     <div class="d-flex mb-3 justify-content-center input-group">
         <input type="text" class="form-control" readonly
-               value="{{ url_for('home_blueprint.calendar_export_ics', property_id=data.property.id, _external=True, _scheme='https') }}">
+               value="{{ url_for('home_blueprint.calendar_export_ics', property=data.property.uuid, _external=True, _scheme='https') }}">
         <button type="button" onclick="copy_to_clipboard()"
                 class="btn btn-block btn-secondary">{{_('Copy')}}
         </button>

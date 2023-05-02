@@ -18,15 +18,6 @@ blueprint = Blueprint(
 
 
 @blueprint.context_processor
-def inject_attendees():
-    from apps.authentication.models import Users
-    from apps.home.models import Attendee
-    users = Users.query.all()
-    attendee = Attendee.query.all()
-    return dict(attendees=list(set([user.email for user in users + attendee])))
-
-
-@blueprint.context_processor
 def utility_processor():
     def active_language():
         lang_code = session['language'] or get_locale()
