@@ -101,11 +101,14 @@ class Event(db.Model):
             db.session.add(attendee)
         db.session.commit()
 
+class PropertyUser(db.Model):
+    __tablename__ = 'property_users'
 
-property_users = db.Table('property_users',
-                          db.Column('user_id', db.Integer, db.ForeignKey('Users.id'), primary_key=True),
-                          db.Column('property_id', db.Integer, db.ForeignKey('Property.id'), primary_key=True)
-                          )
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), primary_key=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('Property.id'), primary_key=True)
+
+    user = db.relationship('Users', back_populates='properties')
+    property = db.relationship('Property', back_populates='users')
 
 
 class Property(db.Model):
@@ -127,11 +130,15 @@ class Property(db.Model):
     creation = db.Column(db.DateTime, default=datetime.utcnow())
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
     active = db.Column(db.Boolean(), default=True)
+
     ical = db.relationship('ICal', backref='property', lazy=True, cascade='all,delete')
+
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    creator = db.relationship('Users', backref='created_properties', foreign_keys=[creator_id])
+
     events = db.relationship('Event', backref='property', lazy=True, cascade='all,delete')
 
-    users = db.relationship('Users', secondary=property_users, backref='property')
+    users = db.relationship('PropertyUser', back_populates='property')
 
 
 class ICal(db.Model):
