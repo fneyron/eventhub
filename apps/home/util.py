@@ -40,11 +40,11 @@ class Upload():
         return '.' in self.filename and self.filename.rsplit('.', 1)[1].lower() in current_app.config[
             'ALLOWED_EXTENSIONS']
 
-def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
+def get_events(property_id=None, attendees=None, start=None, end=None):
     events_query = Event.query
 
-    if calendar_id:
-        events_query = events_query.filter(calendar_id == calendar_id)
+    if property_id:
+        events_query = events_query.filter(property_id == property_id)
 
     if attendees:
         events_query = (
@@ -58,9 +58,10 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
 
     events = []
     for event in events_query.all():
-        if event.all_day and event.calendar.checkin_time and event.calendar.checkout_time:
-            event_start = datetime.combine(event.start_date.date(), event.calendar.checkin_time)
-            event_end = datetime.combine(event.end_date.date(), event.calendar.checkout_time)
+        print(event)
+        if event.all_day and event.property.checkin_time and event.property.checkout_time:
+            event_start = datetime.combine(event.start_date.date(), event.property.checkin_time)
+            event_end = datetime.combine(event.end_date.date(), event.property.checkout_time)
             all_day = event.all_day
         else:
             event_start = event.start_date
@@ -73,8 +74,8 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
             'orig_title': event.orig_summary if event.orig_summary else '',
             'start': event_start.isoformat(),
             'end': event_end.isoformat(),
-            'checkin': event.calendar.checkin_time.strftime('%H:%M:%S'),
-            'checkout': event.calendar.checkout_time.strftime('%H:%M:%S'),
+            'checkin': event.property.checkin_time.strftime('%H:%M:%S'),
+            'checkout': event.property.checkout_time.strftime('%H:%M:%S'),
             'description': event.new_description if event.new_description else '',
             'orig_description': event.orig_description if event.orig_description else '',
             'attendees': [a.email for a in event.attendees],

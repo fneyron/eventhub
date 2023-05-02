@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Length, URL, ValidationError, Email
 from apps.home.models import ICal
 
 
-class CalendarForm(FlaskForm):
+class PropertyForm(FlaskForm):
     name = StringField(_l('Name'), validators=[DataRequired(), Length(max=100)])
     description = TextAreaField(_l('Description'), validators=[Length(max=500)])
     checkin_time = TimeField(_l('Check-in'), format='%H:%M', validators=[DataRequired()])
@@ -21,21 +21,21 @@ class CalendarForm(FlaskForm):
                           validators=[DataRequired()])
     country_code = StringField(_l('Country Code'),
                                validators=[DataRequired()])
-    submit = SubmitField(_l('Save'), name='cal-form')
+    submit = SubmitField(_l('Save'), name='property-form')
 
 
 class LinkedCalendarForm(FlaskForm):
     name = StringField(_l('Name'), validators=[DataRequired(), Length(max=100)])
     color = StringField(_l('Color'), validators=[DataRequired()])
     url = StringField(_l('URL'), description=_l('ICAL Link'), validators=[DataRequired(), URL()])
-    cal_id = HiddenField()
+    property_id = HiddenField()
     ical_id = HiddenField()
     submit = SubmitField(_l('Save'), name='linked-cal-form')
 
     def validate_url(self, field):
         url = field.data
         if self.ical_id.data is None or self.ical_id.data == '':
-            existing_url = ICal.query.filter_by(url=url, calendar_id=self.cal_id.data).first()
+            existing_url = ICal.query.filter_by(url=url, property_id=self.property_id.data).first()
             if existing_url:
                 raise ValidationError(_l('This URL already exists.'))
 

@@ -35,13 +35,13 @@ function renderCalendar(id, events, user) {
         themeSystem: 'bootstrap',
         editable: true,
         firstDay: 1,
-        height: 600,
+        height: 700,
         windowResize: function (view) {
           if (window.innerWidth < 768) {
             calendar.setOption('height', 'auto');
           } else {
             // Set your desired calendar height for larger screens
-            calendar.setOption('height', 600);
+            calendar.setOption('height', 700);
           }
         },
 
@@ -62,33 +62,33 @@ function renderCalendar(id, events, user) {
         },
         bootstrapFontAwesome: { today: 'redo' },
         eventSources:events,
-        eventContent: function(arg) {
-            var contentEl = document.createElement('div');
-
-            title = '&nbsp;' + arg.event.title;
-            if (!arg.event.extendedProps.attendees.length){
-                title = '&nbsp;<i class="fa fa-warning"></i>' + title;
-            }
-            contentEl.innerHTML = title;
-
-            var colors = arg.event.extendedProps.otherColors || [];
-
-            if (colors.length) {
-                var gradient = `repeating-linear-gradient(-45deg, ${arg.event.backgroundColor}`;
-                var stepSize = 10;
-                for (var i = 0; i < colors.length; i++) {
-                    gradient += `, ${arg.event.backgroundColor} ${stepSize}px, ${colors[i]} ${stepSize}px, ${colors[i]} ${stepSize * 2}px`;
-                    stepSize *= 2;
-                }
-                contentEl.style.backgroundImage = gradient + ')';
-            } else {
-                contentEl.style.backgroundColor = arg.event.backgroundColor;
-            }
-
-            //contentEl.style.border = `2px solid ${arg.event.borderColor}`;
-
-            return { domNodes: [contentEl] };
-        },
+//        eventContent: function(arg) {
+//            var contentEl = document.createElement('div');
+//
+//            title = '&nbsp;' + arg.event.title;
+//            if (!arg.event.extendedProps.attendees.length){
+//                title = '&nbsp;<i class="fa fa-warning"></i>' + title;
+//            }
+//            contentEl.innerHTML = title;
+//
+//            var colors = arg.event.extendedProps.otherColors || [];
+//
+//            if (colors.length) {
+//                var gradient = `repeating-linear-gradient(-45deg, ${arg.event.backgroundColor}`;
+//                var stepSize = 10;
+//                for (var i = 0; i < colors.length; i++) {
+//                    gradient += `, ${arg.event.backgroundColor} ${stepSize}px, ${colors[i]} ${stepSize}px, ${colors[i]} ${stepSize * 2}px`;
+//                    stepSize *= 2;
+//                }
+//                contentEl.style.backgroundImage = gradient + ')';
+//            } else {
+//                contentEl.style.backgroundColor = arg.event.backgroundColor;
+//            }
+//
+//            //contentEl.style.border = `2px solid ${arg.event.borderColor}`;
+//
+//            return { domNodes: [contentEl] };
+//        },
         // other calendar options
         /*eventMouseEnter: function(info) {
           var tooltip = new Tooltip(info.el, {

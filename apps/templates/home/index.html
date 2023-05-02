@@ -116,7 +116,7 @@
         function initCalendar() {
             const events = [
                 {
-                    url: "{{ url_for('home_blueprint.calendar_events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
+                    url: "{{ url_for('home_blueprint.events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
                 },
             ];
 
@@ -126,7 +126,7 @@
         function refetchEventsForAttendee(email) {
             calendar.getEventSources().forEach(source => source.remove());
 
-            let url = "{{ url_for('home_blueprint.calendar_events_json') }}";
+            let url = "{{ url_for('home_blueprint.events_json') }}";
             if (email !== 'all') {
                 url += `?attendees=${email}`;
             }

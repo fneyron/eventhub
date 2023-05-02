@@ -28,11 +28,11 @@ def send_email(recipients, **kwargs):
 
 
 @celery.task(name='apps.tasks.sync_events')
-def sync_events(calendar_id=None):
-    if calendar_id is None:
+def sync_events(property_id=None):
+    if property_id is None:
         icals = ICal.query.all()
     else:
-        icals = ICal.query.filter_by(calendar_id=calendar_id)
+        icals = ICal.query.filter_by(property_id=property_id)
 
     # Loop through each calendar
     for ical in icals:
@@ -92,7 +92,7 @@ def sync_events(calendar_id=None):
                                  new_description=event.get('description'),
                                  start_date=event.get('dtstart').dt,
                                  end_date=event.get('dtend').dt,
-                                 calendar_id=ical.calendar_id,
+                                 property_id=ical.property_id,
                                  ical_id=ical.id)
                 if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
                     db_event.all_day = True
@@ -101,7 +101,7 @@ def sync_events(calendar_id=None):
             updated_events.add(db_event)
 
         # Delete all other events
-        Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
+        deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
 
         # Update the last_synced field
         ical.last_synced = datetime.now()

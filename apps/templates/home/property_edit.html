@@ -28,7 +28,7 @@
                 data-bs-target="#share-calendar">{{ _('Ical') }}
         </button>
         <a type="button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', calendar_id=data.calendar.id) }}">{{ _('Download')
+           href="{{ url_for('home_blueprint.calendar_export_ics', property_id=data.property.id) }}">{{ _('Download')
             }}</a>
 
     </div>
@@ -38,7 +38,7 @@
     <p>{{ _('Copy the ical address to your favorite calendar tool to keep all your calendar at the same place.')}}</p>
     <div class="d-flex mb-3 justify-content-center input-group">
         <input type="text" class="form-control" readonly
-               value="{{ url_for('home_blueprint.calendar_export_ics', calendar_id=data.calendar.id, _external=True, _scheme='https') }}">
+               value="{{ url_for('home_blueprint.calendar_export_ics', property_id=data.property.id, _external=True, _scheme='https') }}">
         <button type="button" onclick="copy_to_clipboard()"
                 class="btn btn-block btn-secondary">{{_('Copy')}}
         </button>
@@ -56,148 +56,143 @@
     <div class="col-md-3 col-12">
         <div class="col">
             <form method="POST" action="">
-                {{ cal_form.csrf_token }}
+                {{ property_form.csrf_token }}
                 <div class="card border-0 shadow mb-4">
                     <div class="card-body">
 
                         <div class="mb-4">
                             <div class="col-12">
-                                {{ cal_form.name.label }}
-                                {{ cal_form.name(class="form-control") }}
+                                {{ property_form.name.label }}
+                                {{ property_form.name(class="form-control") }}
 
-                                <small id="{{ cal_form.name.id }}-help" class="form-text text-muted">{{
-                                    cal_form.name.description }}</small>
-                                <div id="{{ cal_form.name.id }}-error" class="invalid-feedback d-block">{{
-                                    cal_form.name.errors | first }}
+                                <small id="{{ property_form.name.id }}-help" class="form-text text-muted">{{
+                                    property_form.name.description }}</small>
+                                <div id="{{ property_form.name.id }}-error" class="invalid-feedback d-block">{{
+                                    property_form.name.errors | first }}
                                 </div>
                             </div>
                         </div>
                         <div class="mb-4">
                             <div class="col-12">
-                                {{ cal_form.description.label }}
-                                {{ cal_form.description(class="form-control") }}
-                                <small id="{{ cal_form.description.id }}-help" class="form-text text-muted">{{
-                                    cal_form.description.description }}</small>
-                                <div id="{{ cal_form.description.id }}-error" class="invalid-feedback d-block">{{
-                                    cal_form.description.errors | first }}
+                                {{ property_form.description.label }}
+                                {{ property_form.description(class="form-control") }}
+                                <small id="{{ property_form.description.id }}-help" class="form-text text-muted">{{
+                                    property_form.description.description }}</small>
+                                <div id="{{ property_form.description.id }}-error" class="invalid-feedback d-block">{{
+                                    property_form.description.errors | first }}
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-4">
-                                    {{ cal_form.checkin_time.label }}
+                                    {{ property_form.checkin_time.label }}
 
-                                    {{ cal_form.checkin_time(class="form-control") }}
-                                    <small id="{{ cal_form.checkin_time.id }}-help" class="form-text text-muted">{{
-                                        cal_form.checkin_time.description }}</small>
-                                    <div id="{{ cal_form.checkin_time.id }}-error" class="invalid-feedback d-block">
+                                    {{ property_form.checkin_time(class="form-control") }}
+                                    <small id="{{ property_form.checkin_time.id }}-help" class="form-text text-muted">{{
+                                        property_form.checkin_time.description }}</small>
+                                    <div id="{{ property_form.checkin_time.id }}-error"
+                                         class="invalid-feedback d-block">
                                         {{
-                                        cal_form.checkin_time.errors | first }}
+                                        property_form.checkin_time.errors | first }}
                                     </div>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="mb-4">
-                                    {{ cal_form.checkout_time.label }}
+                                    {{ property_form.checkout_time.label }}
 
-                                    {{ cal_form.checkout_time(class="form-control") }}
-                                    <small id="{{ cal_form.checkout_time.id }}-help" class="form-text text-muted">{{
-                                        cal_form.checkout_time.description }}</small>
-                                    <div id="{{ cal_form.checkout_time.id }}-error" class="invalid-feedback d-block">
+                                    {{ property_form.checkout_time(class="form-control") }}
+                                    <small id="{{ property_form.checkout_time.id }}-help" class="form-text text-muted">{{
+                                        property_form.checkout_time.description }}</small>
+                                    <div id="{{ property_form.checkout_time.id }}-error"
+                                         class="invalid-feedback d-block">
                                         {{
-                                        cal_form.checkout_time.errors | first }}
+                                        property_form.checkout_time.errors | first }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        {{ cal_form.submit(class="btn btn-gray-800") }}
-                    </div>
-                </div>
-                <div class="card border-0 shadow mb-4">
-                    <div class="card-body">
-                         <h2 class="fs-5 fw-bold mb-3">{{ _('Location')}}</h2>
                         <div class="mb-4">
-                            {{ cal_form.street.label }}
-                            {% if cal_form.street.errors %}
-                            {{ cal_form.street(class="form-control is-invalid", autocomplete="address-line1") }}
+                            {{ property_form.street.label }}
+                            {% if property_form.street.errors %}
+                            {{ property_form.street(class="form-control is-invalid", autocomplete="address-line1") }}
                             {% else %}
-                            {{ cal_form.street(class="form-control", autocomplete="address-line1") }}
+                            {{ property_form.street(class="form-control", autocomplete="address-line1") }}
                             {% endif %}
 
-                            <small id="{{ cal_form.street.id }}-help" class="form-text text-muted">{{
-                                cal_form.street.description
+                            <small id="{{ property_form.street.id }}-help" class="form-text text-muted">{{
+                                property_form.street.description
                                 }}</small>
-                            <div id="{{ cal_form.street.id }}-error" class="invalid-feedback">{{
-                                cal_form.street.errors |
+                            <div id="{{ property_form.street.id }}-error" class="invalid-feedback">{{
+                                property_form.street.errors |
                                 first
                                 }}
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            {{ cal_form.zip.label }}
-                            {% if cal_form.zip.errors %}
+                            {{ property_form.zip.label }}
+                            {% if property_form.zip.errors %}
                             {{ input(class="form-control is-invalid", autocomplete="postal-code") }}
                             {% else %}
-                            {{ cal_form.zip(class="form-control", autocomplete="postal-code") }}
+                            {{ property_form.zip(class="form-control", autocomplete="postal-code") }}
                             {% endif %}
-                            <small id="{{ cal_form.zip.id }}-help" class="form-text text-muted">{{
-                                cal_form.zip.description
+                            <small id="{{ property_form.zip.id }}-help" class="form-text text-muted">{{
+                                property_form.zip.description
                                 }}</small>
-                            <div id="{{ cal_form.zip.id }}-error" class="invalid-feedback">{{
-                                cal_form.zip.errors |
+                            <div id="{{ property_form.zip.id }}-error" class="invalid-feedback">{{
+                                property_form.zip.errors |
                                 first
                                 }}
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            {{ cal_form.city.label }}
-                            {% if cal_form.city.errors %}
+                            {{ property_form.city.label }}
+                            {% if property_form.city.errors %}
                             {{ input(class="form-control is-invalid", autocomplete="address-level2") }}
                             {% else %}
-                            {{ cal_form.city(class="form-control", autocomplete="address-level2") }}
+                            {{ property_form.city(class="form-control", autocomplete="address-level2") }}
                             {% endif %}
 
-                            <small id="{{ cal_form.city.id }}-help" class="form-text text-muted">{{
-                                cal_form.city.description
+                            <small id="{{ property_form.city.id }}-help" class="form-text text-muted">{{
+                                property_form.city.description
                                 }}</small>
-                            <div id="{{ cal_form.city.id }}-error" class="invalid-feedback">{{
-                                cal_form.city.errors
+                            <div id="{{ property_form.city.id }}-error" class="invalid-feedback">{{
+                                property_form.city.errors
                                 | first
                                 }}
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            {{ cal_form.country.label }}
+                            {{ property_form.country.label }}
 
-                            {% if cal_form.country.errors %}
+                            {% if property_form.country.errors %}
                             {{ input(class="form-control is-invalid") }}
                             {% else %}
-                            {{ cal_form.country(class="form-control") }}
+                            {{ property_form.country(class="form-control") }}
                             {% endif %}
-                            {{ cal_form.country_code(hidden=True, autocomplete="country") }}
+                            {{ property_form.country_code(hidden=True, autocomplete="country") }}
 
-                            <small id="{{ cal_form.country.id }}-help" class="form-text text-muted">{{
-                                cal_form.country.description
+                            <small id="{{ property_form.country.id }}-help" class="form-text text-muted">{{
+                                property_form.country.description
                                 }}</small>
-                            <div id="{{ cal_form.country.id }}-error" class="invalid-feedback">{{
-                                cal_form.country.errors |
+                            <div id="{{ property_form.country.id }}-error" class="invalid-feedback">{{
+                                property_form.country.errors |
                                 first
                                 }}
                             </div>
                         </div>
-                        {{ cal_form.submit(class="btn btn-gray-800") }}
+                        {{ property_form.submit(class="btn btn-gray-800") }}
                     </div>
                 </div>
             </form>
             <div class="card border-0 shadow mb-4">
                 <div class="card-body">
                     <h2 class="fs-5 fw-bold mb-3">{{ _('Linked Calendar')}}</h2>
-                    {% for ical in data.calendar.ical %}
+                    {% for ical in data.property.ical %}
                     <div class="row mb-4">
                         <div class="col-auto">
                             <i class="fa fa-calendar" style="color: {{ ical.color }};"></i>
@@ -233,7 +228,7 @@
 <!-- Linked Cal Add modal -->
 {% set modal_content %}
 {{ linked_cal_form.csrf_token }}
-{{ linked_cal_form.cal_id(id='cal-id', value=data.calendar.id) }}
+{{ linked_cal_form.property_id(id='cal-id', value=data.property.id) }}
 {{ linked_cal_form.ical_id(id='ical-id') }}
 <div class="mb-4">
     <div class="col-12">
@@ -336,7 +331,7 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
     $(document).ready(function() {
         var events = [
             {
-                url: "{{ url_for('home_blueprint.calendar_events_json', calendar_id=data.calendar.id) }}",
+                url: "{{ url_for('home_blueprint.events_json', property_id=data.property.id) }}",
             }
         ];
         calendar = renderCalendar('calendar', events);
@@ -368,7 +363,7 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
                 console.log(ical_id);
                 // Get the corresponding linked calendar object using the ical_id
                 const icals = [
-                    {% for ical in data.calendar.ical %}
+                    {% for ical in data.property.ical %}
                     {{ ical.to_dict() | safe }},
                     {% endfor %}
                 ]
@@ -392,6 +387,7 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
             }
         }
     });
+
 
 
 

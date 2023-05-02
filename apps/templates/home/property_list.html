@@ -8,7 +8,7 @@
 {% block content %}
 <div class="py-4">
     <button class="btn btn-gray-800 d-inline-flex align-items-center me-2" data-bs-toggle="modal"
-            data-bs-target="#add-calendar">
+            data-bs-target="#add-property">
         <i class="fa fa-plus me-2"></i>
         {{ _('Add Property') }}
 
@@ -24,30 +24,30 @@
                     <th class="border-bottom col-auto">{{ _('Delete') }}</th>
                 </tr>
 
-                {% for calendar in data.calendars %}
+                {% for property in data.properties %}
 
                 <tr>
                     <td class="col-9">
-                        <a href="{{ url_for('home_blueprint.calendar_edit', calendar_id=calendar.id) }}"
+                        <a href="{{ url_for('home_blueprint.property_edit', property_id=property.id) }}"
                            class="d-flex align-items-center">
 
                             <div class="d-block">
-                                <span class="fw-bold">{{ calendar.name }}</span>
-                                <div class="small text-gray text-wrap">{{ calendar.description if calendar.description }}</div>
+                                <span class="fw-bold">{{ property.name }}</span>
+                                <div class="small text-gray text-wrap">{{ property.description if property.description }}</div>
 
                             </div>
                         </a>
                     </td>
                     <td class="col-auto">
                         <div class="form-check form-switch">
-                            <input class="form-check-input" {% if calendar.active %}checked{% endif %}
+                            <input class="form-check-input" {% if property.active %}checked{% endif %}
                                    type="checkbox"
-                                   name="active" calendar_id="{{ calendar.id }}">
+                                   name="active" property_id="{{ property.id }}">
                         </div>
                     </td>
                     <td class="col-auto text-danger">
                         <a class="d-inline-flex align-items-center me-2" data-bs-toggle="modal"
-                           data-bs-target="#delete-calendar">
+                           data-bs-target="#delete-property-{{ property.id }}">
                             <i class="fa fa-trash"></i>
                         </a>
                     </td>
@@ -55,10 +55,10 @@
                 </tr>
                 <!-- Delete Property Modal -->
                 {% set modal_content %}
-                {{ _('Are you sure you want to delete {name} ?').format(name=calendar.name) }}
+                {{ _('Are you sure you want to delete {name} ?').format(name=property.name) }}
                 {% endset %}
-                {{ macros.render_modal_confirm('delete-calendar', _('Delete Property'), modal_content,
-                _('Confirm'), url_for('home_blueprint.calendar_delete', calendar_id=calendar.id)) }}
+                {{ macros.render_modal_confirm('delete-property-' ~ property.id, _('Delete Property'), modal_content,
+                _('Confirm'), url_for('home_blueprint.property_delete', property_id=property.id)) }}
                 {% endfor %}
             </table>
 
@@ -184,7 +184,7 @@
                 </div>
             </div>
             {% endset %}
-            {{ macros.render_modal_form('add-calendar', _('Add Property'), modal_content,
+            {{ macros.render_modal_form('add-property', _('Add Property'), modal_content,
             form.submit(class="btn btn-primary")) }}
         </div>
     </div>
@@ -198,7 +198,7 @@
     /* If there is errors in the add calendar form then we show the modal */
     {% if form.errors %}
         $(window).on('load', function() {
-            $('#add-calendar').modal('show');
+            $('#add-property').modal('show');
         });
     {% endif %}
 
@@ -209,17 +209,17 @@
 
         $('.form-check-input').change(function() {
 
-            var calendarID=$(this).attr('calendar_id');
+            var propertyID=$(this).attr('property_id');
             var attr=$(this).attr('name');
             var value=$(this).prop('checked');
 
             $.ajax({
                 type: 'POST',
-                url: '{{ url_for("home_blueprint.calendar_update") }}',
+                url: '{{ url_for("home_blueprint.property_update") }}',
                 data: {
                     attr: attr,
                     value: value,
-                    calendar_id: calendarID,
+                    property_id: propertyID,
                 },
                 success: function(data) {
                     //console.log('QR Code geolocation updated.');

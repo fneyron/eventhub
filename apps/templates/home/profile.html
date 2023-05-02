@@ -259,9 +259,9 @@
             var form_data = $('#profile-alerts').serialize();
 
             // Send an AJAX request to the server to update the form
-            $.post('{{ url_for("home_blueprint.update_profile")}}', form_data)
+            $.post('{{ url_for("home_blueprint.profile_update")}}', form_data)
                 .done(function(response) {
-                    if (response.success) {
+                    if (response.status == 'success') {
                         console.log('Update successful');
                     } else {
                         console.log('Update failed');

@@ -20,9 +20,9 @@ from apps.authentication.models import Users, UserRole
 from apps.authentication.util import generate_confirmation_token
 from apps.decorator import authenticated, roles_required
 from apps.home import blueprint
-from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
+from apps.home.forms import PropertyForm, LinkedCalendarForm, EventForm
 from apps.home.models import Property, ICal, Event, Attendee
-from apps.home.util import get_calendar_events, create_ics
+from apps.home.util import get_events, create_ics
 from apps.tasks import sync_events, send_email
 
 
@@ -36,73 +36,74 @@ def index():
     return render_template('home/index.html', segment='index', event_form=event_form, event=event)
 
 
-@blueprint.route('/calendar', methods=['POST', 'GET'])
-def calendar_list():
+@blueprint.route('/property', methods=['POST', 'GET'])
+def property_list():
 
-    calendars = Property.query.all()
+    properties = Property.query.all()
 
-    form = CalendarForm(request.form)
+    form = PropertyForm(request.form)
     form.street.data = request.form.get('street address-search')
     #print(request.form)
     #print(form.data, form.validate_on_submit())
     if form.validate_on_submit():
 
-        calendar_uuid = shortuuid.uuid()
-        while Property.query.filter_by(uuid=calendar_uuid).count():
-            calendar_uuid = shortuuid.uuid()
+        property_uuid = shortuuid.uuid()
+        while Property.query.filter_by(uuid=property_uuid).count():
+            property_uuid = shortuuid.uuid()
 
-        calendar = Property(creator_id=current_user.id)
-        form.populate_obj(calendar)
-        db.session.add(calendar)
+        property = Property(creator_id=current_user.id)
+        form.populate_obj(property)
+        db.session.add(property)
         db.session.commit()
 
-        return redirect(url_for('home_blueprint.calendar_list'))
+        return redirect(url_for('home_blueprint.property_list'))
 
-    data = dict(calendars=calendars)
+    data = dict(properties=properties)
 
-    return render_template('home/calendar_list.html', segment='index', data=data, form=form)
+    return render_template('home/property_list.html', segment='index', data=data, form=form)
 
 
-@blueprint.route('/calendar/<uuid>', methods=['GET'])
-def calendar_display(uuid):
-    calendar = Property.query.filter_by(uuid=uuid).first_or_404()
-    if not calendar.active:
+@blueprint.route('/property/<uuid>', methods=['GET'])
+def property_display(uuid):
+    property = Property.query.filter_by(uuid=uuid).first_or_404()
+    if not property.active:
         abort(404)
-    data = dict(calendar=calendar)
-    return render_template('home/calendar_display.html', segment='qrcode', data=data)
+    data = dict(property=property)
+    return render_template('home/property_display.html', segment='qrcode', data=data)
 
 
-@blueprint.route('/calendar/update', methods=['POST'])
+@blueprint.route('/property/update', methods=['POST'])
 @authenticated
-def calendar_update():
+@roles_required(UserRole.ADMIN, UserRole.EDITOR)
+def property_update():
     attr = request.form.get('attr')
     value = bool(str(request.form.get('value')).lower() == 'true')
-    calendar_id = request.form.get('calendar_id')
-    calendar = Property.query.filter_by(id=calendar_id).first_or_404()
+    property_id = request.form.get('property_id')
+    property = Property.query.filter_by(id=property_id).first_or_404()
 
-    if calendar.user == current_user:
-        setattr(calendar, attr, value)
-        db.session.commit()
+    setattr(property, attr, value)
+    db.session.commit()
 
     # Return a JSON response indicating success
     return jsonify({'status': 'success'})
 
 
-@blueprint.route('/calendar/<int:calendar_id>/edit', methods=['GET', 'POST'])
+@blueprint.route('/property/<int:property_id>/edit', methods=['GET', 'POST'])
 @authenticated
-def calendar_edit(calendar_id):
-    calendar = Property.query.filter_by(id=calendar_id).first_or_404()
-    data = dict(calendar=calendar)
+@roles_required(UserRole.ADMIN, UserRole.EDITOR)
+def property_edit(property_id):
+    property = Property.query.filter_by(id=property_id).first_or_404()
+    data = dict(property=property)
 
     # forms
-    linked_cal_form = LinkedCalendarForm(request.form, obj=calendar.ical)
+    linked_cal_form = LinkedCalendarForm(request.form, obj=property.ical)
 
-    cal_form = CalendarForm(request.form, obj=calendar)
-    cal_form.street.data = request.form.get('street address-search') if request.form.get('street address-search') else cal_form.street.data
+    property_form = PropertyForm(request.form, obj=property)
+    property_form.street.data = request.form.get('street address-search') if request.form.get('street address-search') else property_form.street.data
 
     event_form = EventForm()
     print(request.form)
-    print(cal_form.data, cal_form.validate_on_submit())
+    print(linked_cal_form.data, linked_cal_form.validate_on_submit())
     if request.method == 'POST':
         if 'linked-cal-form' in request.form and linked_cal_form.validate_on_submit():
             is_valid = True
@@ -121,29 +122,28 @@ def calendar_edit(calendar_id):
                 else:
                     ical = ICal()
                     linked_cal_form.populate_obj(ical)
-                    calendar.ical.append(ical)
+                    property.ical.append(ical)
                 db.session.commit()
-                sync_events.delay(calendar_id=calendar.id)
-                return redirect(url_for('home_blueprint.calendar_edit', calendar_id=calendar.id))
+                sync_events.delay(property_id=property.id)
+                return redirect(url_for('home_blueprint.property_edit', property_id=property.id))
 
-        if 'cal-form' in request.form and cal_form.validate_on_submit():
-            cal_form.populate_obj(calendar)
-
+        if 'property-form' in request.form and property_form.validate_on_submit():
+            property_form.populate_obj(property)
             db.session.commit()
-            return redirect(url_for('home_blueprint.calendar_edit', calendar_id=calendar.id))
+            return redirect(url_for('home_blueprint.property_edit', property_id=property.id))
 
-    return render_template('home/calendar_edit.html', segment='elements', data=data, cal_form=cal_form,
+    return render_template('home/property_edit.html', segment='elements', data=data, property_form=property_form,
                            linked_cal_form=linked_cal_form, event_form=event_form)
 
 
-@blueprint.route('/calendar/<int:calendar_id>/delete', methods=['GET', 'POST'])
+@blueprint.route('/property/<int:property_id>/delete', methods=['GET', 'POST'])
 @authenticated
 @roles_required(UserRole.ADMIN, UserRole.EDITOR)
-def calendar_delete(calendar_id):
-    Property.query.filter_by(id=calendar_id).delete()
+def property_delete(property_id):
+    Property.query.filter_by(id=property_id).delete()
     db.session.commit()
 
-    return redirect(url_for('home_blueprint.calendar_list'))
+    return redirect(url_for('home_blueprint.property_list'))
 
 
 @blueprint.route('/profile', methods=['GET', 'POST'])
@@ -191,9 +191,9 @@ def profile():
                            profile_form=profile_form, email_form=email_form, pwd_form=pwd_form)
 
 
-@blueprint.route('/update_profile', methods=['POST'])
+@blueprint.route('/profile/update', methods=['POST'])
 @authenticated
-def update_profile():
+def profile_update():
     # Get the form data from the AJAX request
     form = ProfileForm(request.form)
     current_user.notification_settings.event_notification_email = form.event_notification_email.data
@@ -229,14 +229,14 @@ def task_status(task_id):
     return jsonify({'id': task.id, 'status': task.state})
 
 
-@blueprint.route('/calendar/events', methods=['GET'])
-def calendar_events_json():
-    calendar_id = request.args.get('calendar_id')
+@blueprint.route('/events', methods=['GET'])
+def events_json():
+    property_id = request.args.get('property_id')
     attendees = request.args.getlist('attendees')
     start = request.args.get('start')
     end = request.args.get('end')
 
-    events = get_calendar_events(calendar_id=calendar_id, attendees=attendees, start=start, end=end)
+    events = get_events(property_id=property_id, attendees=attendees, start=start, end=end)
     return jsonify(events)
 
 
@@ -248,7 +248,7 @@ def event_update(event_id):
     form = EventForm(data, obj=event)
 
     if form.validate_on_submit and (
-            event.calendar.creator_id == current_user.get_id() or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
+            event.property.creator_id == current_user.get_id() or current_user.role in (UserRole.ADMIN, UserRole.EDITOR)):
 
         # We delete existing attendees
         db.session.query(Attendee).filter_by(event_id=event.id).delete()
@@ -294,12 +294,12 @@ def linked_calendar_delete(id):
     ).first_or_404()
     db.session.delete(ical)
     db.session.commit()
-    return redirect(url_for('home_blueprint.calendar_edit', calendar_id=ical.calendar_id))
+    return redirect(url_for('home_blueprint.property_edit', property_id=ical.property_id))
 
 
 @blueprint.route('/calendar/export', methods=['GET'])
 def calendar_export_ics():
-    events = get_calendar_events(calendar_id=request.args.get('calendar_id'),
+    events = get_events(property_id=request.args.get('property_id'),
                                  attendees=request.args.getlist('attendees'))
     return create_ics(events)
 

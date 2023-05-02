@@ -1078,17 +1078,18 @@ d.addEventListener("DOMContentLoaded", function (event) {
         }
 
         var sidebarToggle = d.getElementById('sidebar-toggle');
-        sidebarToggle.addEventListener('click', function () {
-            if (sidebar.classList.contains('contracted')) {
-                sidebar.classList.remove('contracted');
-                localStorage.removeItem('sidebar', 'contracted');
-            } else {
-                sidebar.classList.add('contracted');
-                localStorage.setItem('sidebar', 'contracted');
-            }
-            $(window).trigger("resize");
-        });
-
+        if (sidebarToggle){
+            sidebarToggle.addEventListener('click', function () {
+                if (sidebar.classList.contains('contracted')) {
+                    sidebar.classList.remove('contracted');
+                    localStorage.removeItem('sidebar', 'contracted');
+                } else {
+                    sidebar.classList.add('contracted');
+                    localStorage.setItem('sidebar', 'contracted');
+                }
+                $(window).trigger("resize");
+            });
+        }
         sidebar.addEventListener('mouseenter', function () {
             if (localStorage.getItem('sidebar') === 'contracted') {
                 if (sidebar.classList.contains('contracted')) {

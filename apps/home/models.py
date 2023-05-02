@@ -27,8 +27,8 @@ class Attendee(db.Model):
     def notification_message(self):
         event = Event.query.get(self.event_id)
         event_title = event.new_summary
-        calendar_name = event.calendar.name
-        return f"<b>{current_user.firstname} {current_user.lastname}</b> invited you to the following event '{calendar_name} : {event_title}'"
+        property_name = event.property.name
+        return f"<b>{current_user.firstname} {current_user.lastname}</b> invited you to the following event '{property_name} : {event_title}'"
 
 
 class Event(db.Model):
@@ -44,7 +44,7 @@ class Event(db.Model):
     end_date = db.Column(db.DateTime)
     last_modified = db.Column(db.DateTime, onupdate=datetime.utcnow, default=datetime.utcnow)
     all_day = db.Column(db.Boolean(), default=False)
-    calendar_id = db.Column(db.Integer, db.ForeignKey('Property.id'))
+    property_id = db.Column(db.Integer, db.ForeignKey('Property.id'))
     ical_id = db.Column(db.Integer, db.ForeignKey('ICal.id'))
     attendees = db.relationship('Attendee', backref='event', lazy=True, cascade='all,delete')
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
@@ -84,7 +84,7 @@ class Event(db.Model):
                 'You are receiving this email because %s, invited you to the following event.') %
                     (current_user.firstname),
             event={
-                'calendar': self.calendar.name,
+                'property': self.property.name,
                 'title': self.new_summary,
                 'start': format_datetime(self.start_date, format='d MMM YYYY' if self.all_day else 'medium',
                                          locale=lang_code),
@@ -102,9 +102,9 @@ class Event(db.Model):
         db.session.commit()
 
 
-calendar_users = db.Table('calendar_users',
+property_users = db.Table('property_users',
                           db.Column('user_id', db.Integer, db.ForeignKey('Users.id'), primary_key=True),
-                          db.Column('calendar_id', db.Integer, db.ForeignKey('Property.id'), primary_key=True)
+                          db.Column('property_id', db.Integer, db.ForeignKey('Property.id'), primary_key=True)
                           )
 
 
@@ -127,11 +127,11 @@ class Property(db.Model):
     creation = db.Column(db.DateTime, default=datetime.utcnow())
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
     active = db.Column(db.Boolean(), default=True)
-    ical = db.relationship('ICal', backref='calendar', lazy=True, cascade='all,delete')
+    ical = db.relationship('ICal', backref='property', lazy=True, cascade='all,delete')
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
-    events = db.relationship('Event', backref='calendar', lazy=True, cascade='all,delete')
+    events = db.relationship('Event', backref='property', lazy=True, cascade='all,delete')
 
-    users = db.relationship('Users', secondary=calendar_users, backref='calendar')
+    users = db.relationship('Users', secondary=property_users, backref='property')
 
 
 class ICal(db.Model):
@@ -142,7 +142,7 @@ class ICal(db.Model):
     color = db.Column(db.String)
     creation = db.Column(db.DateTime, default=datetime.utcnow())
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
-    calendar_id = db.Column(db.Integer, db.ForeignKey('Property.id'), nullable=False)
+    property_id = db.Column(db.Integer, db.ForeignKey('Property.id'), nullable=False)
     url = db.Column(db.String)
     last_synced = db.Column(db.DateTime())
     events = db.relationship('Event', backref='ical', lazy=True, cascade='all,delete')
@@ -152,6 +152,6 @@ class ICal(db.Model):
             'id': self.id,
             'name': self.name,
             'color': self.color,
-            'calendar_id': self.calendar_id,
+            'property_id': self.property_id,
             'url': self.url,
         }

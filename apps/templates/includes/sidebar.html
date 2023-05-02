@@ -28,13 +28,13 @@
                         <span class="sidebar-icon">
                             <i class="fa fa-calendar me-2"></i>
                         </span>
-                        <span class="mt-1 sidebar-text">{{ _('Property') }}</span>
+                        <span class="mt-1 sidebar-text">{{ _('Calendar') }}</span>
                     </span>
                 </a>
             </li>
             {% if current_user.role.name != 'USER' %}
             <li class="nav-item {% if 'properties' in segment %}active{% endif %}">
-                <a href="{{ url_for('home_blueprint.calendar_list') }}" class="nav-link">
+                <a href="{{ url_for('home_blueprint.property_list') }}" class="nav-link">
             <span class="sidebar-icon">
                 <i class="fa fa-home me-2"></i>
             </span>
