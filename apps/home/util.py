@@ -40,7 +40,6 @@ class Upload():
         return '.' in self.filename and self.filename.rsplit('.', 1)[1].lower() in current_app.config[
             'ALLOWED_EXTENSIONS']
 
-
 def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
     events_query = Event.query
 
@@ -57,47 +56,33 @@ def get_calendar_events(calendar_id=None, attendees=None, start=None, end=None):
     if start and end:
         events_query = events_query.filter(Event.end_date >= start, Event.start_date <= end)
 
-    grouped_events = {}
+    events = []
     for event in events_query.all():
-        key = (event.start_date, event.end_date, event.all_day)
-        if key not in grouped_events:
-            if event.all_day and event.calendar.checkin_time and event.calendar.checkout_time:
-                event_start = datetime.combine(event.start_date.date(), event.calendar.checkin_time)
-                event_end = datetime.combine(event.end_date.date(), event.calendar.checkout_time)
-                # all_day=False
-                all_day = event.all_day
-            else:
-                event_start = event.start_date
-                event_end = event.end_date
-                all_day = event.all_day
-
-            # Object neeeds to be serialized to be passer to fullcalendar js
-            grouped_events[key] = {
-                'id': event.id,
-                'title': event.new_summary,
-                'orig_title': event.orig_summary if event.orig_summary else '',
-                'start': event_start.isoformat(),
-                'end': event_end.isoformat(),
-                'checkin': event.calendar.checkin_time.strftime('%H:%M:%S'),
-                'checkout': event.calendar.checkout_time.strftime('%H:%M:%S'),
-                'description': event.new_description if event.new_description else '',
-                'orig_description': event.orig_description if event.orig_description else '',
-                'attendees': [a.email for a in event.attendees],
-                'color': event.ical.color,
-                'otherColors': [event.ical.color],
-                'allDay': all_day,
-                'disabled': event.ical is not None
-            }
+        if event.all_day and event.calendar.checkin_time and event.calendar.checkout_time:
+            event_start = datetime.combine(event.start_date.date(), event.calendar.checkin_time)
+            event_end = datetime.combine(event.end_date.date(), event.calendar.checkout_time)
+            all_day = event.all_day
         else:
-            grouped_events[key]['otherColors'].append(event.ical.color)
-            # If there is no title or description to the events that is actually grouped
-            # then add the title or description of the other
-            if not grouped_events[key]['title']:
-                grouped_events[key]['title'] = event.new_summary
-            if not grouped_events[key]['description']:
-                grouped_events[key]['description'] = event.new_description
+            event_start = event.start_date
+            event_end = event.end_date
+            all_day = event.all_day
 
-    events = list(grouped_events.values())
+        event_dict = {
+            'id': event.id,
+            'title': event.new_summary,
+            'orig_title': event.orig_summary if event.orig_summary else '',
+            'start': event_start.isoformat(),
+            'end': event_end.isoformat(),
+            'checkin': event.calendar.checkin_time.strftime('%H:%M:%S'),
+            'checkout': event.calendar.checkout_time.strftime('%H:%M:%S'),
+            'description': event.new_description if event.new_description else '',
+            'orig_description': event.orig_description if event.orig_description else '',
+            'attendees': [a.email for a in event.attendees],
+            'color': event.ical.color,
+            'allDay': all_day,
+            'disabled': event.ical is not None
+        }
+        events.append(event_dict)
 
     return events
 
