@@ -44,7 +44,7 @@ class Event(db.Model):
     end_date = db.Column(db.DateTime)
     last_modified = db.Column(db.DateTime, onupdate=datetime.utcnow, default=datetime.utcnow)
     all_day = db.Column(db.Boolean(), default=False)
-    calendar_id = db.Column(db.Integer, db.ForeignKey('Calendar.id'))
+    calendar_id = db.Column(db.Integer, db.ForeignKey('Property.id'))
     ical_id = db.Column(db.Integer, db.ForeignKey('ICal.id'))
     attendees = db.relationship('Attendee', backref='event', lazy=True, cascade='all,delete')
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
@@ -104,12 +104,12 @@ class Event(db.Model):
 
 calendar_users = db.Table('calendar_users',
                           db.Column('user_id', db.Integer, db.ForeignKey('Users.id'), primary_key=True),
-                          db.Column('calendar_id', db.Integer, db.ForeignKey('Calendar.id'), primary_key=True)
+                          db.Column('calendar_id', db.Integer, db.ForeignKey('Property.id'), primary_key=True)
                           )
 
 
-class Calendar(db.Model):
-    __tablename__ = 'Calendar'
+class Property(db.Model):
+    __tablename__ = 'Property'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -142,7 +142,7 @@ class ICal(db.Model):
     color = db.Column(db.String)
     creation = db.Column(db.DateTime, default=datetime.utcnow())
     update = db.Column(db.DateTime, onupdate=datetime.utcnow(), default=datetime.utcnow())
-    calendar_id = db.Column(db.Integer, db.ForeignKey('Calendar.id'), nullable=False)
+    calendar_id = db.Column(db.Integer, db.ForeignKey('Property.id'), nullable=False)
     url = db.Column(db.String)
     last_synced = db.Column(db.DateTime())
     events = db.relationship('Event', backref='ical', lazy=True, cascade='all,delete')

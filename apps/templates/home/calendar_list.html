@@ -53,11 +53,11 @@
                     </td>
 
                 </tr>
-                <!-- Delete Calendar Modal -->
+                <!-- Delete Property Modal -->
                 {% set modal_content %}
                 {{ _('Are you sure you want to delete {name} ?').format(name=calendar.name) }}
                 {% endset %}
-                {{ macros.render_modal_confirm('delete-calendar', _('Delete Calendar'), modal_content,
+                {{ macros.render_modal_confirm('delete-calendar', _('Delete Property'), modal_content,
                 _('Confirm'), url_for('home_blueprint.calendar_delete', calendar_id=calendar.id)) }}
                 {% endfor %}
             </table>

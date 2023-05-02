@@ -8,7 +8,7 @@ from icalendar import Calendar as ICalendar
 from sqlalchemy import or_, and_, not_
 
 from apps.config import Config
-from apps.home.models import Event, ICal, Calendar
+from apps.home.models import Event, ICal, Property
 from . import mail, celery, db
 
 

@@ -21,7 +21,7 @@ from apps.authentication.util import generate_confirmation_token
 from apps.decorator import authenticated, roles_required
 from apps.home import blueprint
 from apps.home.forms import CalendarForm, LinkedCalendarForm, EventForm
-from apps.home.models import Calendar, ICal, Event, Attendee
+from apps.home.models import Property, ICal, Event, Attendee
 from apps.home.util import get_calendar_events, create_ics
 from apps.tasks import sync_events, send_email
 
@@ -39,7 +39,7 @@ def index():
 @blueprint.route('/calendar', methods=['POST', 'GET'])
 def calendar_list():
 
-    calendars = Calendar.query.all()
+    calendars = Property.query.all()
 
     form = CalendarForm(request.form)
     form.street.data = request.form.get('street address-search')
@@ -48,10 +48,10 @@ def calendar_list():
     if form.validate_on_submit():
 
         calendar_uuid = shortuuid.uuid()
-        while Calendar.query.filter_by(uuid=calendar_uuid).count():
+        while Property.query.filter_by(uuid=calendar_uuid).count():
             calendar_uuid = shortuuid.uuid()
 
-        calendar = Calendar(creator_id=current_user.id)
+        calendar = Property(creator_id=current_user.id)
         form.populate_obj(calendar)
         db.session.add(calendar)
         db.session.commit()
@@ -65,7 +65,7 @@ def calendar_list():
 
 @blueprint.route('/calendar/<uuid>', methods=['GET'])
 def calendar_display(uuid):
-    calendar = Calendar.query.filter_by(uuid=uuid).first_or_404()
+    calendar = Property.query.filter_by(uuid=uuid).first_or_404()
     if not calendar.active:
         abort(404)
     data = dict(calendar=calendar)
@@ -78,7 +78,7 @@ def calendar_update():
     attr = request.form.get('attr')
     value = bool(str(request.form.get('value')).lower() == 'true')
     calendar_id = request.form.get('calendar_id')
-    calendar = Calendar.query.filter_by(id=calendar_id).first_or_404()
+    calendar = Property.query.filter_by(id=calendar_id).first_or_404()
 
     if calendar.user == current_user:
         setattr(calendar, attr, value)
@@ -91,7 +91,7 @@ def calendar_update():
 @blueprint.route('/calendar/<int:calendar_id>/edit', methods=['GET', 'POST'])
 @authenticated
 def calendar_edit(calendar_id):
-    calendar = Calendar.query.filter_by(id=calendar_id).first_or_404()
+    calendar = Property.query.filter_by(id=calendar_id).first_or_404()
     data = dict(calendar=calendar)
 
     # forms
@@ -140,7 +140,7 @@ def calendar_edit(calendar_id):
 @authenticated
 @roles_required(UserRole.ADMIN, UserRole.EDITOR)
 def calendar_delete(calendar_id):
-    Calendar.query.filter_by(id=calendar_id).delete()
+    Property.query.filter_by(id=calendar_id).delete()
     db.session.commit()
 
     return redirect(url_for('home_blueprint.calendar_list'))
@@ -288,9 +288,9 @@ def get_user_json(value):
 @blueprint.route('/linkedcal/<int:id>/delete', methods=['GET'])
 @authenticated
 def linked_calendar_delete(id):
-    ical = ICal.query.join(Calendar).filter(
+    ical = ICal.query.join(Property).filter(
         ICal.id == id,
-        Calendar.user_id == current_user.id
+        Property.user_id == current_user.id
     ).first_or_404()
     db.session.delete(ical)
     db.session.commit()

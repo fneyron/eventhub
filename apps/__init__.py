@@ -73,11 +73,11 @@ def register_extensions(app):
 def configure_admin(admin, db):
     from apps.admin import MyModelView, UserAdminView
     from apps.authentication.models import Users, NotificationSettings, Notification
-    from apps.home.models import Calendar, ICal, Event, Attendee
+    from apps.home.models import Property, ICal, Event, Attendee
     from flask_admin.contrib.sqla import ModelView
 
     admin.add_view(UserAdminView(Users, db.session))
-    admin.add_view(ModelView(Calendar, db.session))
+    admin.add_view(ModelView(Property, db.session))
     admin.add_view(ModelView(ICal, db.session))
     admin.add_view(ModelView(Event, db.session))
     admin.add_view(ModelView(Attendee, db.session))
