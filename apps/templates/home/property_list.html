@@ -33,7 +33,9 @@
 
                             <div class="d-block">
                                 <span class="fw-bold">{{ property.name }}</span>
-                                <div class="small text-gray text-wrap">{{ property.description if property.description }}</div>
+                                <div class="small text-gray text-wrap">{{ property.description if property.description
+                                    }}
+                                </div>
 
                             </div>
                         </a>
@@ -116,6 +118,7 @@
                     </div>
                 </div>
             </div>
+            {{ form.latitude }} {{ form.longitude }}
             <div class="mb-4">
                 {{ form.street.label }}
                 {% if form.street.errors %}
@@ -232,6 +235,7 @@
 
 
     });
+
 
 
 

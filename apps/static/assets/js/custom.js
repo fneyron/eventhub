@@ -294,6 +294,8 @@ function initializeAutofill(token, field_id) {
       const countrySelect = $("#" + field_id).countrySelect();
       countrySelect.countrySelect("selectCountry", cc);
       $("#" + field_id + "_code").val(cc);
+      $("#latitude").val(event.detail.features[0].geometry.coordinates[1]);
+      $("#longitude").val(event.detail.features[0].geometry.coordinates[0]);
       const inputEl = event.target;
     });
   };

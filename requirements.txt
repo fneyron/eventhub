@@ -19,7 +19,8 @@ Flask-Babel==2.0.0
 Flask-CKEditor==0.4.6
 Flask-Login==0.5.0
 Flask-Mail==0.9.1
-Flask-Migrate==3.1.0
+#Flask-Migrate==3.1.0
+Flask-Migrate
 Flask-Minify==0.37
 flask-restx==0.5.1
 Flask-SQLAlchemy==2.5.1

@@ -21,6 +21,8 @@ class PropertyForm(FlaskForm):
                           validators=[DataRequired()])
     country_code = StringField(_l('Country Code'),
                                validators=[DataRequired()])
+    latitude = HiddenField()
+    longitude = HiddenField()
     submit = SubmitField(_l('Save'), name='property-form')
 
 
