@@ -78,6 +78,7 @@ def get_events(property_id=None, attendees=None, start=None, end=None):
             'checkout': event.property.checkout_time.strftime('%H:%M:%S'),
             'latitude': event.property.latitude,
             'longitude': event.property.longitude,
+            'address': event.property.full_address,
             'description': event.new_description if event.new_description else '',
             'orig_description': event.orig_description if event.orig_description else '',
             'attendees': [a.email for a in event.attendees],
@@ -103,8 +104,8 @@ def create_ics(events):
         end = event['end']
         if event['allDay']:
             # event is a full day event
-            ical_event.add('dtstart;value=date', datetime.fromisoformat(start).date())
-            ical_event.add('dtend;value=date', datetime.fromisoformat(end).date())
+            ical_event.add('dtstart;value=date', datetime.fromisoformat(start).date().strftime('%Y%m%d'))
+            ical_event.add('dtend;value=date', datetime.fromisoformat(end).date().strftime('%Y%m%d'))
         else:
             # event is not a full day event
             ical_event.add('dtstart', datetime.fromisoformat(start))

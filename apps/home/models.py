@@ -1,12 +1,11 @@
 import uuid
 from datetime import datetime
-from hashlib import sha256
 
 from babel.dates import format_datetime
 from flask import url_for
 from flask_babel import _
 from flask_login import current_user
-from sqlalchemy import event
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from apps import db
 
@@ -138,7 +137,9 @@ class Property(db.Model):
     events = db.relationship('Event', backref='property', lazy=True, cascade='all,delete')
     property_users = db.relationship('PropertyUser', backref='property', lazy=True)
 
-
+    @hybrid_property
+    def full_address(self):
+        return f"{self.street}, {self.city}, {self.zip}, {self.country}"
 class ICal(db.Model):
     __tablename__ = 'ICal'
 

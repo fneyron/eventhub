@@ -134,7 +134,7 @@ function renderCalendar(id, events, user) {
             editEventStartDatepicker.setDate(info.event.start);
             editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
 
-            loadMap('map', info.event.extendedProps.longitude,info.event.extendedProps.latitude, 0, 12)
+            loadMap('map', info.event.extendedProps.address, info.event.extendedProps.longitude, info.event.extendedProps.latitude, 0, 12)
 
             editEventModal.show();
             editEventModalEl.addEventListener('shown.bs.modal', function () {
@@ -304,7 +304,7 @@ function initializeAutofill(field_id) {
   };
 }
 
-function loadMap(id, lng, lat, acc, zoom) {
+function loadMap(id, address, lng, lat, acc, zoom) {
     mapboxgl.accessToken = window.mapbox_token;
     var map = new mapboxgl.Map({
         container: id,
@@ -312,16 +312,19 @@ function loadMap(id, lng, lat, acc, zoom) {
         center: [lng, lat],
         zoom: zoom,
     });
-    console.log(map);
+
+     const popup = new mapboxgl.Popup().setHTML(`
+        <strong>${address}</strong><br>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${address}" target="_blank">Get Directions</a>
+    `);
+
+    // Create a new marker with the custom popup
+    const marker = new mapboxgl.Marker()
+        .setLngLat([lng, lat])
+        .setPopup(popup)
+        .addTo(map);
+
     map.on('load', () => {
-        // Create a new marker.
-        const marker = new mapboxgl.Marker()
-            .setLngLat([lng, lat])
-            .addTo(map);
-        var options = {
-          steps: 100,
-          units: 'kilometers'
-        };
         map.resize();
     });
     return mapboxgl;
