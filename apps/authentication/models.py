@@ -38,10 +38,11 @@ class Users(db.Model, UserMixin):
     email_confirmed_on = db.Column(db.DateTime())
     role = db.Column(db.Enum(UserRole), default=UserRole.USER)
 
-    created_properties = db.relationship('Property', back_populates='creator')
-    properties = db.relationship('PropertyUser', back_populates='user')
+    property_users = db.relationship('PropertyUser', backref='user', lazy=True)
 
-    events = db.relationship('Event', backref='creator', lazy=True)
+    created_events = db.relationship('Event', backref='creator', lazy=True)
+    created_properties = db.relationship('Property', backref='creator', lazy=True)
+
     notifications = db.relationship('Notification', backref='user', lazy=True)
 
     notification_settings_id = db.Column(db.Integer, db.ForeignKey('NotificationSettings.id'))
