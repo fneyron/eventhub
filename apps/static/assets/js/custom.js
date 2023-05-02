@@ -114,6 +114,7 @@ function renderCalendar(id, events, user) {
 
             const initialValue = info.event.extendedProps.attendees;
             tagify.loadOriginalValues(initialValue);
+
             // listen to any keystrokes which modify tagify's input
             tagify.on('input', onInput)
 
@@ -132,6 +133,8 @@ function renderCalendar(id, events, user) {
 
             editEventStartDatepicker.setDate(info.event.start);
             editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
+
+            loadMap('map', info.event.extendedProps.longitude,info.event.extendedProps.latitude, 0, 12)
 
             editEventModal.show();
             editEventModalEl.addEventListener('shown.bs.modal', function () {
@@ -282,11 +285,11 @@ function initializeCountrySelect(field_id){
     return countrySelect;
 }
 
-function initializeAutofill(token, field_id) {
+function initializeAutofill(field_id) {
   const script = document.getElementById('search-js');
   script.onload = function() {
     autofill = mapboxsearch.autofill({
-      accessToken: token,
+      accessToken: window.mapbox_token,
     });
     autofill.addEventListener('retrieve', (event) => {
       const featureCollection = event.detail;
@@ -302,14 +305,14 @@ function initializeAutofill(token, field_id) {
 }
 
 function loadMap(id, lng, lat, acc, zoom) {
-    mapboxgl.accessToken = token;
-    const metersToPixelsAtMaxZoom = (acc, lat) => acc / 0.075 / Math.cos(lat * Math.PI / 180)
+    mapboxgl.accessToken = window.mapbox_token;
     var map = new mapboxgl.Map({
         container: id,
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [lng, lat],
         zoom: zoom,
     });
+    console.log(map);
     map.on('load', () => {
         // Create a new marker.
         const marker = new mapboxgl.Marker()
@@ -319,23 +322,7 @@ function loadMap(id, lng, lat, acc, zoom) {
           steps: 100,
           units: 'kilometers'
         };
-        if (acc != 0){
-            var circle = turf.circle(turf.point([lng, lat]), acc/1000, options);
-            // Create a circle for accuracy
-             map.addLayer({
-                "id": "circle-fill",
-                "type": "fill",
-                "source": {
-                    "type": "geojson",
-                    "data": circle
-                },
-                "paint": {
-                    "fill-color": "#1da1f2",
-                    "fill-opacity": 0.2
-                }
-            });
-            map.fitBounds(turf.bbox(circle), {padding: 20});
-        }
+        map.resize();
     });
     return mapboxgl;
 }

@@ -76,6 +76,8 @@ def get_events(property_id=None, attendees=None, start=None, end=None):
             'end': event_end.isoformat(),
             'checkin': event.property.checkin_time.strftime('%H:%M:%S'),
             'checkout': event.property.checkout_time.strftime('%H:%M:%S'),
+            'latitude': event.property.latitude,
+            'longitude': event.property.longitude,
             'description': event.new_description if event.new_description else '',
             'orig_description': event.orig_description if event.orig_description else '',
             'attendees': [a.email for a in event.attendees],
