@@ -1,4 +1,66 @@
 let calendar;
+
+function openEditEventModalById(eventId) {
+  const event = calendar.getEventById(eventId);
+  openEditEventModal({ event });
+}
+
+function openEditEventModal(info) {
+
+    // Check if event source is not editable
+    if (info.event.extendedProps.disabled) {
+        // Disable form fields
+        $('#dateStartEdit').prop('disabled', true);
+        $('#dateEndEdit').prop('disabled', true);
+        $('#deleteEvent').prop('disabled', true);
+    } else {
+        // Enable form fields
+        $('#dateStartEdit').prop('disabled', false);
+        $('#dateEndEdit').prop('disabled', false);
+        $('#deleteEvent').prop('disabled', false);
+    }
+
+    // Remove errors
+    $('.form-control.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').text('');
+
+    // set current id
+    $('#eventIdEdit').val(info.event.id);
+    $('#eventTitleEdit-tooltip').attr('data-bs-content', info.event.extendedProps.orig_title);
+    $('#eventTitleEdit').val(info.event.title);
+    $('#eventDescriptionEdit').val(info.event.extendedProps.description);
+    $('#eventDescriptionEdit-tooltip').attr('data-bs-content', info.event.extendedProps.orig_description);
+    const editEventStartDatepicker = new Datepicker(d.getElementById('dateStartEdit'), { buttonClass: 'btn' });
+    const editEventEndDatepicker = new Datepicker(d.getElementById('dateEndEdit'), { buttonClass: 'btn' });
+    editEventStartDatepicker.setDate(info.event.start);
+    editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
+
+    // TAGIFY
+    const initialValue = info.event.extendedProps.attendees;
+    tagify.loadOriginalValues(initialValue);
+    tagify.on('input', onInput)
+
+    loadMap('map', info.event.extendedProps.address, info.event.extendedProps.longitude, info.event.extendedProps.latitude, 0, 12)
+
+    $('#modal-edit-event').modal('show');
+    $('#modal-edit-event').on('shown.bs.modal', function () {
+      $('#eventTitleEdit').focus();
+    });
+
+    function onInput(e) {
+        var value = e.detail.value
+        tagify.whitelist = null // reset the whitelist
+        if (value.length < 2) {
+            return; // Do not search if the input length is less than 2
+        }
+        fetch('/user/' + value + '/json')
+            .then(RES => RES.json())
+            .then(function (newWhitelist) {
+                tagify.whitelist = newWhitelist // update whitelist Array in-place
+            })
+    }
+}
+
 function renderCalendar(id, events, user) {
     const calendarEl = d.getElementById(id);
     if (!calendarEl) {
@@ -29,7 +91,7 @@ function renderCalendar(id, events, user) {
     // current id selection
     let currentId = null;
 
-    calendar = new FullCalendar.Calendar(calendarEl, {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
         selectable: true,
         initialView: 'dayGridMonth',
         themeSystem: 'bootstrap',
@@ -72,79 +134,12 @@ function renderCalendar(id, events, user) {
             });
         },*/
         eventClick: (info) => {
-            // Check if event source is not editable
-            if (info.event.extendedProps.disabled) {
-
-                // Disable form fields
-                //editEventTitleInput.disabled = true;
-                //editEventDescriptionInput.disabled = true;
-                d.getElementById('dateStartEdit').disabled = true;
-                d.getElementById('dateEndEdit').disabled = true;
-                editEventDeleteButton.disabled = true;
-            } else {
-                // Enable form fields
-                //editEventTitleInput.disabled = false;
-                //editEventDescriptionInput.disabled = false;
-                d.getElementById('dateStartEdit').disabled = false;
-                d.getElementById('dateEndEdit').disabled = false;
-                editEventDeleteButton.disabled = false;
-            }
-
-
-            // Remove errors
-            $('.form-control.is-invalid').removeClass('is-invalid');
-            $('.invalid-feedback').text('');
-
-            // set current id
-            currentId = info.event.id;
-            editEventIdInput.value = info.event.id;
-            editEventOrigTitleTooltip.setAttribute('data-bs-content', info.event.extendedProps.orig_title);
-            editEventTitleInput.value = info.event.title;
-            editEventDescriptionInput.value = info.event.extendedProps.description;
-            editEventOrigDescriptionTooltip.setAttribute('data-bs-content', info.event.extendedProps.orig_description);
-
-            // add event listeners to title and description tooltips
-            /*editEventOrigTitleTooltip.addEventListener('click', function() {
-              editEventTitleInput.value = info.event.extendedProps.orig_title;
-            });
-
-            editEventOrigDescriptionTooltip.addEventListener('click', function() {
-              editEventDescriptionInput.value = info.event.extendedProps.orig_description;
-            });*/
-
-            const initialValue = info.event.extendedProps.attendees;
-            tagify.loadOriginalValues(initialValue);
-
-            // listen to any keystrokes which modify tagify's input
-            tagify.on('input', onInput)
-
-            function onInput( e ){
-              var value = e.detail.value
-              tagify.whitelist = null // reset the whitelist
-              if (value.length < 2) {
-                return; // Do not search if the input length is less than 2
-              }
-              fetch('/user/' + value + '/json')
-                .then(RES => RES.json())
-                .then(function(newWhitelist){
-                  tagify.whitelist = newWhitelist // update whitelist Array in-place
-                })
-            }
-
-            editEventStartDatepicker.setDate(info.event.start);
-            editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
-
-            loadMap('map', info.event.extendedProps.address, info.event.extendedProps.longitude, info.event.extendedProps.latitude, 0, 12)
-
-            editEventModal.show();
-            editEventModalEl.addEventListener('shown.bs.modal', function () {
-                editEventTitleInput.focus();
-            });
+            openEditEventModal(info);
         }
     });
     calendar.render();
-    console.log(calendar.getEvents());
-    d.getElementById('addNewEventForm').addEventListener('submit', function (event) {
+
+    document.getElementById('addNewEventForm').addEventListener('submit', function (event) {
         event.preventDefault();
         calendar.addEvent({
             id: Math.random() * 10000, // this should be a unique id from your back-end or API
@@ -160,14 +155,14 @@ function renderCalendar(id, events, user) {
     document.getElementById('editEventForm').addEventListener('submit', (event) => {
         event.preventDefault();
 
-        // Update Full calendar live
-        var editEvent = calendar.getEventById(currentId);
-        var startDate = moment(editEventStartDatepicker.getDate()).format('YYYY-MM-DD HH:mm');
-        var endDate = moment(editEventEndDatepicker.getDate()).format('YYYY-MM-DD HH:mm');
+        var eventId = $('#eventIdEdit').val()
+        var editEvent = calendar.getEventById(eventId);
+        console.log(editEvent);
 
-        editEvent.setProp('id', editEventIdInput.value);
+        var startDate = moment($('#dateStartEdit').val()).format('YYYY-MM-DD HH:mm');
+        var endDate = moment($('#dateEndEdit').val()).format('YYYY-MM-DD HH:mm');
+
         editEvent.setProp('title', editEventTitleInput.value);
-        //editEvent.setExtendedProp('attendees', editEventAttendeeInput.value.length ? editEventAttendeeInput.value.split(',') : []);
         editEvent.setExtendedProp('attendees', tagify.value.map(function (t) { return t.value; }));
         editEvent.setExtendedProp('description', editEventDescriptionInput.value);
         editEvent.setStart(startDate);
@@ -176,7 +171,7 @@ function renderCalendar(id, events, user) {
 
         // Send the updated event data to the server
         var eventData = {
-            'id': editEvent.id,
+            'id': eventId,
             'csrf_token': document.querySelector('input[name="csrf_token"]').value,
             'title': editEvent.title,
             'attendee': editEvent.extendedProps.attendees,
