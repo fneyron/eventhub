@@ -29,7 +29,10 @@ from apps.tasks import sync_events, send_email
 @blueprint.route('/index', methods=['POST', 'GET'])
 @authenticated
 def index():
-    event = request.args.get('event_id')
+    event_id = request.args.get('event_id')
+    event = None
+    if event_id:
+        event = Event.query.filter_by(id=event_id).first_or_404()
     users = Users.query.all()
     event_form = EventForm()
     return render_template('home/index.html', segment='index', event_form=event_form, event=event, users=users)
@@ -241,35 +244,53 @@ def events_json():
 @blueprint.route('/event/<event_id>/update', methods=['POST'])
 def event_update(event_id):
     event = Event.query.get(event_id)
-    if not event: return jsonify({'success': False, 'error': 'Event not found'})
+    if not event:
+        return jsonify({'success': False, 'error': 'Event not found'})
+
     data = MultiDict(request.form)
     form = EventForm(data, obj=event)
 
     if form.validate_on_submit and (
-            event.property.creator_id == current_user.get_id() or current_user.role in (
-            UserRole.ADMIN, UserRole.EDITOR)):
+        event.property.creator_id == current_user.get_id() or current_user.role in (
+            UserRole.ADMIN, UserRole.EDITOR)
+    ):
 
-        # We delete existing attendees
-        db.session.query(Attendee).filter_by(event_id=event.id).delete()
         if not event.ical_id:
             event.start_date = form.start_date.data
             event.end_date = form.end_date.data
+
         event.new_summary = form.title.data
         event.new_description = form.description.data
 
         from wtforms.validators import Email
         from wtforms import ValidationError
 
-        for attendee in data.getlist('attendee[]'):
-            form.attendee.data = attendee
+        new_attendees = set(data.getlist('attendee[]'))
+        existing_attendees = {a.email for a in event.attendees}
+
+        # Remove attendees that are not in the new list
+        for attendee_email in existing_attendees - new_attendees:
+            Attendee.query.filter_by(event_id=event.id, email=attendee_email).delete()
+
+        # Add new attendees and update existing ones
+        for attendee_email in new_attendees:
+
+            form.attendee.data = attendee_email
             validator = Email()
             try:
                 validator(None, form.attendee)
-                event.add_attendee(attendee)
-                user = Users.query.filter_by(email=attendee).first()
+                attendee = Attendee.query.filter_by(event_id=event.id, email=attendee_email).first()
+
+                if attendee is None:
+                    event.add_attendee(attendee_email)
+
+                user = Users.query.filter_by(email=attendee_email).first()
                 if user:
                     event.associate_attendee_with_user(user)
+
             except ValidationError:
+                if not form.attendee.errors:
+                    form.attendee.errors = []
                 form.attendee.errors.append(_('Invalid email address'))
 
         db.session.commit()
@@ -286,10 +307,11 @@ def get_user_json(value):
 
 @blueprint.route('/linkedcal/<int:id>/delete', methods=['GET'])
 @authenticated
+@roles_required(UserRole.ADMIN, UserRole.EDITOR)
 def linked_calendar_delete(id):
     ical = ICal.query.join(Property).filter(
         ICal.id == id,
-        Property.user_id == current_user.id
+        Property.creator_id == current_user.id
     ).first_or_404()
     db.session.delete(ical)
     db.session.commit()
