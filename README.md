@@ -1,6 +1,21 @@
 # Event Hub
 
+EventHub is a free **best effort** Channel Manager and 
+taks manager in order to visualise all the book on a property and assign event to other people.
 
+My use case is :
+I own multiple properties and I want to balance the reservation between different cleaning teams. 
+
+It's basically using icalendar url exported directly from the platforms (which is normed by the RFC 2445, much more easier to implement than all the different platforms APIs)
+
+Do not hesitate to help me to improve this code.
+
+** I'm not a developper and it's a quick and dirty code ** based on flask sqlalchemy wtforms with celery and beat for background tasks and sync. And the great fullcalendar JS for the calendar.
+I personnaly have a VPS hosting a Caprover instance with the flask application which is very staightforward to implement.
+
+![Screenshot 2023-05-04 at 19.13.27.png](apps%2Fstatic%2Fassets%2Fimg%2Freadme%2FScreenshot%202023-05-04%20at%2019.13.27.png)
+![Screenshot 2023-05-04 at 19.13.44.png](apps%2Fstatic%2Fassets%2Fimg%2Freadme%2FScreenshot%202023-05-04%20at%2019.13.44.png)
+![Screenshot 2023-05-04 at 19.13.51.png](apps%2Fstatic%2Fassets%2Fimg%2Freadme%2FScreenshot%202023-05-04%20at%2019.13.51.png)
 
 ## Appseed
 Application is using flask appseed templates. More informations and documentation here : 
