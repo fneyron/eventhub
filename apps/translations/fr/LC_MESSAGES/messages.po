@@ -1,0 +1,626 @@
+# French translations for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-05-04 17:53+0200\n"
+"PO-Revision-Date: 2023-05-04 17:25+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+
+#: apps/authentication/forms.py:18 apps/authentication/forms.py:20
+#: apps/authentication/forms.py:38 apps/authentication/forms.py:39
+#: apps/authentication/forms.py:58 apps/authentication/forms.py:84
+#: apps/authentication/forms.py:114 apps/authentication/forms.py:115
+#: apps/authentication/forms.py:121
+msgid "Email"
+msgstr ""
+
+#: apps/authentication/forms.py:22 apps/authentication/forms.py:24
+#: apps/authentication/forms.py:42 apps/authentication/forms.py:43
+#: apps/authentication/forms.py:88 apps/authentication/forms.py:89
+#: apps/authentication/forms.py:99 apps/authentication/forms.py:124
+#: apps/templates/home/elements/element_wifi.html:31
+#: apps/templates/includes/archives/element_display.html:43
+msgid "Password"
+msgstr "Mot de passe"
+
+#: apps/authentication/forms.py:26
+msgid "Remember Me"
+msgstr ""
+
+#: apps/authentication/forms.py:30 apps/authentication/forms.py:31
+#: apps/authentication/forms.py:50 apps/authentication/forms.py:51
+msgid "First Name"
+msgstr ""
+
+#: apps/authentication/forms.py:34 apps/authentication/forms.py:35
+#: apps/authentication/forms.py:54 apps/authentication/forms.py:55
+#, fuzzy
+msgid "Last Name"
+msgstr "Nom"
+
+#: apps/authentication/forms.py:63
+msgid "Event Email"
+msgstr ""
+
+#: apps/authentication/forms.py:64
+msgid "I want to receive an email when I'm added to an event."
+msgstr ""
+
+#: apps/authentication/forms.py:69
+msgid "Event Reminder"
+msgstr ""
+
+#: apps/authentication/forms.py:70
+msgid "I want to receive a reminder by email one day before an event."
+msgstr ""
+
+#: apps/authentication/forms.py:79
+msgid "Save All"
+msgstr ""
+
+#: apps/authentication/forms.py:86
+#, fuzzy
+msgid "Provide your new email address"
+msgstr "Adresse email invalide"
+
+#: apps/authentication/forms.py:91
+msgid "Your actual password is required to secure email change."
+msgstr ""
+
+#: apps/authentication/forms.py:93
+#, fuzzy
+msgid "Send Confirmation"
+msgstr "Renvoyer le lien de confirmation"
+
+#: apps/authentication/forms.py:97
+#, fuzzy
+msgid "Old Password"
+msgstr "Mot de passe"
+
+#: apps/authentication/forms.py:101
+msgid "Password should contains at least 6 alphanumerical characters"
+msgstr ""
+
+#: apps/authentication/forms.py:103 apps/authentication/forms.py:128
+#, fuzzy
+msgid "Confirm Password"
+msgstr "Changer de Mot de Passe"
+
+#: apps/authentication/forms.py:106
+#, fuzzy
+msgid "Change password"
+msgstr "Changer de Mot de Passe"
+
+#: apps/authentication/forms.py:110
+#, fuzzy
+msgid "Invalid old password"
+msgstr "Mauvais email ou mot de passe"
+
+#: apps/authentication/forms.py:127
+#, fuzzy
+msgid "Passwords must match"
+msgstr "Mot de passe changé"
+
+#: apps/authentication/models.py:22
+msgid "Admin"
+msgstr ""
+
+#: apps/authentication/models.py:23
+msgid "Editor"
+msgstr "Editeur"
+
+#: apps/authentication/models.py:24
+msgid "User"
+msgstr "Utilisateur"
+
+#: apps/authentication/routes.py:69
+msgid "Wrong email or password"
+msgstr "Mauvais email ou mot de passe"
+
+#: apps/authentication/routes.py:83
+msgid "Email already registered"
+msgstr "Email déjà enregistré"
+
+#: apps/authentication/routes.py:126
+msgid "Password successfully updated"
+msgstr "Mot de passe mis à jour"
+
+#: apps/authentication/routes.py:162
+msgid "Unknown Email, please check the email address"
+msgstr "Email inconnu, veuillez vérifier l'adresse"
+
+#: apps/authentication/routes.py:173
+msgid "Password Reset Requested"
+msgstr "Réinitialisation du mot de passe"
+
+#: apps/authentication/routes.py:175
+#, python-format
+msgid ""
+"A password reset request has been received. In order to reset your "
+"password, please follow this link : %s"
+msgstr ""
+
+#: apps/authentication/routes.py:176
+msgid ""
+"A password reset request has been received. In order to reset your "
+"password, please follow this link"
+msgstr ""
+
+#: apps/authentication/routes.py:178
+msgid "Reset Password"
+msgstr "Réinitialiser le mot de passe"
+
+#: apps/authentication/routes.py:180
+msgid ""
+"A link to reset your password has been sent. Please check you inbox and "
+"spam folder"
+msgstr ""
+
+#: apps/authentication/util.py:74
+msgid "Email confirmation"
+msgstr "Confirmer l'Email"
+
+#: apps/authentication/util.py:75
+#, python-format
+msgid "To confirm your account, please follow this link : %s"
+msgstr "Pour confirmer votre compte, veuillez suivre le lien suivant : %s"
+
+#: apps/authentication/util.py:80
+msgid "Confirm Email"
+msgstr "Confirmer l'Email"
+
+#: apps/authentication/util.py:82
+msgid "A confirmation link has been sent. Please check you inbox and spam folder"
+msgstr ""
+"Un lien de confirmation a été envoyé. Veuillez vérifier votre Boite de "
+"Réception et/ou Spam"
+
+#: apps/home/forms.py:10 apps/home/forms.py:30
+#: apps/templates/home/property_list.html:22
+msgid "Name"
+msgstr "Nom"
+
+#: apps/home/forms.py:11 apps/home/forms.py:53
+#, fuzzy
+msgid "Description"
+msgstr "Description Original"
+
+#: apps/home/forms.py:12
+msgid "Check-in"
+msgstr ""
+
+#: apps/home/forms.py:13
+msgid "Check-out"
+msgstr ""
+
+#: apps/home/forms.py:14
+msgid "Street"
+msgstr ""
+
+#: apps/home/forms.py:16
+msgid "ZIP Code"
+msgstr ""
+
+#: apps/home/forms.py:18
+msgid "City"
+msgstr ""
+
+#: apps/home/forms.py:20
+msgid "Country"
+msgstr ""
+
+#: apps/home/forms.py:22
+msgid "Country Code"
+msgstr ""
+
+#: apps/home/forms.py:26 apps/home/forms.py:35
+#, fuzzy
+msgid "Save"
+msgstr "Actif"
+
+#: apps/home/forms.py:31
+#, fuzzy
+msgid "Color"
+msgstr "Fermer"
+
+#: apps/home/forms.py:32
+msgid "URL"
+msgstr ""
+
+#: apps/home/forms.py:32
+msgid "ICAL Link"
+msgstr ""
+
+#: apps/home/forms.py:42
+#, fuzzy
+msgid "This URL already exists."
+msgstr "Email déjà enregistré"
+
+#: apps/home/forms.py:46
+msgid "Title"
+msgstr "Titre"
+
+#: apps/home/forms.py:47
+msgid "Select Start Date"
+msgstr "Sélectionner une date de début"
+
+#: apps/home/forms.py:47 apps/home/forms.py:49
+msgid "dd/mm/yyyy"
+msgstr ""
+
+#: apps/home/forms.py:49
+msgid "Select End Date"
+msgstr "Sélectionner une date de fin"
+
+#: apps/home/forms.py:54
+msgid "Attendee"
+msgstr "Participants"
+
+#: apps/home/forms.py:55
+msgid "Please, add attendee email address of people in charge"
+msgstr ""
+
+#: apps/home/models.py:34
+msgid "Invited you to the following event <a href={event_url}><b>{event}</b></a>"
+msgstr "Vous a invité à l'évenement suivant <a href={event_url}><b>{event}</b></a>"
+
+#: apps/home/models.py:43
+msgid "Deleted the following event <b>{event}</b>"
+msgstr "A supprimé l'évenement suivant <b>{event}</b>"
+
+#: apps/home/models.py:104
+msgid "You've been invited to an event"
+msgstr "Vous avez été invité à un évènement"
+
+#: apps/home/models.py:107
+#, python-format
+msgid ""
+"You've been invited to an event by %s %s. Please sign-in or register to "
+"view the details: %s"
+msgstr ""
+
+#: apps/home/models.py:109
+#, python-format
+msgid ""
+"You are receiving this email because %s, invited you to the following "
+"event."
+msgstr ""
+
+#: apps/home/models.py:120
+msgid "View Event"
+msgstr "Voir l'évenement"
+
+#: apps/home/routes.py:112
+msgid "Ical format not recognized"
+msgstr "Format ICAL non reconnu"
+
+#: apps/home/routes.py:158
+msgid "This email address is already registered."
+msgstr "Cette adresse email est déjà enregistré"
+
+#: apps/home/routes.py:166
+msgid "Email change"
+msgstr ""
+
+#: apps/home/routes.py:167
+#, python-format
+msgid "To confirm your new email address, please follow this link : %s"
+msgstr ""
+
+#: apps/home/routes.py:169
+msgid "To confirm your new email address, please click the link below."
+msgstr ""
+
+#: apps/home/routes.py:171
+msgid "Confirm Change"
+msgstr "Confirmer le changement"
+
+#: apps/home/routes.py:173
+msgid ""
+"A confirmation link has been sent to your email. Please check you inbox "
+"and spam folder"
+msgstr ""
+
+#: apps/home/routes.py:176
+msgid "Wrong password provided."
+msgstr "Mauvais mot de passe fourni."
+
+#: apps/home/routes.py:180
+msgid "Password changed"
+msgstr "Mot de passe changé"
+
+#: apps/home/routes.py:184
+msgid "New profile successfully saved"
+msgstr "Nouveau profile sauvegardé"
+
+#: apps/home/routes.py:296
+msgid "Invalid email address"
+msgstr "Adresse email invalide"
+
+#: apps/templates/accounts/forgot-password.html:39
+msgid ""
+"Recover\n"
+"                                    password"
+msgstr ""
+
+#: apps/templates/accounts/login.html:67
+msgid "Lost password?"
+msgstr "Mot de passe perdu?"
+
+#: apps/templates/accounts/login.html:72
+msgid "Sign in"
+msgstr "Se connecter"
+
+#: apps/templates/accounts/login.html:77
+msgid "Not registered?"
+msgstr "Pas enregistré?"
+
+#: apps/templates/accounts/login.html:79
+msgid "Create account"
+msgstr "Créer un Compte"
+
+#: apps/templates/accounts/register.html:90
+msgid "Sign up"
+msgstr "Se connecter"
+
+#: apps/templates/accounts/register.html:96
+msgid "Already have an account?"
+msgstr "Vous avez déjà un compte?"
+
+#: apps/templates/accounts/unconfirmed.html:18
+msgid "Confirm your email"
+msgstr "Confirmer votre email"
+
+#: apps/templates/accounts/unconfirmed.html:20
+msgid "Consult you inbox"
+msgstr "Consultez votre boite de réception"
+
+#: apps/templates/accounts/unconfirmed.html:21
+msgid "to validate your account and start."
+msgstr "pour valider votre compte et démarrer"
+
+#: apps/templates/accounts/unconfirmed.html:25
+msgid "Resend Confirmation Link"
+msgstr "Renvoyer le lien de confirmation"
+
+#: apps/templates/email/event_email_template.html:16
+msgid "From"
+msgstr "De"
+
+#: apps/templates/email/event_email_template.html:16
+msgid "To"
+msgstr "A"
+
+#: apps/templates/email/footer.html:11
+msgid "About"
+msgstr "A propos"
+
+#: apps/templates/email/footer.html:12
+msgid ""
+"EventHub est une plateforme de gestion de calendriers de\n"
+"                                        réservation de locations "
+"saisonnières."
+msgstr ""
+
+#: apps/templates/email/footer.html:22
+msgid "Contact Info"
+msgstr "Informations de Contact"
+
+#: apps/templates/home/index.html:13
+msgid "All"
+msgstr "Tous"
+
+#: apps/templates/home/index.html:23 apps/templates/home/property_edit.html:28
+msgid "Ical"
+msgstr ""
+
+#: apps/templates/home/index.html:26 apps/templates/home/property_edit.html:31
+msgid "Download"
+msgstr "Télécharger"
+
+#: apps/templates/home/index.html:31 apps/templates/home/property_edit.html:38
+msgid ""
+"Copy the ical address to your favorite calendar tool to keep all your "
+"calendar at the same place."
+msgstr ""
+
+#: apps/templates/home/index.html:36 apps/templates/home/property_edit.html:43
+msgid "Copy"
+msgstr "Copier"
+
+#: apps/templates/home/index.html:41 apps/templates/home/property_edit.html:48
+msgid "Share Calendar"
+msgstr "Partager le Calendrier"
+
+#: apps/templates/home/page-403.html:16
+msgid "Access"
+msgstr "Accès"
+
+#: apps/templates/home/page-403.html:16
+msgid "Denied"
+msgstr "Refusé"
+
+#: apps/templates/home/page-403.html:18
+msgid "Please contact support or authenticate with another account."
+msgstr "Veuillez contacter le support ou vous authentifier avec un autre compte."
+
+#: apps/templates/home/page-403.html:21
+msgid "Sign In"
+msgstr "Se connecter"
+
+#: apps/templates/home/page-404.html:16
+msgid "Page not <span class=\"fw-bolder\">found</span>"
+msgstr "Page non <span class=\"fw-bolder\">trouvé</span>"
+
+#: apps/templates/home/page-404.html:17
+msgid ""
+"Oops! Looks like you followed a bad link. If you think this is a problem "
+"with us, please tell us."
+msgstr ""
+
+#: apps/templates/home/page-404.html:20 apps/templates/home/page-500.html:24
+msgid "Back to homepage"
+msgstr "Retour à la page d'accueil"
+
+#: apps/templates/home/page-500.html:14
+msgid "Something has gone <span class=\"text-primary\">seriously</span> wrong"
+msgstr "Une erreur <span class=\"text-primary\">critique</span> c'est produite"
+
+#: apps/templates/home/page-500.html:15
+msgid ""
+"It's always time for a coffee break. We should be back by the time you "
+"finish your coffee."
+msgstr ""
+
+#: apps/templates/home/profile.html:14
+msgid "General information"
+msgstr "Informations Générales"
+
+#: apps/templates/home/profile.html:61
+msgid "Update email address"
+msgstr "Mettre à jour l'adresse Email"
+
+#: apps/templates/home/profile.html:89
+msgid "Alerts & Notifications"
+msgstr "Alertes & Notifications"
+
+#: apps/templates/home/elements/element_content.html:33
+#: apps/templates/home/elements/element_wifi.html:54
+#: apps/templates/home/profile.html:129 apps/templates/includes/modals.html:15
+#: apps/templates/includes/modals.html:38
+#: apps/templates/includes/modals.html:62
+msgid "Close"
+msgstr "Fermer"
+
+#: apps/templates/home/profile.html:179
+msgid "Change Password"
+msgstr "Changer de Mot de Passe"
+
+#: apps/templates/home/property_edit.html:13
+msgid "Edit"
+msgstr "Editer"
+
+#: apps/templates/home/property_edit.html:23
+#: apps/templates/home/property_edit.html:195
+#: apps/templates/home/property_edit.html:277
+msgid "Linked Calendar"
+msgstr "Calendrier Liés"
+
+#: apps/templates/home/property_edit.html:216
+#: apps/templates/home/property_list.html:60
+msgid "Are you sure you want to delete <b>{name}</b> ?"
+msgstr "Etes vous sûr de vouloir supprimer <b>{name}</b> ?"
+
+#: apps/templates/home/property_edit.html:218
+msgid "Delete Ical"
+msgstr "Supprimer le ICal"
+
+#: apps/templates/home/property_edit.html:220
+#: apps/templates/home/property_list.html:63
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: apps/templates/home/property_edit.html:224
+msgid "Add"
+msgstr "Ajouter"
+
+#: apps/templates/home/property_list.html:13
+#: apps/templates/home/property_list.html:190
+msgid "Add Property"
+msgstr "Ajouter la Propriété"
+
+#: apps/templates/home/property_list.html:23
+msgid "Active"
+msgstr "Actif"
+
+#: apps/templates/home/property_list.html:24
+msgid "Delete"
+msgstr "Supprimer"
+
+#: apps/templates/home/property_list.html:62
+msgid "Delete Property"
+msgstr "Supprimer la Propriété"
+
+#: apps/templates/home/elements/element_wifi.html:27
+#: apps/templates/includes/archives/element_display.html:39
+msgid "SSID"
+msgstr "SSID"
+
+#: apps/templates/includes/footer.html:4
+msgid "General Terms & Conditions"
+msgstr "CGU"
+
+#: apps/templates/includes/header.html:3
+msgid "EventHub - Gestion de calendriers de réservation de locations saisonnières"
+msgstr "EventHub - Gestion de calendriers de réservation de locations saisonnières"
+
+#: apps/templates/includes/modals.html:81
+msgid "Original Title"
+msgstr "Titre Original"
+
+#: apps/templates/includes/modals.html:107
+msgid "Original Description"
+msgstr "Description Original"
+
+#: apps/templates/includes/navigation.html:52
+msgid "No notifications yet !"
+msgstr "Pas de notifications pour le moment!"
+
+#: apps/templates/includes/navigation.html:71
+msgid "{time} ago"
+msgstr "Il y a {time}"
+
+#: apps/templates/includes/navigation.html:110
+#: apps/templates/includes/sidebar.html:63
+msgid "Profile"
+msgstr "Profil"
+
+#: apps/templates/includes/navigation.html:115
+#: apps/templates/includes/sidebar.html:71
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: apps/templates/includes/sidebar.html:31
+msgid "Calendar"
+msgstr "Calendrier"
+
+#: apps/templates/includes/sidebar.html:41
+msgid "Properties"
+msgstr "Propriétés"
+
+#: apps/templates/includes/sidebar.html:52
+msgid "Notifications"
+msgstr "Notifications"
+
+#: apps/templates/includes/archives/element_display.html:27
+msgid "Get Directions"
+msgstr ""
+
+#~ msgid "Il y a"
+#~ msgstr ""
+
+#~ msgid "ago"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "It's always time for a coffee "
+#~ "break. We should be back by the"
+#~ " time you finish your\n"
+#~ "                    coffee."
+#~ msgstr ""
+
+#~ msgid "Linked calendar"
+#~ msgstr ""
+
