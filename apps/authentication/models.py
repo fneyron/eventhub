@@ -10,7 +10,7 @@ from datetime import timedelta
 from enum import Enum
 
 from flask_babel import _
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -47,13 +47,14 @@ class Users(db.Model, UserMixin):
     created_events = db.relationship('Event', backref='creator', lazy=True)
     created_properties = db.relationship('Property', backref='creator', lazy=True)
 
-    notifications = db.relationship('Notification', backref='user', lazy=True)
+    created_notifications = db.relationship('Notification', backref='author', lazy=True, foreign_keys="[Notification.author_id]")
+    notifications = db.relationship('Notification', backref='user', lazy=True, foreign_keys="[Notification.user_id]")
 
     notification_settings_id = db.Column(db.Integer, db.ForeignKey('NotificationSettings.id'))
     notification_settings = db.relationship('NotificationSettings', backref='user', uselist=False)
 
     def add_notification(self, content):
-        notification = Notification(user_id=self.id, content=content)
+        notification = Notification(user_id=self.id, content=content, author_id=current_user.get_id())
         db.session.add(notification)
         db.session.commit()
 
@@ -114,12 +115,18 @@ class NotificationSettings(db.Model):
     def reminder_time(self, value):
         self.reminder_time_minutes = value.total_seconds() // 60
 
+
+
 class Notification(db.Model):
     __tablename__ = 'Notification'
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.utcnow())
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    url = db.Column(db.String)
+    author_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    read_status = db.Column(db.Boolean(), default=False)
 
 
 # Charge l'utilisateur

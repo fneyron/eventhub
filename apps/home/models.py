@@ -4,6 +4,7 @@ from datetime import datetime
 from babel.dates import format_datetime
 from flask import url_for
 from flask_babel import _
+from flask_babel import gettext
 from flask_login import current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -18,18 +19,31 @@ class Attendee(db.Model):
     email = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
 
-
     def __init__(self, email, event, user_id=None):
         self.email = email
         self.event_id = event.id
         self.user_id = user_id
 
     @property
-    def notification_message(self):
+    def notification_add(self, locale):
         event = Event.query.get(self.event_id)
         event_title = event.new_summary
         property_name = event.property.name
-        return f"<b>{current_user.firstname} {current_user.lastname}</b> invited you to the following event '{property_name} : {event_title}'"
+        return gettext("Invited you to the following event <a href={event_url}><b>{event}</b></a>".format(
+            user=f"{current_user.firstname} {current_user.lastname}",
+            event_url=url_for('home_blueprint.index', event_id=event.id),
+            event=f"{property_name} : {event_title}",
+        ), locale=locale)
+
+    @property
+    def notification_delete(self, locale):
+        event = Event.query.get(self.event_id)
+        event_title = event.new_summary
+        property_name = event.property.name
+        return gettext("Deleted the following event <b>{event}</b>".format(
+            user=f"{current_user.firstname} {current_user.lastname}",
+            event=f"{property_name} : {event_title}",
+        ), locale=locale)
 
 
 class Event(db.Model):
@@ -50,6 +64,15 @@ class Event(db.Model):
     attendees = db.relationship('Attendee', backref='event', lazy=True, cascade='all,delete')
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
 
+    def remove_attendee(self, email):
+        from apps.authentication.models import Users, Notification
+        attendee = Attendee.query.filter_by(event_id=self.id, email=email)
+        user = Users.query.filter_by(email=email).first()
+        if user and current_user != user:
+            notification = Notification(content=attendee.first_or_404().notification_delete(locale=user.language), user=user, author=current_user)
+            db.session.add(notification)
+        attendee.delete()
+        db.session.commit()
     def add_attendee(self, email):
         from apps.authentication.models import Users, Notification
         # Check if the user already exists and if an invitation was already sent for this email
@@ -67,8 +90,8 @@ class Event(db.Model):
                 self.send_invitation_email(email)
 
         # No notification if we are inviting ourself
-        if current_user.email != email:
-            notification = Notification(content=attendee.notification_message, user=current_user)
+        if user and current_user != user:
+            notification = Notification(content=attendee.notification_add(locale=user.language), user=user, author=current_user)
             db.session.add(notification)
         db.session.commit()
 
@@ -94,14 +117,13 @@ class Event(db.Model):
                 'end': format_datetime(self.end_date, format='d MMM YYYY' if self.all_day else 'medium',
                                        locale=lang_code),
             },
-            buttons={'url': url_for('home_blueprint.index', _external=True), 'text': _('View Event')},
+            buttons={'url': url_for('home_blueprint.index', _external=True, event_id=self.id), 'text': _('View Event')},
         )
 
     def associate_attendee_with_user(self, user):
         attendees = Attendee.query.filter_by(email=user.email).all()
         for attendee in attendees:
             attendee.user_id = user.id
-            db.session.add(attendee)
         db.session.commit()
 
 
@@ -140,6 +162,8 @@ class Property(db.Model):
     @hybrid_property
     def full_address(self):
         return f"{self.street}, {self.city}, {self.zip}, {self.country}"
+
+
 class ICal(db.Model):
     __tablename__ = 'ICal'
 
