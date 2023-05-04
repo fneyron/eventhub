@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+from flask_babel import gettext
 import os
 from importlib import import_module
 
@@ -16,8 +17,6 @@ from flask_login import LoginManager, current_user
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import SQLAlchemy as _BaseSQLAlchemy
-
-
 
 app = Flask(__name__)
 db = SQLAlchemy()

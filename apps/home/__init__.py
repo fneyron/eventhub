@@ -7,6 +7,8 @@ import json
 
 from babel.dates import format_datetime
 from flask import Blueprint, session
+from datetime import datetime
+from babel.dates import format_timedelta
 
 from apps import babel, get_locale
 
@@ -52,4 +54,15 @@ def json_loads_filter(value):
 
 @blueprint.app_template_filter('format_datetime')
 def format_datetime_filter(value, format='medium', locale='en'):
+    if get_locale():
+        locale = get_locale()
     return format_datetime(value, format=format, locale=locale)
+
+
+@blueprint.app_template_filter('format_timedelta')
+def format_timedelta_filter(value, granularity='minute', locale='en'):
+    if get_locale():
+        locale = get_locale()
+    now = datetime.now()
+    delta = value - now
+    return format_timedelta(delta, locale=locale, granularity=granularity)
