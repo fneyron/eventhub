@@ -42,10 +42,11 @@ def sync_events(property_id=None):
 
         # Download the ICS data
         response = requests.get(ical.url)
+        print(response.status_code)
 
         # Parse the ICS data
         cal = ICalendar.from_ical(response.text)
-
+        #print(response.text)
         updated_events = set()
 
         # Loop through each event in the ICS data
@@ -72,9 +73,9 @@ def sync_events(property_id=None):
                     )
                 )
             ).first()
-
+            print('%s %s %s' %(event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
             if db_event:
-
+                #print(db_event, 'existing')
                 # If the event already exists, update the date start end and full day.
                 db_event.orig_summary = event.get('summary')
                 db_event.orig_description = event.get('description')
@@ -99,6 +100,8 @@ def sync_events(property_id=None):
                 db.session.add(db_event)
                 db.session.commit()
             updated_events.add(db_event)
+
+
 
         # Delete all other events
         deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()

@@ -270,7 +270,9 @@ def event_update(event_id):
 
         # Remove attendees that are not in the new list
         for attendee_email in existing_attendees - new_attendees:
-            Attendee.query.filter_by(event_id=event.id, email=attendee_email).delete()
+            event.remove_attendee(attendee_email)
+
+
 
         # Add new attendees and update existing ones
         for attendee_email in new_attendees:

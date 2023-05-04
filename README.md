@@ -1,4 +1,6 @@
-# QRly
+# Event Hub
+
+
 
 ## Appseed
 Application is using flask appseed templates. More informations and documentation here : 
@@ -92,4 +94,19 @@ Delete alembic folder :
 >>> conn.close()
 ```
 
+## Babel multilingual
+~~~
+pybabel extract -F babel.cfg -o messages.pot -k lazy_gettext 
+~~~
+Init the translations if not already :
+~~~
+pybabel init -i messages.pot -d apps/translations -l fr
+~~~
+Update trasnlations:
+~~~
+pybabel update -i messages.pot -d apps/translations  
+pybabel compile -d apps/translations
+~~~
+
+Ref : https://medium.com/@nicolas_84494/flask-create-a-multilingual-web-application-with-language-specific-urls-5d994344f5fd
 

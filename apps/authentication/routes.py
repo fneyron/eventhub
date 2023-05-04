@@ -172,9 +172,8 @@ def forgot_password():
             recipients=[user.email],
             subject=_("Password Reset Requested"),
             template='email/default_email_template.html',
-            text=_(
-                "A password reset request has been received. In order to reset your password, please follow this link : %s" % recover_url),
-            content='A password reset request has been received. In order to reset your password, please follow this link',
+            text=_("A password reset request has been received. In order to reset your password, please follow this link : %s" % recover_url),
+            content=_('A password reset request has been received. In order to reset your password, please follow this link'),
             lang_code=user.language,
             buttons={'url': recover_url, 'text': _('Reset Password')},
         )

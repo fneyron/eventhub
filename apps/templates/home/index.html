@@ -6,7 +6,6 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
     <div class="col-md-3 col-7">
         {% if current_user.role.name in ['ADMIN', 'EDITOR'] %}
@@ -114,14 +113,29 @@
         const eventId = urlParams.get('event_id');
 
         function initCalendar() {
-            const events = [
+            var events = [
                 {
                     url: "{{ url_for('home_blueprint.events_json', attendees=(current_user.email if current_user.role.name == 'USER' else None)) }}",
                 },
+
             ];
 
-            renderCalendar('calendar', events, user);
+            calendar = renderCalendar('calendar', events, user);
+
+            {% if event %}
+            calendar.gotoDate('{{ event.start_date }}');
+            var checkEventInterval = setInterval(function() {
+              var event = calendar.getEventById(eventId);
+              console.log(event);
+              if (event) {
+                clearInterval(checkEventInterval);
+                openEditEventModalById(event.id);
+              }
+            }, 500); // check every 500ms
+
+            {% endif %}
         }
+
 
          function refetchEventsForAttendee(email) {
             calendar.getEventSources().forEach((source) => source.remove());

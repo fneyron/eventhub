@@ -57,7 +57,7 @@
                 </tr>
                 <!-- Delete Property Modal -->
                 {% set modal_content %}
-                {{ _('Are you sure you want to delete {name} ?').format(name=property.name) }}
+                {{ _('Are you sure you want to delete <b>{name}</b> ?').format(name=property.name) }}
                 {% endset %}
                 {{ macros.render_modal_confirm('delete-property-' ~ property.id, _('Delete Property'), modal_content,
                 _('Confirm'), url_for('home_blueprint.property_delete', property_id=property.id)) }}
