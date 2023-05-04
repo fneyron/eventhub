@@ -20,7 +20,7 @@
         <div class="dropdown-menu calendar-dropdown dropdown-menu-start mt-2 py-1">
             <a class="dropdown-item d-flex align-items-center" href="#">
                 <i class="fa fa-link text-gray-500 me-2"></i>
-                {{ _('Linked calendar')}} </a>
+                {{ _('Linked Calendar')}} </a>
         </div>-->
     </div>
     <div class="btn-group">
@@ -113,7 +113,7 @@
                                 </div>
                             </div>
                         </div>
-                         {{ property_form.latitude }} {{ property_form.longitude }}
+                        {{ property_form.latitude }} {{ property_form.longitude }}
                         <div class="mb-4">
                             {{ property_form.street.label }}
                             {% if property_form.street.errors %}
@@ -206,11 +206,18 @@
                         </div>
                         <div class="col-auto">
                             <a class="text-danger"
-                               href="{{ url_for('home_blueprint.linked_calendar_delete', id=ical.id) }}">
+                               data-bs-toggle="modal"
+                               data-bs-target="#delete-ical-{{ ical.id }}">
                                 <i class="fa fa-xmark"></i>
                             </a>
                         </div>
                     </div>
+                    {% set modal_content %}
+                    {{ _('Are you sure you want to delete <b>{name}</b> ?').format(name=ical.name) }}
+                    {% endset %}
+                    {{ macros.render_modal_confirm('delete-ical-' ~ ical.id, _('Delete Ical'),
+                    modal_content,
+                    _('Confirm'), url_for('home_blueprint.linked_calendar_delete', id=ical.id)) }}
                     {% endfor %}
                     <button class="btn btn-gray-800 d-inline-flex align-items-center me-2" data-bs-toggle="modal"
                             data-bs-target="#add-linked-calendar">
@@ -388,6 +395,8 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
             }
         }
     });
+
+
 
 
 
