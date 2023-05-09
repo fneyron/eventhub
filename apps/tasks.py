@@ -105,10 +105,15 @@ def sync_events(property_id=None):
                 print(f"Error occurred during event processing: {e}")
                 db.session.rollback()
 
-        # Delete all other events
-        deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
+        try:
+            # Delete all other events
+            deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
 
-        # Update the last_synced field
-        ical.last_synced = datetime.now()
-        db.session.commit()
+            # Update the last_synced field
+            ical.last_synced = datetime.now()
+            db.session.commit()
+
+        except Exception as e:
+            print(f"Error occurred during event deletion: {e}")
+            db.session.rollback()
     return {'success': True}
