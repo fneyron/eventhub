@@ -51,57 +51,59 @@ def sync_events(property_id=None):
 
         # Loop through each event in the ICS data
         for event in cal.walk('vevent'):
-            # Check if the event already exists in the database
-            db_event = Event.query.filter(
-                or_(
-                    and_(
-                        Event.uid.isnot(None),
-                        Event.uid == event.get('uid'),
-                        Event.ical_id == ical.id,
-                    ),
-                    and_(
-                        Event.orig_summary == event.get('summary'),
-                        Event.start_date == datetime.combine(event.get('dtstart').dt, time.min) if isinstance(
-                            event.get('dtstart').dt,
-                            date) else event.get('dtstart').dt,
-                        Event.end_date == datetime.combine(event.get('dtend').dt, time.min) if isinstance(
-                            event.get('dtend').dt,
-                            date) else event.get('dtend').dt,
-                        Event.ical_id == ical.id,
-                        Event.all_day == ('VALUE' in event.get('dtstart').params and event.get('dtstart').params[
-                            'VALUE'] == 'DATE')
+            try:
+                # Check if the event already exists in the database
+                db_event = Event.query.filter(
+                    or_(
+                        and_(
+                            Event.uid.isnot(None),
+                            Event.uid == event.get('uid'),
+                            Event.ical_id == ical.id,
+                        ),
+                        and_(
+                            Event.orig_summary == event.get('summary'),
+                            Event.start_date == datetime.combine(event.get('dtstart').dt, time.min) if isinstance(
+                                event.get('dtstart').dt,
+                                date) else event.get('dtstart').dt,
+                            Event.end_date == datetime.combine(event.get('dtend').dt, time.min) if isinstance(
+                                event.get('dtend').dt,
+                                date) else event.get('dtend').dt,
+                            Event.ical_id == ical.id,
+                            Event.all_day == ('VALUE' in event.get('dtstart').params and event.get('dtstart').params[
+                                'VALUE'] == 'DATE')
+                        )
                     )
-                )
-            ).first()
-            print('%s %s %s' %(event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
-            if db_event:
-                #print(db_event, 'existing')
-                # If the event already exists, update the date start end and full day.
-                db_event.orig_summary = event.get('summary')
-                db_event.orig_description = event.get('description')
-                db_event.start_date = event.get('dtstart').dt
-                db_event.end_date = event.get('dtend').dt
-                if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
-                    db_event.all_day = True
-                db.session.commit()
-            else:
-                # If the event doesn't exist, create it
-                db_event = Event(uid=event.get('uid'),
-                                 orig_summary=event.get('summary'),
-                                 orig_description=event.get('description'),
-                                 new_summary=event.get('summary'),
-                                 new_description=event.get('description'),
-                                 start_date=event.get('dtstart').dt,
-                                 end_date=event.get('dtend').dt,
-                                 property_id=ical.property_id,
-                                 ical_id=ical.id)
-                if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
-                    db_event.all_day = True
-                db.session.add(db_event)
-                db.session.commit()
-            updated_events.add(db_event)
-
-
+                ).first()
+                print('%s %s %s' %(event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
+                if db_event:
+                    #print(db_event, 'existing')
+                    # If the event already exists, update the date start end and full day.
+                    db_event.orig_summary = event.get('summary')
+                    db_event.orig_description = event.get('description')
+                    db_event.start_date = event.get('dtstart').dt
+                    db_event.end_date = event.get('dtend').dt
+                    if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
+                        db_event.all_day = True
+                    db.session.commit()
+                else:
+                    # If the event doesn't exist, create it
+                    db_event = Event(uid=event.get('uid'),
+                                     orig_summary=event.get('summary'),
+                                     orig_description=event.get('description'),
+                                     new_summary=event.get('summary'),
+                                     new_description=event.get('description'),
+                                     start_date=event.get('dtstart').dt,
+                                     end_date=event.get('dtend').dt,
+                                     property_id=ical.property_id,
+                                     ical_id=ical.id)
+                    if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
+                        db_event.all_day = True
+                    db.session.add(db_event)
+                    db.session.commit()
+                updated_events.add(db_event)
+            except Exception as e:
+                print(f"Error occurred during event processing: {e}")
+                db.session.rollback()
 
         # Delete all other events
         deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
