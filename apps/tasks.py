@@ -46,7 +46,7 @@ def sync_events(property_id=None):
 
         # Parse the ICS data
         cal = ICalendar.from_ical(response.text)
-        #print(response.text)
+        # print(response.text)
         updated_events = set()
 
         # Loop through each event in the ICS data
@@ -74,9 +74,8 @@ def sync_events(property_id=None):
                         )
                     )
                 ).first()
-                print('%s %s %s' %(event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
+                print('%s %s %s' % (event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
                 if db_event:
-                    #print(db_event, 'existing')
                     # If the event already exists, update the date start end and full day.
                     db_event.orig_summary = event.get('summary')
                     db_event.orig_description = event.get('description')
@@ -85,6 +84,7 @@ def sync_events(property_id=None):
                     if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
                         db_event.all_day = True
                     db.session.commit()
+                    print("Update : " + db_event)
                 else:
                     # If the event doesn't exist, create it
                     db_event = Event(uid=event.get('uid'),
@@ -100,6 +100,7 @@ def sync_events(property_id=None):
                         db_event.all_day = True
                     db.session.add(db_event)
                     db.session.commit()
+                    print("Create : " + db_event)
                 updated_events.add(db_event)
             except Exception as e:
                 print(f"Error occurred during event processing: {e}")
@@ -107,11 +108,14 @@ def sync_events(property_id=None):
 
         try:
             # Delete all other events
-            deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(not_(Event.id.in_([e.id for e in updated_events]))).delete()
+            deleted_events = Event.query.filter(Event.ical_id == ical.id).filter(
+                not_(Event.id.in_([e.id for e in updated_events]))).delete()
 
             # Update the last_synced field
             ical.last_synced = datetime.now()
             db.session.commit()
+            for e in deleted_events:
+                print("Delete : " + e)
 
         except Exception as e:
             print(f"Error occurred during event deletion: {e}")

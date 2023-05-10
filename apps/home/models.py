@@ -64,6 +64,16 @@ class Event(db.Model):
     attendees = db.relationship('Attendee', backref='event', lazy=True, cascade='all,delete')
     creator_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
 
+    def __repr__(self):
+        return (
+            f"Event(id={self.id}, uid={self.uid}, orig_summary={self.orig_summary}, "
+            f"orig_description={self.orig_description}, new_summary={self.new_summary}, "
+            f"new_description={self.new_description}, start_date={self.start_date}, "
+            f"end_date={self.end_date}, last_modified={self.last_modified}, "
+            f"all_day={self.all_day}, property_id={self.property_id}, "
+            f"ical_id={self.ical_id}, creator_id={self.creator_id})"
+        )
+
     def remove_attendee(self, email):
         from apps.authentication.models import Users, Notification
         attendee = Attendee.query.filter_by(event_id=self.id, email=email)
