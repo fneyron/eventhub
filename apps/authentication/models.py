@@ -48,10 +48,10 @@ class Users(db.Model, UserMixin):
     created_properties = db.relationship('Property', backref='creator', lazy=True)
 
     created_notifications = db.relationship('Notification', backref='author', lazy=True, foreign_keys="[Notification.author_id]")
-    notifications = db.relationship('Notification', backref='user', lazy=True, foreign_keys="[Notification.user_id]")
+    notifications = db.relationship('Notification', backref='user', lazy=True, foreign_keys="[Notification.user_id]", cascade='all,delete')
 
     notification_settings_id = db.Column(db.Integer, db.ForeignKey('NotificationSettings.id'))
-    notification_settings = db.relationship('NotificationSettings', backref='user', uselist=False)
+    notification_settings = db.relationship('NotificationSettings', backref='user', uselist=False, cascade='all,delete')
 
     def add_notification(self, content):
         notification = Notification(user_id=self.id, content=content, author_id=current_user.get_id())

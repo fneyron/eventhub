@@ -98,6 +98,7 @@ def register():
 
         user.language = apps.get_locale()
         db.session.add(user)
+        print("user added")
         db.session.commit()
 
         send_email_confirmation(user)

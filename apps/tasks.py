@@ -74,7 +74,7 @@ def sync_events(property_id=None):
                         )
                     )
                 ).first()
-                print('%s %s %s' % (event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
+                #print('%s %s %s' % (event.get('summary'), event.get('dtstart').dt, event.get('dtend').dt))
                 if db_event:
                     # If the event already exists, update the date start end and full day.
                     db_event.orig_summary = event.get('summary')
