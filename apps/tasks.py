@@ -84,7 +84,8 @@ def sync_events(property_id=None):
                     if 'VALUE' in event.get('dtstart').params and event.get('dtstart').params['VALUE'] == 'DATE':
                         db_event.all_day = True
                     db.session.commit()
-                    print("Update : " + db_event)
+                    print("Update")
+                    print(db_event)
                 else:
                     # If the event doesn't exist, create it
                     db_event = Event(uid=event.get('uid'),
@@ -100,7 +101,8 @@ def sync_events(property_id=None):
                         db_event.all_day = True
                     db.session.add(db_event)
                     db.session.commit()
-                    print("Create : " + db_event)
+                    print("Create")
+                    print(db_event)
                 updated_events.add(db_event)
             except Exception as e:
                 print(f"Error occurred during event processing: {e}")
@@ -115,7 +117,8 @@ def sync_events(property_id=None):
             ical.last_synced = datetime.now()
             db.session.commit()
             for e in deleted_events:
-                print("Delete : " + e)
+                print("Delete")
+                print(e)
 
         except Exception as e:
             print(f"Error occurred during event deletion: {e}")
