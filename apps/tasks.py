@@ -42,7 +42,7 @@ def sync_events(property_id=None):
 
         # Download the ICS data
         response = requests.get(ical.url)
-        print(response.status_code)
+        print("{ical.name} : {response.status_code}")
 
         # Parse the ICS data
         cal = ICalendar.from_ical(response.text)
