@@ -124,15 +124,26 @@
 
             {% if event %}
             calendar.gotoDate('{{ event.start_date }}');
+            var eventId = '{{ event.id }}';
+            var counter = 1;
             var checkEventInterval = setInterval(function() {
-              var event = calendar.getEventById(eventId);
-              console.log(event);
-              if (event) {
-                clearInterval(checkEventInterval);
-                openEditEventModalById(event.id);
-              }
-            }, 500); // check every 500ms
-
+                var event = calendar.getEventById(eventId);
+                console.log(event);
+                if (event) {
+                  clearInterval(checkEventInterval);
+                  openEditEventModalById(event.id);
+                } else {
+                  if (counter == 2) {
+                    clearInterval(checkEventInterval);
+                    swal.fire({
+                      icon: 'error',
+                      title: '{{ _('Event not found')}}',
+                      text: '{{ _('The event you were looking for could not be found.')}}',
+                    });
+                  }
+                  counter++;
+                }
+            }, 200); // check every 500ms
             {% endif %}
         }
 
