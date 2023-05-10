@@ -18,32 +18,12 @@ class Attendee(db.Model):
     event_id = db.Column(db.Integer, db.ForeignKey('Event.id'), nullable=False)
     email = db.Column(db.String(64), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    user = db.relationship('Users', backref='attendee', uselist=False)
 
     def __init__(self, email, event, user_id=None):
         self.email = email
         self.event_id = event.id
         self.user_id = user_id
-
-    @property
-    def notification_add(self, locale):
-        event = Event.query.get(self.event_id)
-        event_title = event.new_summary
-        property_name = event.property.name
-        return gettext("Invited you to the following event <a href={event_url}><b>{event}</b></a>".format(
-            user=f"{current_user.firstname} {current_user.lastname}",
-            event_url=url_for('home_blueprint.index', event_id=event.id),
-            event=f"{property_name} : {event_title}",
-        ), locale=locale)
-
-    @property
-    def notification_delete(self, locale):
-        event = Event.query.get(self.event_id)
-        event_title = event.new_summary
-        property_name = event.property.name
-        return gettext("Deleted the following event <b>{event}</b>".format(
-            user=f"{current_user.firstname} {current_user.lastname}",
-            event=f"{property_name} : {event_title}",
-        ), locale=locale)
 
 
 class Event(db.Model):
@@ -76,13 +56,24 @@ class Event(db.Model):
 
     def remove_attendee(self, email):
         from apps.authentication.models import Users, Notification
-        attendee = Attendee.query.filter_by(event_id=self.id, email=email)
-        user = Users.query.filter_by(email=email).first()
-        if user and current_user != user:
-            notification = Notification(content=attendee.first_or_404().notification_delete(locale=user.language), user=user, author=current_user)
+        attendee = Attendee.query.filter_by(email=email, event_id=self.id).first()
+        if attendee:
+            # Create a notification for the user who was removed from the event
+            content = gettext("Deleted the following event <b>{event}</b>".format(
+                user=f"{current_user.firstname} {current_user.lastname}",
+                event=f"{self.property.name} : {self.new_summary}",
+            ), locale=attendee.user.language)
+            notification = Notification(
+                content=content,
+                user_id=attendee.user_id,
+                author_id=current_user.id,
+            )
             db.session.add(notification)
-        attendee.delete()
-        db.session.commit()
+            db.session.commit()
+
+            db.session.delete(attendee)
+            db.session.commit()
+
     def add_attendee(self, email):
         from apps.authentication.models import Users, Notification
         # Check if the user already exists and if an invitation was already sent for this email
@@ -101,7 +92,12 @@ class Event(db.Model):
 
         # No notification if we are inviting ourself
         if user and current_user != user:
-            notification = Notification(content=attendee.notification_add(locale=user.language), user=user, author=current_user)
+            content = gettext("Invited you to the following event <a href={event_url}><b>{event}</b></a>".format(
+                user=f"{current_user.firstname} {current_user.lastname}",
+                event_url=url_for('home_blueprint.index', event_id=self.id),
+                event=f"{self.property.name} : {self.new_summary}",
+            ), locale=user.language)
+            notification = Notification(content=content, user=user, author=current_user)
             db.session.add(notification)
         db.session.commit()
 
