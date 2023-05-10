@@ -105,9 +105,10 @@ def register():
 
         # Delete user from session
         logout_user()
-        print(user.is_authenticated)
+        response = make_response(redirect(url_for('authentication_blueprint.route_default')))
+        response.set_cookie('session', '', expires=0)
 
-        return redirect(url_for('authentication_blueprint.route_default'))
+        return response
 
     return render_template('accounts/register.html', form=form)
 
