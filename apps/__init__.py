@@ -3,7 +3,6 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from flask_babel import gettext
 import os
 from importlib import import_module
 
@@ -73,15 +72,14 @@ def configure_admin(admin, db):
     from apps.admin import MyModelView, UserAdminView
     from apps.authentication.models import Users, NotificationSettings, Notification
     from apps.home.models import Property, ICal, Event, Attendee
-    from flask_admin.contrib.sqla import ModelView
 
     admin.add_view(UserAdminView(Users, db.session))
-    admin.add_view(ModelView(Property, db.session))
-    admin.add_view(ModelView(ICal, db.session))
-    admin.add_view(ModelView(Event, db.session))
-    admin.add_view(ModelView(Attendee, db.session))
-    admin.add_view(ModelView(NotificationSettings, db.session))
-    admin.add_view(ModelView(Notification, db.session))
+    admin.add_view(MyModelView(Property, db.session))
+    admin.add_view(MyModelView(ICal, db.session))
+    admin.add_view(MyModelView(Event, db.session))
+    admin.add_view(MyModelView(Attendee, db.session))
+    admin.add_view(MyModelView(NotificationSettings, db.session))
+    admin.add_view(MyModelView(Notification, db.session))
 
 
 def register_blueprints(app):
