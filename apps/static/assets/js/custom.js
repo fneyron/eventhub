@@ -61,6 +61,31 @@ function openEditEventModal(info) {
     }
 }
 
+function getEventContent(arg) {
+  const contentEl = document.createElement('div');
+  let title = '&nbsp;' + arg.event.title;
+  let popoverContent = '';
+  if (arg.event.extendedProps.attendees.length) {
+    const attendees = arg.event.extendedProps.attendees;
+    title = '&nbsp;<i class="fa fa-users"></i>&nbsp;' + title;
+    attendees.forEach((attendee) => {
+      popoverContent += `<p>${attendee}</p>`;
+    });
+  }
+  contentEl.innerHTML = title;
+
+  // Add popover with attendees information
+  if (popoverContent !== '') {
+    const popover = new bootstrap.Popover(contentEl, {
+      content: popoverContent,
+      trigger: 'hover',
+      html: true,
+    });
+  }
+
+  return { domNodes: [contentEl] };
+}
+
 function renderCalendar(id, events, user) {
     const calendarEl = d.getElementById(id);
     if (!calendarEl) {
@@ -114,15 +139,7 @@ function renderCalendar(id, events, user) {
           today: ''
         },
         eventSources:events,
-        eventContent: function(arg) {
-            var contentEl = document.createElement('div');
-            title = '&nbsp;' + arg.event.title;
-            if (!arg.event.extendedProps.attendees.length){
-                title = '&nbsp;<i class="fa fa-warning"></i>' + title;
-            }
-            contentEl.innerHTML = title;
-            return { domNodes: [contentEl] };
-        },
+        eventContent: getEventContent,
         /*dateClick: (d) => {
             addNewEventModal.show();
             newEventTitleInput.value = '';

@@ -249,7 +249,7 @@ def event_update(event_id):
 
     data = MultiDict(request.form)
     form = EventForm(data, obj=event)
-
+    #print(request.form)
     if form.validate_on_submit and (
         event.property.creator_id == current_user.get_id() or current_user.role in (
             UserRole.ADMIN, UserRole.EDITOR)
@@ -266,6 +266,7 @@ def event_update(event_id):
         from wtforms import ValidationError
 
         new_attendees = set(data.getlist('attendee[]'))
+
         existing_attendees = {a.email for a in event.attendees}
 
         # Remove attendees that are not in the new list
@@ -276,7 +277,7 @@ def event_update(event_id):
 
         # Add new attendees and update existing ones
         for attendee_email in new_attendees:
-
+            print(attendee_email)
             form.attendee.data = attendee_email
             validator = Email()
             try:
