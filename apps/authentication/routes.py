@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from datetime import datetime
 
-from flask import render_template, redirect, request, url_for, flash, current_app
+from flask import render_template, redirect, request, url_for, flash, current_app, make_response
 from flask_babel import _
 from flask_login import (
     current_user,
@@ -105,6 +105,7 @@ def register():
 
         # Delete user from session
         logout_user()
+        print(user.is_authenticated)
 
         return redirect(url_for('authentication_blueprint.route_default'))
 
@@ -187,7 +188,9 @@ def forgot_password():
 @blueprint.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('authentication_blueprint.login'))
+    response = make_response(redirect(url_for('authentication_blueprint.login')))
+    response.set_cookie('session', '', expires=0)
+    return response
 
 
 # Errors
