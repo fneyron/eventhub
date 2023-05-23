@@ -59,15 +59,17 @@ def get_events(property_id=None, attendees=None, start=None, end=None):
     events = []
     for event in events_query.all():
         #print(event)
-        if event.all_day and event.property.checkin_time and event.property.checkout_time:
-            event_start = datetime.combine(event.start_date.date(), event.property.checkin_time)
-            event_end = datetime.combine(event.end_date.date(), event.property.checkout_time)
-            all_day = event.all_day
-        else:
-            event_start = event.start_date
-            event_end = event.end_date
-            all_day = event.all_day
-
+        # if event.all_day and event.property.checkin_time and event.property.checkout_time:
+        #     event_start = datetime.combine(event.start_date.date(), event.property.checkin_time)
+        #     event_end = datetime.combine(event.end_date.date(), event.property.checkout_time)
+        #     all_day = event.all_day
+        # else:
+        #     event_start = event.start_date
+        #     event_end = event.end_date
+        #     all_day = event.all_day
+        event_start = event.start_date
+        event_end = event.end_date
+        all_day = event.all_day
         event_dict = {
             'id': event.id,
             'title': event.new_summary,
@@ -122,3 +124,37 @@ def create_ics(events):
     response.headers['Content-Type'] = 'text/calendar;charset=utf-8'
 
     return response
+
+def create_csv(events):
+    output = []
+    headers = ['Event Title', 'Start Date', 'End Date', 'Description', 'Attendees']
+
+    output.append(headers)
+
+    for event in events:
+        attendees = ', '.join(event['attendees'])
+        start_date = datetime.strptime(event['start'], '%Y-%m-%dT%H:%M:%S')
+        end_date = datetime.strptime(event['end'], '%Y-%m-%dT%H:%M:%S')
+
+        # Format the start and end dates based on whether it is a full-day event or not
+        if event['allDay']:
+            start_date_str = start_date.strftime('%Y-%m-%d')
+            end_date_str = end_date.strftime('%Y-%m-%d')
+        else:
+            start_date_str = start_date.strftime('%Y-%m-%d %H:%M:%S')
+            end_date_str = end_date.strftime('%Y-%m-%d %H:%M:%S')
+
+        row = [
+            event['title'],
+            start_date_str,
+            end_date_str,
+            event['description'],
+            attendees
+        ]
+        output.append(row)
+
+    csv_data = io.StringIO()
+    writer = csv.writer(csv_data)
+    writer.writerows(output)
+
+    return csv_data.getvalue()

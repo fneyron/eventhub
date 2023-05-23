@@ -25,11 +25,15 @@
     </div>
     <div class="btn-group">
         <button type="button" class="btn btn-sm btn-outline-gray-600" data-bs-toggle="modal"
-                data-bs-target="#share-calendar">{{ _('Ical') }}
+                data-bs-target="#share-calendar">{{ _('Link') }}
         </button>
         <a type="button" class="btn btn-sm btn-outline-gray-600"
-           href="{{ url_for('home_blueprint.calendar_export_ics', property=data.property.uuid) }}">{{ _('Download')
+           href="{{ url_for('home_blueprint.calendar_export_ics', property=data.property.uuid) }}">{{ _('ICS')
             }}</a>
+        <a type="button" class="btn btn-sm btn-outline-gray-600"
+           href="{{ url_for('home_blueprint.calendar_export_csv', property=data.property.uuid) }}">{{ _('CSV')
+            }}</a>
+
 
     </div>
 </div>
@@ -395,6 +399,7 @@ linked_cal_form.submit(class="btn btn-gray-800")) }}
             }
         }
     });
+
 
 
 

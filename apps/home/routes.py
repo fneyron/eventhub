@@ -2,19 +2,20 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import csv
+import io
 import os
+from datetime import datetime
 
 import requests
-import shortuuid
-from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash, Response, current_app
-from flask import send_from_directory
+from flask import Response
+from flask import render_template, request, redirect, url_for, send_file, abort, jsonify, flash
 from flask_babel import _
 from flask_login import current_user
 from icalendar import Calendar as ICalendar
 from werkzeug.datastructures import MultiDict
 
 from apps import db, celery
-from apps import login_manager
 from apps.authentication.forms import ProfileForm, ChangePasswordForm, ChangeEmailForm
 from apps.authentication.models import Users, UserRole
 from apps.authentication.util import generate_confirmation_token
@@ -22,7 +23,7 @@ from apps.decorator import authenticated, roles_required
 from apps.home import blueprint
 from apps.home.forms import PropertyForm, LinkedCalendarForm, EventForm
 from apps.home.models import Property, ICal, Event, Attendee
-from apps.home.util import get_events, create_ics
+from apps.home.util import get_events, create_ics, create_csv
 from apps.tasks import sync_events, send_email
 
 
@@ -249,9 +250,9 @@ def event_update(event_id):
 
     data = MultiDict(request.form)
     form = EventForm(data, obj=event)
-    #print(request.form)
+    # print(request.form)
     if form.validate_on_submit and (
-        event.property.creator_id == current_user.get_id() or current_user.role in (
+            event.property.creator_id == current_user.get_id() or current_user.role in (
             UserRole.ADMIN, UserRole.EDITOR)
     ):
 
@@ -272,8 +273,6 @@ def event_update(event_id):
         # Remove attendees that are not in the new list
         for attendee_email in existing_attendees - new_attendees:
             event.remove_attendee(attendee_email)
-
-
 
         # Add new attendees and update existing ones
         for attendee_email in new_attendees:
@@ -321,7 +320,7 @@ def linked_calendar_delete(id):
     return redirect(url_for('home_blueprint.property_edit', property_id=ical.property_id))
 
 
-@blueprint.route('/calendar/export', methods=['GET'])
+@blueprint.route('/calendar/export/ics', methods=['GET'])
 def calendar_export_ics():
     attendees = []
     for uuid in request.args.getlist('attendees'):
@@ -337,6 +336,31 @@ def calendar_export_ics():
     events = get_events(property_id=property,
                         attendees=attendees)
     return create_ics(events)
+
+
+@blueprint.route('/calendar/export/csv', methods=['GET'])
+def calendar_export_csv():
+    attendees = []
+    for uuid in request.args.getlist('attendees'):
+        attendees.append(Users.query.filter_by(uuid=uuid).first().email)
+
+    property = request.args.get('property')
+    if property:
+        property = Property.query.filter_by(uuid=request.args.get('property')).first().id
+
+    if not property and not attendees:
+        abort(404)
+
+    events = get_events(property_id=property, attendees=attendees)
+    print(events)
+    csv_data = create_csv(events)
+
+    response = Response(csv_data, mimetype='text/csv')
+    response.headers.set('Content-Disposition', 'attachment', filename='calendar_events.csv')
+
+    return response
+
+
 
 
 @blueprint.route('/icalendar', methods=['GET'])
