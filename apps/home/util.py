@@ -8,7 +8,7 @@ from flask import current_app, make_response, request
 from icalendar import Calendar as ICalendar, Event as ICalEvent
 from werkzeug.utils import secure_filename
 
-from apps.home.models import Event, Attendee
+from apps.home.models import Event, Attendee, Task
 
 
 class Upload():
@@ -62,15 +62,7 @@ def get_events(property_id=None, attendees=None, start=None, end=None):
 
     events = []
     for event in events_query.all():
-        # print(event)
-        # if event.all_day and event.property.checkin_time and event.property.checkout_time:
-        #     event_start = datetime.combine(event.start_date.date(), event.property.checkin_time)
-        #     event_end = datetime.combine(event.end_date.date(), event.property.checkout_time)
-        #     all_day = event.all_day
-        # else:
-        #     event_start = event.start_date
-        #     event_end = event.end_date
-        #     all_day = event.all_day
+        tasks = Task.query.filter(Task.event_id == event.id)
         event_start = event.start_date
         event_end = event.end_date
         all_day = event.all_day
@@ -88,6 +80,7 @@ def get_events(property_id=None, attendees=None, start=None, end=None):
             'description': event.new_description if event.new_description else '',
             'orig_description': event.orig_description if event.orig_description else '',
             'attendees': [a.email for a in event.attendees],
+            'tasks': [t.description for t in tasks if t.done is False],
             'color': event.ical.color,
             'allDay': all_day,
             'disabled': event.ical is not None

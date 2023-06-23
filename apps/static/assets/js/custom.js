@@ -84,6 +84,10 @@ function getEventContent(arg) {
       popoverContent += `<p>${attendee}</p>`;
     });
   }
+  if (arg.event.extendedProps.tasks.length) {
+    const tasks = arg.event.extendedProps.tasks;
+    title = '&nbsp;<i class="fa fa-list-check"></i>&nbsp;' + title;
+  }
   contentEl.innerHTML = title;
 
   // Add popover with attendees information
