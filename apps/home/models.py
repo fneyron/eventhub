@@ -25,6 +25,21 @@ class Attendee(db.Model):
         self.event_id = event.id
         self.user_id = user_id
 
+class Task(db.Model):
+    __tablename__ = 'tasks'
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('Event.id'))
+    done = db.Column(db.Boolean, default=False)
+    description = db.Column(db.String(255))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'event_id': self.event_id,
+            'description': self.description,
+            'done': self.done,
+        }
 
 class Event(db.Model):
     __tablename__ = 'Event'

@@ -34,13 +34,25 @@ function openEditEventModal(info) {
     const editEventEndDatepicker = new Datepicker(d.getElementById('dateEndEdit'), { buttonClass: 'btn' });
     editEventStartDatepicker.setDate(info.event.start);
     editEventEndDatepicker.setDate(info.event.end ? info.event.end : info.event.start);
+    $('#eventLocationEdit').text(info.event.extendedProps.address);
+    $('#eventLocationEdit').attr("href", "https://www.google.com/maps/dir/?api=1&destination="+ info.event.extendedProps.address);
+
+    // TASKS
+    getTasks(info.event.id);
+    // Event listener for "Add Task" button
+    $('#addTaskBtn').on('click',  function() {
+        // Call the addTask() function and pass the eventId
+        addTask(info.event.id);
+    });
 
     // TAGIFY
     const initialValue = info.event.extendedProps.attendees;
     tagify.loadOriginalValues(initialValue);
     tagify.on('input', onInput)
 
-    loadMap('map', info.event.extendedProps.address, info.event.extendedProps.longitude, info.event.extendedProps.latitude, 0, 12)
+    //loadMap('map', info.event.extendedProps.address, info.event.extendedProps.longitude, info.event.extendedProps.latitude, 0, 12)
+
+
 
     $('#modal-edit-event').modal('show');
     $('#modal-edit-event').on('shown.bs.modal', function () {
@@ -360,4 +372,127 @@ function initChoices(el) {
         itemSelectText: '',
         renderChoiceLimit: -1,
     });
+}
+// Function to handle adding a new task
+function addTask(eventId) {
+  // Get the task description from the input field
+  var description = document.getElementById('taskInput').value;
+
+  // Create a new task object
+  var task = {
+    event_id: eventId,
+    description: description
+  };
+
+  // Send an AJAX request to add the task
+  $.ajax({
+    url: '/tasks',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(task),
+    success: function(response) {
+      // Task added successfully
+      // Refresh the task list
+      getTasks(eventId);
+      // Clear the task input field
+      document.getElementById('taskInput').value = '';
+    },
+    error: function(error) {
+      // Error occurred while adding the task
+      console.log(error);
+    }
+  });
+}
+
+// Function to handle deleting a task
+function deleteTask(taskId, eventId) {
+  // Send an AJAX request to delete the task
+  $.ajax({
+    url: '/tasks/' + taskId,
+    type: 'DELETE',
+    success: function(response) {
+      // Task deleted successfully
+      // Refresh the task list
+      getTasks(eventId);
+    },
+    error: function(error) {
+      // Error occurred while deleting the task
+      console.log(error);
+    }
+  });
+}
+
+// Function to update the task status
+function updateTaskStatus(taskId, done) {
+  // Send an AJAX request to update the task status
+  $.ajax({
+    url: '/tasks/' + taskId + '/update',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ done: done }),
+    success: function(response) {
+      // Task status updated successfully
+      // Perform any necessary actions
+    },
+    error: function(error) {
+      // Error occurred while updating the task status
+      console.log(error);
+    }
+  });
+}
+
+// Function to get tasks for an event
+function getTasks(eventId) {
+  // Send an AJAX request to get the tasks for the event
+  $.ajax({
+    url: '/tasks/' + eventId,
+    type: 'GET',
+    success: function(tasks) {
+      // Clear the task list
+      var taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+
+      // Iterate over the tasks and add them to the task list
+      tasks.forEach(function(task) {
+        var listItem = document.createElement('li');
+        if (task.done) {
+          listItem.className = 'task-item small rounded-pill list-group-item d-flex justify-content-between align-items-center checked';
+        } else {
+          listItem.className = 'task-item small rounded-pill list-group-item d-flex justify-content-between align-items-center';
+        }
+        listItem.addEventListener('click', function(ev) {
+            listItem.classList.toggle('checked');
+            updateTaskStatus(task.id, listItem.classList.contains('checked'));
+        }, false);
+
+
+
+        var taskText = document.createElement('span');
+        taskText.textContent = task.description;
+        taskText.className = 'task-description'
+        listItem.appendChild(taskText);
+
+//        var checkButton = document.createElement('a');
+//        checkButton.className = 'text-success fa fa-check fa-xs check-icon';
+//        checkButton.addEventListener('click', function(ev) {
+//          ev.target.classList.toggle('checked');
+//            updateTaskStatus(task.id, ev.target.classList.contains('checked'));
+//        }, false);
+//        listItem.appendChild(checkButton);
+
+        var deleteButton = document.createElement('a');
+        deleteButton.className = 'text-danger fa fa-xmark fa-sm delete-icon';
+        deleteButton.addEventListener('click', function() {
+          deleteTask(task.id, eventId);
+        });
+        listItem.appendChild(deleteButton);
+
+        taskList.appendChild(listItem);
+      });
+    },
+    error: function(error) {
+      // Error occurred while getting the tasks
+      console.log(error);
+    }
+  });
 }

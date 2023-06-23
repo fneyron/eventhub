@@ -71,12 +71,13 @@ def register_extensions(app):
 def configure_admin(admin, db):
     from apps.admin import MyModelView, UserAdminView
     from apps.authentication.models import Users, NotificationSettings, Notification
-    from apps.home.models import Property, ICal, Event, Attendee
+    from apps.home.models import Property, ICal, Event, Attendee, Task
 
     admin.add_view(UserAdminView(Users, db.session))
     admin.add_view(MyModelView(Property, db.session))
     admin.add_view(MyModelView(ICal, db.session))
     admin.add_view(MyModelView(Event, db.session))
+    admin.add_view(MyModelView(Task, db.session))
     admin.add_view(MyModelView(Attendee, db.session))
     admin.add_view(MyModelView(NotificationSettings, db.session))
     admin.add_view(MyModelView(Notification, db.session))

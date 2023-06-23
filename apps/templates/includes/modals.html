@@ -76,9 +76,10 @@
         <form id="editEventForm" class="modal-content" method="POST">
             <div class="modal-body">
                 {{ form.csrf_token }}
-                {{ form.id}}
+                {{ form.id }}
                 <div class="mb-4">
-                    {{ form.title.label }} <a data-bs-toggle="popover" data-bs-title="{{ _('Original Title')}}" data-bs-placement="top"
+                    {{ form.title.label }} <a data-bs-toggle="popover" data-bs-title="{{ _('Original Title')}}"
+                                              data-bs-placement="top"
                                               id="{{ form.title.id }}-tooltip"><i
                         class="fa fa-info-circle ml-1"></i></a>
                     {{ form.title(class='form-control') }}
@@ -104,7 +105,9 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    {{ form.description.label }} <a data-bs-toggle="popover" data-bs-placement="top" data-bs-title="{{ _('Original Description')}}" id="{{ form.description.id }}-tooltip"><i
+                    {{ form.description.label }} <a data-bs-toggle="popover" data-bs-placement="top"
+                                                    data-bs-title="{{ _('Original Description')}}"
+                                                    id="{{ form.description.id }}-tooltip"><i
                         class="fa fa-info-circle ml-1"></i></a>
                     {{ form.description(class='form-control') }}
                     <small id="{{ form.description.id }}-help" class="form-text text-muted">
@@ -148,7 +151,30 @@
                         </div>
                     </div>
                 </div>
-                <div id="map" style="height: 200px;"></div>
+                <div class="mb-4">
+                    <label>{{ _('Location') }}</label>
+                    <div>
+                        <i class="fa fa-location-dot me-2"></i><a id="eventLocationEdit" class="small"
+                                                                  target="_blank"></a>
+                    </div>
+                </div>
+                <div id="eventTasks">
+                    {{ form.task.label }}
+                    <div>
+                        <ul id="taskList" class="list-group mb-3 task-list">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="task-text flex-grow-1">Task 1</span>
+                                <a href="#" class="task-action me-3"><i class="fas text-success fa-check"></i></a>
+                                <a href="#" class="task-action"><i class="fas text-danger fa-xmark"></i></a>
+                            </li>
+                        </ul>
+                        <div class="input-group">
+                            {{ form.task(class="form-control") }}
+                            <a id="addTaskBtn" class="input-group-text"><i class="fa fa-sm fa-plus"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!--<div id="map" style="height: 200px;"></div>-->
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-gray-800 me-2" id="editEvent">Update event</button>

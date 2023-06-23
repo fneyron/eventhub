@@ -49,7 +49,9 @@ class EventForm(FlaskForm):
     end_date = DateTimeField(_l('Select End Date'), id='dateEndEdit', render_kw={"placeholder": _l('dd/mm/yyyy')},
                              format='%Y-%m-%d %H:%M', validators=[DataRequired()])
     id = HiddenField(id='eventIdEdit')
-    location = StringField('Location')
+    location = StringField(_l('Location'))
     description = TextAreaField(_l('Description'), id='eventDescriptionEdit')
     attendee = StringField(_l('Attendee'), id='eventAttendeeEdit',
                            description=_l('Please, add attendee email address of people in charge'))
+    task = StringField(_l('Task'), id='taskInput')
+

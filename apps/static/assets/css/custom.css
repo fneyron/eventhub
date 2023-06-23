@@ -139,3 +139,30 @@ ul {
 div[class$="--MapboxSearch"] > div[class$="--Results"] {
   z-index: 2000 !important;
 }
+
+/* TASKS */
+.task-list {
+}
+
+li.task-item {
+  list-style-type: disc;
+}
+
+li.task-item.checked .task-description {
+  text-decoration: line-through;
+}
+
+li.task-item:hover{
+    background: #EEE;
+    cursor: pointer;
+}
+
+.task-description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-button {
+  flex-shrink: 0;
+}

@@ -22,7 +22,7 @@ from apps.authentication.util import generate_confirmation_token
 from apps.decorator import authenticated, roles_required
 from apps.home import blueprint
 from apps.home.forms import PropertyForm, LinkedCalendarForm, EventForm
-from apps.home.models import Property, ICal, Event, Attendee
+from apps.home.models import Property, ICal, Event, Attendee, Task
 from apps.home.util import get_events, create_ics, create_csv
 from apps.tasks import sync_events, send_email
 
@@ -202,6 +202,59 @@ def profile_update():
     # Return a JSON response indicating success
     return jsonify({'status': 'success'})
 
+
+# Route to add a task to an event
+@blueprint.route('/tasks', methods=['POST'])
+def add_task():
+    event_id = request.json['event_id']
+    description = request.json['description']
+
+    task = Task(event_id=event_id, description=description)
+    db.session.add(task)
+    db.session.commit()
+
+    return jsonify({'message': 'Task added successfully'})
+
+@blueprint.route('/tasks/<task_id>/update', methods=['POST'])
+def update_task_status(task_id):
+    # Retrieve the 'done' parameter from the request data
+    data = request.get_json()
+    done = data.get('done')
+
+    # Find the task by its ID
+    task = Task.query.get(task_id)
+
+    if task:
+        # Update the task status
+        task.done = done
+        db.session.commit()
+
+        # Return a JSON response indicating the success of the update
+        return jsonify({'success': True})
+    else:
+        # Return a JSON response with an error if the task is not found
+        return jsonify({'success': False, 'error': 'Task not found'})
+
+# Route to delete a task
+@blueprint.route('/tasks/<task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    task = Task.query.get(task_id)
+
+    if not task:
+        return jsonify({'error': 'Task not found'}), 404
+
+    db.session.delete(task)
+    db.session.commit()
+
+    return jsonify({'message': 'Task deleted successfully'})
+
+# Route to get tasks for an event
+@blueprint.route('/tasks/<event_id>', methods=['GET'])
+def get_tasks(event_id):
+    tasks = Task.query.filter_by(event_id=event_id).all()
+    tasks_data = [task.to_dict() for task in tasks]
+
+    return jsonify(tasks_data)
 
 @blueprint.route('/image/<filename>', methods=['GET'])
 def image(filename):

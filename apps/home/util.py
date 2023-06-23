@@ -40,25 +40,29 @@ class Upload():
         return '.' in self.filename and self.filename.rsplit('.', 1)[1].lower() in current_app.config[
             'ALLOWED_EXTENSIONS']
 
+
 def get_events(property_id=None, attendees=None, start=None, end=None):
     events_query = Event.query
-
     if property_id:
-        events_query = events_query.filter(property_id == property_id)
-
+        events_query = (
+            events_query
+            .filter(Event.property_id == property_id)
+        )
     if attendees:
         events_query = (
             events_query
             .join(Attendee)
             .filter(Attendee.email.in_(attendees))
         )
-
     if start and end:
-        events_query = events_query.filter(Event.end_date >= start, Event.start_date <= end)
+        events_query = (
+            events_query
+            .filter(Event.end_date >= start, Event.start_date <= end)
+        )
 
     events = []
     for event in events_query.all():
-        #print(event)
+        # print(event)
         # if event.all_day and event.property.checkin_time and event.property.checkout_time:
         #     event_start = datetime.combine(event.start_date.date(), event.property.checkin_time)
         #     event_end = datetime.combine(event.end_date.date(), event.property.checkout_time)
@@ -124,6 +128,7 @@ def create_ics(events):
     response.headers['Content-Type'] = 'text/calendar;charset=utf-8'
 
     return response
+
 
 def create_csv(events):
     output = []
