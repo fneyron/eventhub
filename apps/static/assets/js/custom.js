@@ -190,7 +190,6 @@ function renderCalendar(id, events, user) {
 
         var eventId = $('#eventIdEdit').val()
         var editEvent = calendar.getEventById(eventId);
-        console.log(editEvent);
 
         var startDate = moment($('#dateStartEdit').val()).format('YYYY-MM-DD HH:mm');
         var endDate = moment($('#dateEndEdit').val()).format('YYYY-MM-DD HH:mm');
@@ -212,7 +211,7 @@ function renderCalendar(id, events, user) {
             'start_time': moment(editEvent.start).format('YYYY-MM-DD HH:mm'),
             'end_time': moment(editEvent.end).format('YYYY-MM-DD HH:mm'),
         };
-        console.log(eventData);
+
         $.ajax({
             type: "POST",
             url: "/event/" + editEvent.id + "/update",
@@ -231,7 +230,6 @@ function renderCalendar(id, events, user) {
                             $field = $field.closest('div').find('tags');
                         }
                         $field.addClass('is-invalid');
-                        console.log($field.next('.invalid-feedback'));
                         $field.closest('div').find('.invalid-feedback').text(error);
 
                     }

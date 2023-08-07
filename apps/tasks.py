@@ -41,11 +41,16 @@ def sync_events(property_id=None):
             continue
 
         # Download the ICS data
-        response = requests.get(ical.url)
-        print("{ical.name} : {response.status_code}")
+        try:
+            response = requests.get(ical.url)
+            print(f"{ical.name} : {response.status_code}")
 
-        # Parse the ICS data
-        cal = ICalendar.from_ical(response.text)
+            # Parse the ICS data
+            cal = ICalendar.from_ical(response.text)
+        except Exception as e:
+            print(f"Error while processing {ical.url}: {e}")
+            continue
+
         # print(response.text)
         updated_events = set()
 
