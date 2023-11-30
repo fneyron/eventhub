@@ -36,7 +36,7 @@ class Config(object):
     MAPBOX_TOKEN = os.getenv('MAPBOX_TOKEN')
 
     # EMAIL Server configuration
-    MAIL_SERVER = 'mail.gandi.net'
+    MAIL_SERVER = 'ssl0.ovh.net'
     MAIL_SENDER = ('EventHub', 'contact@dataik.com')
     MAIL_PORT = 465
     MAIL_USE_SSL = True
